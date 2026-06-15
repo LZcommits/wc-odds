@@ -351,7 +351,7 @@ def build_detail(cfg, rows, rich):
                 f'<div class="panel"><h2>实时 +EV(我的概率 × 锐庄赔率)</h2><table><tr><th>结果</th><th>我估</th><th>锐庄</th><th>期望值</th><th>判定</th></tr>{evtable(rows, cfg)}</table></div>'
                 f'<div class="panel"><h2>推理过程:"我估"是怎么来的</h2>{reasoning_html(cfg)}</div>'
                 f'<div class="panel"><h2>逐比分赔率(书商原盘 vs 泊松)</h2>{score_odds_html(rich, grid)}</div>'
-                f'<div class="panel"><h2>比分概率(泊松反推 Top6)</h2>{scores_html(lh, la, grid)}</div>'
+                f'<div class="panel"><h2>比分概率 Top6</h2>{scores_html(lh, la, grid)}</div>'
                 f'<div class="panel"><h2>全盘口快照(锐庄)</h2>{markets_html(cfg, rows, rich)}</div>'
                 f'<div class="panel"><h2>对阵分析</h2>{analysis_html(cfg)}</div>')
     html = (f'<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
