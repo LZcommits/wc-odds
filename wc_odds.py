@@ -162,9 +162,15 @@ except Exception as e: data = []; print('bulk error', e)
 def find(cfg): return next((m for m in data if m['home_team'] == cfg['home'] and m['away_team'] == cfg['away']), None)
 def load_rows(slug):
     p = os.path.join(DATA_DIR, slug+'.jsonl')
-    rows = [json.loads(l) for l in open(p)] if os.path.exists(p) else []
-    for r in rows:
-        if 'devig' not in r and 'devig_pin' in r: r['devig'] = r['devig_pin']
+    rows = []
+    if os.path.exists(p):
+        for l in open(p):
+            l = l.strip()
+            if not l: continue
+            try: r = json.loads(l)
+            except Exception: continue
+            if 'devig' not in r and 'devig_pin' in r: r['devig'] = r['devig_pin']
+            rows.append(r)
     return [r for r in rows if r.get('devig')]
 
 def process(cfg):
