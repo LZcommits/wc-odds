@@ -305,7 +305,22 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .track-bar{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin:10px 0 8px}
 .track-bar i{display:block;height:100%;background:var(--lime);border-radius:3px}
 .track-note{font-size:11px;color:var(--sec);opacity:.7;font-style:italic;line-height:1.5}
-.pcard{background:rgba(13,28,45,.55);border:1px solid var(--line);border-left:3px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.pcard{display:block;background:rgba(13,28,45,.55);border:1px solid var(--line);border-left:3px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;transition:background .15s}
+.pcard:hover{background:rgba(20,38,58,.7)}
+.pmore{margin-left:auto;font-size:11px;color:var(--lime);font-weight:600;white-space:nowrap}
+.pd-flags{font-size:38px;line-height:1.1}
+.pd-sc{font-family:'JetBrains Mono',monospace;font-size:34px;font-weight:800;color:var(--on);margin:0 10px;vertical-align:middle}
+.pd-tn{font-size:15px;color:var(--sec);margin-top:6px}
+.pd-meta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--sec);opacity:.7;margin-top:6px}
+.pva{display:flex;align-items:center;justify-content:space-around;gap:8px;margin-bottom:12px}
+.pva-col{flex:1;text-align:center}
+.pva-lbl{font-size:11px;color:var(--sec);opacity:.7;margin-bottom:6px}
+.pva-sc{font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:800;color:var(--on);letter-spacing:.02em}
+.pva-sc.lime{color:var(--lime)}
+.pva-sub{font-size:10px;color:var(--sec);opacity:.6;margin-top:4px}
+.pva-vs{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--sec);opacity:.5;flex:0 0 auto}
+.pva-note{font-size:12px;color:var(--sec);line-height:1.6;border-top:1px solid rgba(255,255,255,.06);padding-top:10px}
+.pva-note b{color:var(--lime)}
 .ptop{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .pteams{font-size:15px;font-weight:600;color:var(--on)}
 .psc{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;margin:0 6px;letter-spacing:.02em}
@@ -575,7 +590,9 @@ def build_past():
                       'devig': d, 'tier': tier, 'fav': fav, 'dir': dirn, 'kind': kind,
                       'hit': bool(call_hit(kind, fav, gh, ga))}
     with open(PAST_CACHE, 'w') as fp: json.dump(cache, fp, ensure_ascii=False, indent=0)
-    out = list(cache.values())
+    out = []
+    for fid, v in cache.items():
+        v = dict(v); v['fid'] = fid; out.append(v)  # 注入 fixture id 供详情页链接
     out.sort(key=lambda x: x['date'], reverse=True)
     return out
 
@@ -905,9 +922,51 @@ def past_card(p):
                 f'<div class="pmeta"><span class="pchip">{ds}</span><span class="pval">（无赛前赔率,仅记录比分）</span></div></div>')
     ok = p.get('hit'); accent = '#CCFF00' if ok else 'rgba(255,255,255,.14)'
     badge = '<span class="pres ok">✓ 命中</span>' if ok else '<span class="pres no">✗ 未中</span>'
-    return (f'<div class="pcard" style="border-left-color:{accent}"><div class="ptop">{teams}{badge}</div>'
+    return (f'<a class="pcard" style="border-left-color:{accent}" href="past_{p["fid"]}.html"><div class="ptop">{teams}{badge}</div>'
             f'<div class="pmeta"><span class="pchip">{ds}</span><span class="pchip">{p["tier"]}</span>'
-            f'<span class="pval">价值:<b>{p["dir"]}</b></span></div></div>')
+            f'<span class="pval">价值:<b>{p["dir"]}</b></span><span class="pmore">推演 ›</span></div></a>')
+
+def build_past_detail(p):
+    if not p.get('devig'): return
+    fid = p['fid']; cnh = cn_of(p['h']); cna = cn_of(p['a']); fh = flag_of(p['h']); fa = flag_of(p['a'])
+    gh, ga = p['gh'], p['ga']; d = p['devig']
+    try:
+        bj = datetime.datetime.fromisoformat(p['date']).astimezone(BJ); ds = f'{bj.month}/{bj.day} {bj.hour:02d}:{bj.minute:02d}'
+    except Exception: ds = p['date'][:10]
+    lh, la, grid = poisson_calc(d['home'], d['away'], None)
+    pred = sorted(grid.items(), key=lambda x: -x[1])[0][0]; pred_sc = pred.replace('-', ' - ')
+    ok = p.get('hit'); badge = '<span class="pres ok">✓ 方向命中</span>' if ok else '<span class="pres no">✗ 方向未中</span>'
+    title = f'{cnh} vs {cna}'
+    dv = lambda k: f'{d[k]*100:.0f}%'
+    head_card = (f'<div class="glass" style="text-align:center">'
+                 f'<div class="pd-flags">{fh} <span class="pd-sc">{gh} - {ga}</span> {fa}</div>'
+                 f'<div class="pd-tn">{cnh} vs {cna}</div>'
+                 f'<div style="margin:8px 0">{badge}</div>'
+                 f'<div class="pd-meta">{ds}(北京) · 已结束 FT · {p["tier"]}</div></div>')
+    pva = (f'<div class="glass">{sec_head("compare_arrows","模型推测 vs 实际")}'
+           f'<div class="pva"><div class="pva-col"><div class="pva-lbl">模型最可能比分</div>'
+           f'<div class="pva-sc lime">{pred_sc}</div><div class="pva-sub">赛前去水位 · 泊松反推</div></div>'
+           f'<div class="pva-vs">VS</div>'
+           f'<div class="pva-col"><div class="pva-lbl">实际比分</div>'
+           f'<div class="pva-sc">{gh} - {ga}</div><div class="pva-sub">真实赛果</div></div></div>'
+           f'<div class="pva-note">价值方向:<b>{p["dir"]}</b> &nbsp;→&nbsp; {"✓ 命中" if ok else "✗ 未中"}'
+           f'(口径:{"①档悬殊看热门没被血洗、净胜≤1" if p["kind"]=="anti_blowout" else "②③档看热门没赢、出现平或冷门"})</div></div>')
+    grid_card = f'<div class="glass">{sec_head("grid_view","模型推测比分分布 Top 6")}{scores_grid(lh, la, grid)}</div>'
+    devig_card = (f'<div class="glass">{sec_head("balance","赛前市场预期(锐庄去水位)")}'
+                  f'<div class="tp-pct"><span style="color:#CCFF00">{cnh} {dv("home")}</span>'
+                  f'<span style="color:#8e9379">平 {dv("draw")}</span>'
+                  f'<span style="color:#FF0055">{cna} {dv("away")}</span></div>'
+                  f'<div class="tp-bar"><i style="flex:{max(d["home"]*100,3):.0f};background:#CCFF00"></i>'
+                  f'<i style="flex:{max(d["draw"]*100,3):.0f};background:#3f465c"></i>'
+                  f'<i style="flex:{max(d["away"]*100,3):.0f};background:#FF0055"></i></div>'
+                  f'<div class="vs-note">这是赛前市场对该场的真实定价(去水位);模型据此反推价值方向,再与实际赛果对账。</div></div>')
+    body = (f'{APPBAR}<main>'
+            f'<a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
+            f'<div class="sub">战绩复盘 · {ds}</div><div style="height:12px"></div>'
+            f'{head_card}{pva}{grid_card}{devig_card}'
+            f'<div class="foot">价值≠会赢、看长期;赛前去水位自动判定方向,逐场仅供参考</div></main>')
+    open(os.path.join(DOCS, f'past_{fid}.html'), 'w').write(
+        f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title)}</head><body>{body}</body></html>')
 
 def build_index(items):
     mc = ''
@@ -927,6 +986,7 @@ def build_index(items):
         mc += (f'<a class="mcard" style="border-left-color:{accent}" href="{cfg["slug"]}.html">'
                f'{topbar}{tier_chips(cfg, last["hrs_to_ko"])}{probrow(d, cfg)}{minibar(d)}</a>')
     past = build_past()
+    for p in past: build_past_detail(p)  # 为每场已结束比赛生成"推测vs实际"复盘页
     scored = [p for p in past if p.get('devig')]
     nhit = sum(1 for p in scored if p.get('hit')); ntot = len(scored)
     pct = round(nhit/ntot*100) if ntot else 0
