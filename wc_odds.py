@@ -5,9 +5,9 @@ import json, os, sys, math, datetime, urllib.request
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(ROOT, 'data'); DOCS = os.path.join(ROOT, 'docs')
 os.makedirs(DATA_DIR, exist_ok=True); os.makedirs(DOCS, exist_ok=True)
-KEY = os.environ.get('ODDS_API_KEY', '').strip()
-if not KEY: sys.exit('缺少 ODDS_API_KEY 环境变量')
 AFKEY = os.environ.get('API_FOOTBALL_KEY', '').strip()
+if not AFKEY: sys.exit('缺少 API_FOOTBALL_KEY 环境变量')
+KEY = os.environ.get('ODDS_API_KEY', '').strip()  # The Odds API 已弃用,保留仅作可选回退
 TZ = datetime.timezone.utc
 def ko(y, mo, d, h): return datetime.datetime(y, mo, d, h, 0, 0, tzinfo=TZ)
 
@@ -230,33 +230,86 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .opta-bar i{display:block;border-radius:999px}
 .opta-val{font-style:italic;font-size:12.5px;color:var(--sec)}"""
 
-def get(url):
-    with urllib.request.urlopen(url, timeout=30) as r: return json.load(r)
-def fetch_bulk():
-    return get("https://api.the-odds-api.com/v4/sports/soccer_fifa_world_cup/odds"
-               f"?apiKey={KEY}&regions=eu,uk&markets=h2h,totals,spreads&oddsFormat=decimal&dateFormat=iso")
-def fetch_extra(eid):
-    try:
-        return get("https://api.the-odds-api.com/v4/sports/soccer_fifa_world_cup/events/"
-                   f"{eid}/odds?apiKey={KEY}&regions=eu&markets=btts,double_chance&oddsFormat=decimal")
-    except Exception: return None
-def fetch_exact_score(afid):
+# ---------- API-Football 赔率源(单次 /odds 调用拿全 14 家书商×所有盘口)----------
+PIN = 4  # Pinnacle(锐庄)bookmaker id
+def fetch_af_odds(afid):
+    """返回该场全部 bookmakers(每家含全部 bet 种类),失败返回 None。每场每次仅 1 个请求。"""
     if not AFKEY or not afid: return None
     try:
-        req = urllib.request.Request(f"https://v3.football.api-sports.io/odds?fixture={afid}&bet=10",
+        req = urllib.request.Request(f"https://v3.football.api-sports.io/odds?fixture={afid}",
                                      headers={'x-apisports-key': AFKEY})
         d = json.load(urllib.request.urlopen(req, timeout=30))
     except Exception as e: print('api-football error', e); return None
     resp = d.get('response', [])
-    if not resp: return None
+    return resp[0].get('bookmakers') if resp else None
+def af_book(bms, bid): return next((b for b in bms if b['id'] == bid), None) if bms else None
+def af_bet(book, betid):
+    if not book: return None
+    bt = next((x for x in book.get('bets', []) if x['id'] == betid), None)
+    return bt['values'] if bt else None
+def af_vals(bms, betid, prefer=PIN):
+    """优先取 Pinnacle 的该盘口,缺则取第一家有此盘口的书商。"""
+    v = af_bet(af_book(bms, prefer), betid)
+    if v: return v
+    for b in (bms or []):
+        v = af_bet(b, betid)
+        if v: return v
+    return None
+def af_h2h(vals):
+    o = {}
+    for v in (vals or []):
+        k = v['value'].lower()
+        if k in ('home', 'draw', 'away'):
+            try: o[k] = float(v['odd'])
+            except Exception: pass
+    return o if len(o) == 3 else None
+def af_tot(vals):  # 大小球 2.5
+    if not vals: return None
+    o = {}
+    for v in vals:
+        s = v['value'].lower()
+        if '2.5' in s:
+            if s.startswith('over'):
+                try: o['over'] = float(v['odd'])
+                except Exception: pass
+            elif s.startswith('under'):
+                try: o['under'] = float(v['odd'])
+                except Exception: pass
+    return o or None
+def af_spread(bms):  # 亚盘:取主客赔率最接近(主盘口)的让球线
+    vals = af_vals(bms, 4)
+    if not vals: return None
+    g = {}
+    for v in vals:
+        p = v['value'].rsplit(' ', 1)
+        if len(p) != 2: continue
+        side, num = p[0].strip(), p[1].strip()
+        try: g.setdefault(num, {})[side] = float(v['odd'])
+        except Exception: pass
+    cand = [(n, d) for n, d in g.items() if 'Home' in d and 'Away' in d]
+    if not cand: return None
+    n, d = min(cand, key=lambda x: abs(x[1]['Home'] - x[1]['Away']))
+    try: pt = float(n)
+    except Exception: pt = None
+    return {'pt': pt, 'home': d['Home'], 'away': d['Away']}
+def af_pair(vals, keys):  # 双方进球/双重机会:取指定取值
+    if not vals: return None
+    o = {}
+    for v in vals:
+        if v['value'] in keys:
+            try: o[v['value']] = float(v['odd'])
+            except Exception: pass
+    return o or None
+def af_score(bms):  # 逐比分:取盘口条目最多的书商(通常 Pinnacle 121 条)
     cands = []
-    for bm in resp[0].get('bookmakers', []):
-        vals = bm['bets'][0]['values'] if bm.get('bets') else []
+    for b in (bms or []):
+        vals = af_bet(b, 10)
+        if not vals: continue
         parsed = {}
         for v in vals:
             try: parsed[v['value'].replace(':', '-').strip()] = float(v['odd'])
             except Exception: pass
-        if parsed: cands.append((len(parsed), bm['name'], parsed))
+        if parsed: cands.append((len(parsed), b['name'], parsed))
     if not cands: return None
     cands.sort(key=lambda x: -x[0])
     _, name, parsed = cands[0]
@@ -319,10 +372,7 @@ def poisson_calc(p_h, p_a, under_prob):
     return lh, la, grid
 
 now = datetime.datetime.now(TZ)
-try: data = fetch_bulk()
-except Exception as e: data = []; print('bulk error', e)
 
-def find(cfg): return next((m for m in data if m['home_team'] == cfg['home'] and m['away_team'] == cfg['away']), None)
 def load_rows(slug):
     p = os.path.join(DATA_DIR, slug+'.jsonl'); rows = []
     if os.path.exists(p):
@@ -336,34 +386,27 @@ def load_rows(slug):
     return [r for r in rows if r.get('devig')]
 
 def process(cfg):
-    m = find(cfg); rich = {}
-    if m:
-        books = m['bookmakers']
-        pin = next((b for b in books if b['key'] == 'pinnacle'), None)
-        ph = h2h(pin, cfg['home'], cfg['away']) if pin else None
-        allh = [x for x in (h2h(b, cfg['home'], cfg['away']) for b in books) if x]
+    rich = {}; hrs = round((cfg['ko']-now).total_seconds()/3600, 1)
+    bms = fetch_af_odds(AFID.get(cfg['slug'])) if hrs > 0 else None  # 仅赛前采样,每场 1 个请求
+    if bms:
+        pinb = af_book(bms, PIN)
+        ph = af_h2h(af_bet(pinb, 1))                       # 锐庄胜平负
+        allh = [h for h in (af_h2h(af_bet(b, 1)) for b in bms) if h]
         soft = {k: round(sum(x[k] for x in allh)/len(allh), 3) for k in ('home','draw','away')} if allh else None
         src = ph or soft
-        hrs = round((cfg['ko']-now).total_seconds()/3600, 1)
+        tot = af_tot(af_bet(pinb, 5)) or af_tot(af_vals(bms, 5))  # 锐庄大小球,缺则软庄
         if src:
             dv = {k: round(v, 4) for k, v in devig(src).items()}
             rec = {'ts': now.isoformat(timespec='minutes'), 'hrs_to_ko': hrs, 'pin_h2h': ph,
-                   'soft_h2h': soft, 'pin_tot25': totals(pin) if pin else None, 'devig': dv, 'n_books': len(allh)}
+                   'soft_h2h': soft, 'pin_tot25': tot, 'devig': dv, 'n_books': len(allh)}
             with open(os.path.join(DATA_DIR, cfg['slug']+'.jsonl'), 'a') as f:
                 f.write(json.dumps(rec, ensure_ascii=False)+'\n')
-            print('sampled', cfg['slug'], hrs, 'h')
-        rich['spread'] = spreads(pin, cfg['home']) if pin else None
-        rich['tot'] = totals(pin) if pin else None
-        if 0 < hrs < 48:
-            ev = fetch_extra(m['id'])
-            if ev and ev.get('bookmakers'):
-                bks = ev['bookmakers']
-                bt = next((mkt(b, 'btts') for b in bks if mkt(b, 'btts')), None)
-                dc = next((mkt(b, 'double_chance') for b in bks if mkt(b, 'double_chance')), None)
-                rich['btts'] = {o['name']: o['price'] for o in bt['outcomes']} if bt else None
-                rich['dc'] = {o['name']: o['price'] for o in dc['outcomes']} if dc else None
-            so = fetch_exact_score(AFID.get(cfg['slug']))
-            if so: rich['score_odds'] = so
+            print('sampled', cfg['slug'], hrs, 'h', '| books', len(allh))
+        rich['spread'] = af_spread(bms)
+        rich['tot'] = tot
+        rich['btts'] = af_pair(af_vals(bms, 8), ('Yes', 'No'))
+        rich['dc'] = af_pair(af_vals(bms, 12), ('Home/Draw', 'Home/Away', 'Draw/Away'))
+        rich['score_odds'] = af_score(bms)
     return rich
 
 def L(cfg): return {'home': cfg['cn_h'], 'draw': '平局', 'away': cfg['cn_a']}
@@ -522,7 +565,8 @@ def markets_html(cfg, rows, rich):
         r += f'<tr><td>让球(亚盘)</td><td class="num">{l["home"]} {sp["pt"]:+g} @{sp["home"]} · {l["away"]} {-sp["pt"]:+g} @{sp.get("away","-")}</td></tr>'
     if rich.get('btts'): r += f'<tr><td>双方进球</td><td class="num">是 {rich["btts"].get("Yes","-")} · 否 {rich["btts"].get("No","-")}</td></tr>'
     if rich.get('dc'):
-        r += f'<tr><td>双重机会</td><td class="num">{" · ".join(f"{k} {v}" for k,v in rich["dc"].items())}</td></tr>'
+        dcn = {'Home/Draw': f'{l["home"]}或平', 'Home/Away': f'{l["home"]}或{l["away"]}', 'Draw/Away': f'平或{l["away"]}'}
+        r += f'<tr><td>双重机会</td><td class="num">{" · ".join(f"{dcn.get(k,k)} {v}" for k,v in rich["dc"].items())}</td></tr>'
     return f'<table>{r}</table>' if r else '<p class="note">暂无盘口数据</p>'
 
 def matchup_analysis(cfg):
