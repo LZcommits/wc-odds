@@ -300,7 +300,7 @@ def score_odds_html(rich, grid):
     top = sorted(odds.items(), key=lambda x: x[1])[:12]  # 赔率低=书商认为越可能
     h = (f'<div class="note" style="margin-bottom:6px">书商:{so["book"]} · 共 {len(odds)} 个比分 · '
          f'EV=泊松%×赔率,&gt;1 即该比分有价值</div>'
-         f'<table><tr><th>比分</th><th>书商赔率</th><th>泊松%</th><th>EV</th></tr>')
+         f'<table><tr><th>比分</th><th>盘口</th><th>模型推测</th><th>期望值</th></tr>')
     for s, o in top:
         pp = grid.get(s, 0); ev = pp*o
         bg = ' style="background:#dcfce7"' if ev > 1.05 else ''
@@ -348,7 +348,7 @@ def build_detail(cfg, rows, rich):
         body = (f'<div class="row">{cards(rows, cfg)}</div>'
                 f'<div class="panel"><h2>移盘曲线(锐庄去水位概率)</h2>{sparkline(rows)}'
                 f'<div style="font-size:12px;color:#666;margin-top:2px"><span style="color:#2563eb">{l["home"]}</span> <span style="color:#6b7280">平</span> <span style="color:#d97706">{l["away"]}</span> · 左早→右临场</div></div>'
-                f'<div class="panel"><h2>实时 +EV(我的概率 × 锐庄赔率)</h2><table><tr><th>结果</th><th>我估</th><th>锐庄</th><th>EV</th><th>判定</th></tr>{evtable(rows, cfg)}</table></div>'
+                f'<div class="panel"><h2>实时 +EV(我的概率 × 锐庄赔率)</h2><table><tr><th>结果</th><th>我估</th><th>锐庄</th><th>期望值</th><th>判定</th></tr>{evtable(rows, cfg)}</table></div>'
                 f'<div class="panel"><h2>推理过程:"我估"是怎么来的</h2>{reasoning_html(cfg)}</div>'
                 f'<div class="panel"><h2>逐比分赔率(书商原盘 vs 泊松)</h2>{score_odds_html(rich, grid)}</div>'
                 f'<div class="panel"><h2>比分概率(泊松反推 Top6)</h2>{scores_html(lh, la, grid)}</div>'
