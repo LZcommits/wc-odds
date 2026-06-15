@@ -59,6 +59,13 @@ MATCHES = [
 ]
 COL = {'home':'#CCFF00', 'draw':'#8e9379', 'away':'#FF0055'}  # 移盘曲线用色
 AFID = {'belgium_egypt':1489377, 'saudi_uruguay':1489379, 'france_senegal':1489383, 'argentina_algeria':1489381}
+# 球队实力静态表:FIFA 世界排名 + 阵容总身价(百万欧,赛前参考值,可校准)+ API-Football team id
+STREN = {
+ 'Belgium':{'rank':8,'val':480,'tid':1},  'Egypt':{'rank':36,'val':140,'tid':32},
+ 'Saudi Arabia':{'rank':58,'val':35,'tid':23}, 'Uruguay':{'rank':15,'val':430,'tid':7},
+ 'France':{'rank':2,'val':1100,'tid':2}, 'Senegal':{'rank':18,'val':320,'tid':13},
+ 'Argentina':{'rank':1,'val':700,'tid':26}, 'Algeria':{'rank':37,'val':200,'tid':1532},
+}
 # 全量球队表(API 英文名 → 中文名, 国旗 emoji);供未来比赛与过去赛果对账共用
 TEAM = {
  'Belgium':('比利时','🇧🇪'), 'Egypt':('埃及','🇪🇬'), 'Saudi Arabia':('沙特','🇸🇦'), 'Uruguay':('乌拉圭','🇺🇾'),
@@ -292,7 +299,21 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .pmeta{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:8px}
 .pchip{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--sec);border:1px solid rgba(190,198,224,.2);border-radius:3px;padding:1px 6px}
 .pval{font-size:12px;color:var(--sec)}
-.pval b{color:var(--lime);font-weight:600}"""
+.pval b{color:var(--lime);font-weight:600}
+.vstat{width:100%;border-collapse:collapse;margin-bottom:14px}
+.vstat td{padding:10px 6px;border-bottom:1px solid rgba(255,255,255,.06)}
+.vstat .vh,.vstat .va{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--sec);width:34%}
+.vstat .vh{text-align:left}
+.vstat .va{text-align:right}
+.vstat .vc{text-align:center;font-size:11px;color:var(--sec);opacity:.6;font-family:'JetBrains Mono',monospace}
+.vstat .vstrong{color:var(--lime);font-weight:700}
+.form-blk{display:flex;flex-direction:column;gap:9px}
+.form-row{display:flex;align-items:center;gap:10px}
+.form-team{font-size:13px;color:var(--on);flex:0 0 72px}
+.form-dots{display:flex;gap:5px}
+.fdot{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--navy);font-family:'JetBrains Mono',monospace}
+.fdmin{font-size:12px;color:var(--sec);opacity:.6}
+.vs-note{font-size:11px;color:var(--sec);opacity:.6;margin-top:10px;font-style:italic;line-height:1.5}"""
 
 # ---------- API-Football 赔率源(单次 /odds 调用拿全 14 家书商×所有盘口)----------
 PIN = 4  # Pinnacle(锐庄)bookmaker id
@@ -736,6 +757,37 @@ def reasoning_html(cfg):
     if not steps: return '<p class="note">暂无推理</p>'
     return ''.join(f'<div class="mtag"><b>{i+1}.</b> {s}</div>' for i, s in enumerate(steps))
 
+def fetch_last5(tid):  # 该队最近 5 场(API,含热身赛),返回 W/D/L 列表(旧→新)
+    if not tid: return []
+    d = af_get(f"https://v3.football.api-sports.io/fixtures?team={tid}&last=5")
+    out = []
+    for f in (d.get('response', []) if d else []):
+        gh, ga = f['goals']['home'], f['goals']['away']
+        if gh is None or ga is None: continue
+        ih = f['teams']['home']['id'] == tid
+        gf, gc = (gh, ga) if ih else (ga, gh)
+        out.append('W' if gf > gc else ('L' if gf < gc else 'D'))
+    return list(reversed(out))
+def form_dots(form):
+    col = {'W':'#CCFF00','D':'#8e9379','L':'#FF0055'}
+    if not form: return '<span class="form-dots"><span class="fdmin">暂无</span></span>'
+    return '<span class="form-dots">' + ''.join(f'<span class="fdot" style="background:{col.get(r,"#888")}">{r}</span>' for r in form) + '</span>'
+def strength_block(cfg):
+    sh = STREN.get(cfg['home']); sa = STREN.get(cfg['away'])
+    if not sh or not sa: return ''
+    rh = 'vstrong' if sh['rank'] <= sa['rank'] else ''; ra = 'vstrong' if sa['rank'] < sh['rank'] else ''
+    vh = 'vstrong' if sh['val'] >= sa['val'] else ''; va = 'vstrong' if sa['val'] > sh['val'] else ''
+    fh = fetch_last5(sh['tid']); fa = fetch_last5(sa['tid'])
+    return (f'{sec_head("military_tech","实力对比")}'
+            f'<table class="vstat">'
+            f'<tr><td class="vh {rh}">第 {sh["rank"]} 位</td><td class="vc">FIFA 世界排名</td><td class="va {ra}">第 {sa["rank"]} 位</td></tr>'
+            f'<tr><td class="vh {vh}">{sh["val"]/100:.1f} 亿欧</td><td class="vc">阵容总身价</td><td class="va {va}">{sa["val"]/100:.1f} 亿欧</td></tr>'
+            f'</table>'
+            f'<div class="form-blk">'
+            f'<div class="form-row"><span class="form-team">{cfg["cn_h"]}</span>{form_dots(fh)}</div>'
+            f'<div class="form-row"><span class="form-team">{cfg["cn_a"]}</span>{form_dots(fa)}</div></div>'
+            f'<div class="vs-note">FIFA 排名 / 身价为赛前参考值(可校准);近 5 场含热身赛,左旧 → 右新(W 胜 / D 平 / L 负)</div>')
+
 def build_detail(cfg, rows, rich):
     l = L(cfg); title = f'{cfg["cn_h"]} vs {cfg["cn_a"]}'; script = ''
     if not rows:
@@ -759,6 +811,7 @@ def build_detail(cfg, rows, rich):
                  f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
                  f'<div class="glass">{sec_head("view_list",score_title)}{score_odds_html(rich, grid)}</div>'
                  f'<div class="glass">{sec_head("dashboard","全盘口快照")}{markets_html(cfg, rows, rich)}</div>'
+                 f'<div class="glass">{strength_block(cfg)}</div>'
                  f'{sec_head("analytics","对阵分析")}{matchup_analysis(cfg)}')
     body = (f'{APPBAR}<main>'
             f'<a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
