@@ -441,12 +441,16 @@ def nav(active='value'):
     items = [('matches','sports_soccer','Matches'),('value','trending_up','Value'),('signals','sensors','Signals'),('account','person','Account')]
     a = ''.join(f'<a class="{"on" if k==active else ""}"><span class="material-symbols-outlined">{ic}</span>{lb}</a>' for k, ic, lb in items)
     return f'<nav class="nav">{a}</nav>'
+def bj_time(cfg):  # 北京时间(UTC+8)比赛日期
+    bj = cfg['ko'] + datetime.timedelta(hours=8)
+    return f'{bj.month}/{bj.day} 周{"一二三四五六日"[bj.weekday()]} {bj.hour:02d}:{bj.minute:02d}'
 def tier_chips(cfg, hrs):
     out = ''
     for p in [x.strip() for x in cfg['tier'].split('·')]:
         cls = 'chip val' if '价值' in p else ('chip warn' if ('冷门' in p or '警报' in p) else 'chip')
         out += f'<span class="{cls}">{p}</span>'
-    out += f'<span class="chip dim">{("距开赛 "+str(hrs)+"h") if hrs>0 else "已开赛"}</span>'
+    rel = f' · 距开赛 {hrs}h' if hrs > 0 else ' · 已开赛'
+    out += f'<span class="chip dim">🕐 {bj_time(cfg)}（北京）{rel}</span>'
     return f'<div class="chips">{out}</div>'
 def probrow(d, cfg):
     l = L(cfg); mx = max(d, key=d.get); al = {'home':'left','draw':'center','away':'right'}
