@@ -180,6 +180,19 @@ tr.bad td{background:rgba(255,0,85,.09)}
 .shield .bigtxt{font-size:24px;font-weight:800;color:var(--on)}
 .flag-xl{font-size:60px;line-height:1}
 .bigtxt-xl{font-size:38px;font-weight:800;color:var(--on)}
+.lockbox{position:relative;border-radius:8px;overflow:hidden;margin-top:4px}
+.lockbox .locked{filter:blur(9px);pointer-events:none;user-select:none;transition:filter .3s}
+.lockbox.open .locked{filter:none;pointer-events:auto}
+.lockmask{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(5,20,36,.55);text-align:center;padding:16px}
+.lockbox.open .lockmask{display:none}
+.lockmask .material-symbols-outlined{font-size:30px}
+.lockicon{color:var(--lime)}
+.lockttl{font-size:13px;color:var(--on);font-weight:600}
+.lockrow{display:flex;gap:8px}
+.lockinput{width:140px;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:7px;padding:8px 12px;color:var(--on);font-family:'JetBrains Mono',monospace;font-size:15px;text-align:center;letter-spacing:.18em;outline:none}
+.lockinput:focus{border-color:var(--lime)}
+.lockbtn{background:var(--lime);color:var(--navy);font-weight:800;font-size:14px;border:none;border-radius:7px;padding:8px 16px;cursor:pointer}
+.lockhint{font-size:11px;color:var(--crim);min-height:14px}
 .tn{font-size:13px;color:var(--on);font-weight:500;text-align:center}
 .vsmid{flex:1;text-align:center;padding-top:6px}
 .kol{font-size:11px;color:var(--sec);opacity:.7}
@@ -611,6 +624,13 @@ CDSCRIPT = ('<script>(function(){var ko=new Date("__KO__").getTime();var e=docum
             'var h=Math.floor(d/3.6e6),m=Math.floor(d%3.6e6/6e4);'
             'e.innerHTML=("0"+h).slice(-2)+"<small>H</small> "+("0"+m).slice(-2)+"<small>M</small>";}'
             't();setInterval(t,30000);})();</script>')
+# 比分概率付费遮挡:输入验证码 666888 解锁(前端简单门槛,localStorage 记忆)
+UNLOCK_JS = ('<script>(function(){var b=document.getElementById("lock-scores");if(!b)return;'
+             'if(localStorage.getItem("wc_paid")==="1"){b.classList.add("open");return;}'
+             'var k=b.querySelector(".lockbtn"),i=b.querySelector(".lockinput"),h=b.querySelector(".lockhint");'
+             'function go(){if(i.value.trim()==="666888"){b.classList.add("open");try{localStorage.setItem("wc_paid","1")}catch(e){}}'
+             'else{h.textContent="验证码错误,请重试";i.value="";}}'
+             'k.addEventListener("click",go);i.addEventListener("keyup",function(e){if(e.key==="Enter")go();});})();</script>')
 
 def sec_head(icon, title, sub=''):
     s = f'<span class="sech-sub">{sub}</span>' if sub else ''
@@ -727,9 +747,14 @@ def build_detail(cfg, rows, rich):
         lh, la, grid = poisson_calc(d['home'], d['away'], up)
         bk = (rich.get('score_odds') or {}).get('book', '')
         score_title = f'逐比分赔率{" ("+bk+")" if bk else ""}'
-        script = CDSCRIPT.replace('__KO__', cfg['ko'].isoformat())
+        script = CDSCRIPT.replace('__KO__', cfg['ko'].isoformat()) + UNLOCK_JS
         inner = (f'{match_header(rows, cfg)}'
-                 f'<div class="glass">{sec_head("grid_view","比分概率 Top 6")}{scores_grid(lh, la, grid)}</div>'
+                 f'<div class="glass">{sec_head("grid_view","比分概率 Top 6")}'
+                 f'<div class="lockbox" id="lock-scores"><div class="locked">{scores_grid(lh, la, grid)}</div>'
+                 f'<div class="lockmask"><span class="material-symbols-outlined lockicon">lock</span>'
+                 f'<div class="lockttl">比分概率 · 付费内容</div>'
+                 f'<div class="lockrow"><input class="lockinput" type="tel" inputmode="numeric" maxlength="6" placeholder="输入验证码"><button class="lockbtn">解锁</button></div>'
+                 f'<div class="lockhint"></div></div></div></div>'
                  f'<div class="glass"><div class="evhead"><span class="l"><span class="dot"></span>实时 +EV 分析</span></div>{ev_cards(rows, cfg)}</div>'
                  f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
                  f'<div class="glass">{sec_head("view_list",score_title)}{score_odds_html(rich, grid)}</div>'
