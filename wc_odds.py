@@ -7,6 +7,7 @@ DATA_DIR = os.path.join(ROOT, 'data'); DOCS = os.path.join(ROOT, 'docs')
 os.makedirs(DATA_DIR, exist_ok=True); os.makedirs(DOCS, exist_ok=True)
 KEY = os.environ.get('ODDS_API_KEY', '').strip()
 if not KEY: sys.exit('缺少 ODDS_API_KEY 环境变量')
+AFKEY = os.environ.get('API_FOOTBALL_KEY', '').strip()  # API-Football(逐比分赔率)
 TZ = datetime.timezone.utc
 def ko(y, mo, d, h): return datetime.datetime(y, mo, d, h, 0, 0, tzinfo=TZ)
 
@@ -53,6 +54,8 @@ MATCHES = [
    'note':'①档(阿71%)。阿根廷强,但揭幕战警惕(2022曾负沙特);价值在砍屠杀+小球。⚡冷门警报'}},
 ]
 COL = {'home':'#2563eb','draw':'#6b7280','away':'#d97706'}
+# API-Football 的 fixture id(逐比分赔率用)
+AFID = {'belgium_egypt':1489377, 'saudi_uruguay':1489379, 'france_senegal':1489383, 'argentina_algeria':1489381}
 
 # 每场"我估"的推理链(为什么这么估)
 REASON = {
@@ -118,6 +121,30 @@ def fetch_extra(eid):
     except Exception:
         return None
 
+def fetch_exact_score(afid):
+    # API-Football 逐比分赔率(bet=10 Exact Score),取比分最全的一家书商
+    if not AFKEY or not afid: return None
+    try:
+        req = urllib.request.Request(f"https://v3.football.api-sports.io/odds?fixture={afid}&bet=10",
+                                     headers={'x-apisports-key': AFKEY})
+        d = json.load(urllib.request.urlopen(req, timeout=30))
+    except Exception as e:
+        print('api-football error', e); return None
+    resp = d.get('response', [])
+    if not resp: return None
+    cands = []
+    for bm in resp[0].get('bookmakers', []):
+        vals = bm['bets'][0]['values'] if bm.get('bets') else []
+        parsed = {}
+        for v in vals:
+            try: parsed[v['value'].replace(':', '-').strip()] = float(v['odd'])
+            except Exception: pass
+        if parsed: cands.append((len(parsed), bm['name'], parsed))
+    if not cands: return None
+    cands.sort(key=lambda x: -x[0])  # 比分最全优先
+    _, name, parsed = cands[0]
+    return {'book': name, 'odds': parsed}
+
 def mkt(book, key):
     return next((m for m in book.get('markets', []) if m['key'] == key), None) if book else None
 
@@ -177,15 +204,10 @@ def split_lambda(mu, p_home, p_away):
         else: hi = lh
     lh = (lo+hi)/2
     return lh, mu-lh
-def scoreline_top(p_h, p_a, under_prob, n=6):
-    mu = solve_mu(under_prob)
-    lh, la = split_lambda(mu, p_h, p_a)
-    grid = []
-    for i in range(6):
-        for j in range(6):
-            grid.append((f'{i}-{j}', pois(i, lh)*pois(j, la)))
-    grid.sort(key=lambda x: -x[1])
-    return lh, la, grid[:n]
+def poisson_calc(p_h, p_a, under_prob):
+    mu = solve_mu(under_prob); lh, la = split_lambda(mu, p_h, p_a)
+    grid = {f'{i}-{j}': pois(i, lh)*pois(j, la) for i in range(6) for j in range(6)}
+    return lh, la, grid
 
 now = datetime.datetime.now(TZ)
 try: data = fetch_bulk()
@@ -234,6 +256,8 @@ def process(cfg):
                 dc = next((mkt(b, 'double_chance') for b in bks if mkt(b, 'double_chance')), None)
                 rich['btts'] = {o['name']: o['price'] for o in bt['outcomes']} if bt else None
                 rich['dc'] = {o['name']: o['price'] for o in dc['outcomes']} if dc else None
+            so = fetch_exact_score(AFID.get(cfg['slug']))
+            if so: rich['score_odds'] = so
     return rich
 
 def L(cfg): return {'home': cfg['cn_h'], 'draw': '平局', 'away': cfg['cn_a']}
@@ -263,16 +287,25 @@ def evtable(rows, cfg):
         out += f'<tr style="background:{bg}"><td>{l[k]}</td><td>{cfg["my"][k]:.0%}</td><td>{p[k]}</td><td>{ev:.2f}</td><td>{tag}</td></tr>'
     return out
 
-def scores_html(rows):
-    last = rows[-1]; d = last['devig']; u = (last.get('pin_tot25') or {}).get('under')
-    up = None
-    if u and (last.get('pin_tot25') or {}).get('over'):
-        up = devig({'over': last['pin_tot25']['over'], 'under': u})['under']
-    lh, la, top = scoreline_top(d['home'], d['away'], up)
+def scores_html(lh, la, grid):
+    top = sorted(grid.items(), key=lambda x: -x[1])[:6]
     chips = ''.join(f'<div class="scb"><b>{s}</b> {p*100:.0f}%</div>' for s, p in top)
     return (f'<div class="sc">{chips}</div>'
-            f'<div class="note" style="margin-top:8px">由赔率反推:预期进球 主 {lh:.2f} / 客 {la:.2f}。'
-            f'(The Odds API 无逐比分赔率,此为泊松模型概率)</div>')
+            f'<div class="note" style="margin-top:8px">由赔率反推:预期进球 主 {lh:.2f} / 客 {la:.2f}(泊松模型公允概率)</div>')
+
+def score_odds_html(rich, grid):
+    so = rich.get('score_odds')
+    if not so: return '<p class="note">逐比分赔率暂无(部分书商临近开赛才上盘)</p>'
+    odds = so['odds']
+    top = sorted(odds.items(), key=lambda x: x[1])[:12]  # 赔率低=书商认为越可能
+    h = (f'<div class="note" style="margin-bottom:6px">书商:{so["book"]} · 共 {len(odds)} 个比分 · '
+         f'EV=泊松%×赔率,&gt;1 即该比分有价值</div>'
+         f'<table><tr><th>比分</th><th>书商赔率</th><th>泊松%</th><th>EV</th></tr>')
+    for s, o in top:
+        pp = grid.get(s, 0); ev = pp*o
+        bg = ' style="background:#dcfce7"' if ev > 1.05 else ''
+        h += f'<tr{bg}><td>{s}</td><td>{o}</td><td>{pp*100:.0f}%</td><td>{ev:.2f}</td></tr>'
+    return h + '</table>'
 
 def markets_html(cfg, rows, rich):
     l = L(cfg); p = rows[-1].get('pin_h2h'); t = rich.get('tot') or rows[-1].get('pin_tot25')
@@ -309,12 +342,16 @@ def build_detail(cfg, rows, rich):
         body = '<div class="panel note">暂无数据(比赛可能已开赛或尚未采样)</div>'; hrs = n = updated = '?'
     else:
         last = rows[-1]; hrs = last['hrs_to_ko']; n = len(rows); updated = last['ts']
+        d = last['devig']; t25 = last.get('pin_tot25') or {}
+        up = devig({'over': t25['over'], 'under': t25['under']})['under'] if (t25.get('over') and t25.get('under')) else None
+        lh, la, grid = poisson_calc(d['home'], d['away'], up)
         body = (f'<div class="row">{cards(rows, cfg)}</div>'
                 f'<div class="panel"><h2>移盘曲线(锐庄去水位概率)</h2>{sparkline(rows)}'
                 f'<div style="font-size:12px;color:#666;margin-top:2px"><span style="color:#2563eb">{l["home"]}</span> <span style="color:#6b7280">平</span> <span style="color:#d97706">{l["away"]}</span> · 左早→右临场</div></div>'
                 f'<div class="panel"><h2>实时 +EV(我的概率 × 锐庄赔率)</h2><table><tr><th>结果</th><th>我估</th><th>锐庄</th><th>EV</th><th>判定</th></tr>{evtable(rows, cfg)}</table></div>'
                 f'<div class="panel"><h2>推理过程:"我估"是怎么来的</h2>{reasoning_html(cfg)}</div>'
-                f'<div class="panel"><h2>比分概率(泊松反推 Top6)</h2>{scores_html(rows)}</div>'
+                f'<div class="panel"><h2>逐比分赔率(书商原盘 vs 泊松)</h2>{score_odds_html(rich, grid)}</div>'
+                f'<div class="panel"><h2>比分概率(泊松反推 Top6)</h2>{scores_html(lh, la, grid)}</div>'
                 f'<div class="panel"><h2>全盘口快照(锐庄)</h2>{markets_html(cfg, rows, rich)}</div>'
                 f'<div class="panel"><h2>对阵分析</h2>{analysis_html(cfg)}</div>')
     html = (f'<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'

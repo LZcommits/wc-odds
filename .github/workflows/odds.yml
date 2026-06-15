@@ -19,6 +19,7 @@ jobs:
       - name: 采样 + 生成 H5
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: python wc_odds.py
       - name: 提交数据与页面
         run: |
