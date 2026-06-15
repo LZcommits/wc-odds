@@ -273,8 +273,10 @@ def cards(rows, cfg):
     l = L(cfg); last = rows[-1]; first = rows[0]; out = ''
     for k in ('home','draw','away'):
         cur = last['devig'][k]*100; dv = (last['devig'][k]-first['devig'][k])*100
-        arr = '▲' if dv > .2 else ('▼' if dv < -.2 else '–'); ac = '#16a34a' if dv > .2 else ('#dc2626' if dv < -.2 else '#999')
-        out += f'<div class="card"><div class="lbl">{l[k]}</div><div class="big" style="color:{COL[k]}">{cur:.1f}%</div><div class="chg" style="color:{ac}">{arr} {dv:+.1f}pt</div></div>'
+        if dv >= 0.05: arr, ac = '↑', '#16a34a'      # 增长
+        elif dv <= -0.05: arr, ac = '↓', '#dc2626'   # 下降
+        else: arr, ac = '→', '#999'                  # 持平
+        out += f'<div class="card"><div class="lbl">{l[k]}</div><div class="big" style="color:{COL[k]}">{cur:.1f}%</div><div class="chg" style="color:{ac}">{arr} {abs(dv):.1f}%</div></div>'
     return out
 
 def evtable(rows, cfg):
