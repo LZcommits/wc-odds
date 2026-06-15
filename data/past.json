@@ -202,5 +202,39 @@
 "dir": "平 / 弱队 / 小球",
 "kind": "anti_fav",
 "hit": false
+},
+"1489380": {
+"date": "2026-06-15T16:00:00+00:00",
+"h": "Spain",
+"a": "Cape Verde Islands",
+"gh": 0,
+"ga": 0,
+"devig": {
+"home": 0.9057,
+"draw": 0.0675,
+"away": 0.0268
+},
+"tier": "①悬殊",
+"fav": "home",
+"dir": "砍屠杀 / 小球 / 弱队受让",
+"kind": "anti_blowout",
+"hit": true
+},
+"1489377": {
+"date": "2026-06-15T19:00:00+00:00",
+"h": "Belgium",
+"a": "Egypt",
+"gh": 1,
+"ga": 1,
+"devig": {
+"home": 0.6238,
+"draw": 0.2278,
+"away": 0.1484
+},
+"tier": "②中热门",
+"fav": "home",
+"dir": "平 / 弱队 / 小球",
+"kind": "anti_fav",
+"hit": true
 }
 }
