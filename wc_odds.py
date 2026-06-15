@@ -56,30 +56,34 @@ MATCHES = [
 COL = {'home':'#CCFF00', 'draw':'#8e9379', 'away':'#FF0055'}  # 移盘曲线用色
 AFID = {'belgium_egypt':1489377, 'saudi_uruguay':1489379, 'france_senegal':1489383, 'argentina_algeria':1489381}
 REASON = {
- 'belgium_egypt': ['市场基准(锐庄去水位):比利时 ≈62% / 平 ≈24% / 埃及 ≈16%',
-  '分档:② 中热门——比利时是黄金一代大牌,正是大众情绪最易高估的格口',
-  '修正① 揭幕效应:世界杯首轮热门常熄火(本届巴西/瑞士已被逼平)→ 热门胜率打折',
-  '修正② 阵容相克:比利时后防老化、转身慢;埃及有萨拉赫+马尔穆什速度反击 → 埃及上调',
-  '修正③ 交锋史:埃及 4 次交锋胜 2,不怵比利时 → 平/埃及再上调',
-  '结论:比利时 62%→50%、平 24%→27%、埃及 16%→23% → 价值在 平 / 埃及 / 小球'],
- 'saudi_uruguay': ['市场基准:乌拉圭 ≈66% / 平 ≈22% / 沙特 ≈12%',
-  '分档:① 悬殊(乌66%),但带揭幕+冷门基因 → 按②的逆向思路处理',
-  '修正① 揭幕效应:强热门首战遇硬骨头,易被拖入苦战',
-  '修正② 阵容:乌拉圭后防伤兵多(Giménez/Araújo/Cáceres 存疑)→ 失球风险升,乌下调',
-  '修正③ 冷门基因:沙特 2022 掀翻阿根廷,Al-Dawsari 反击犀利 → 沙特/平上调',
-  '结论:乌 66%→56%、平 22%→26%、沙 12%→18% → 价值在 平 / 沙特受让 / 小球。⚡'],
- 'france_senegal': ['市场基准:法国 ≈65% / 平 ≈21% / 塞内加尔 ≈13%',
-  '分档:① 临界 ②(法65%),球星光环(姆巴佩)易被高估',
-  '修正① 揭幕效应 + 法国揭幕翻车史(2002 正是负塞内加尔出局)',
-  '修正② 阵容:塞内加尔高大强壮+反击快(Jackson/Ndiaye),实力被低估',
-  '修正③ 交锋史:塞内加尔历史交锋占优(前 3 次胜 2)',
-  '结论:法 65%→58%、平 21%→26%、塞 13%→16% → 价值在 平 / 塞内加尔 / 小球'],
- 'argentina_algeria': ['市场基准:阿根廷 ≈69% / 平 ≈21% / 阿尔及利亚 ≈10%',
-  '分档:① 悬殊(阿69%),阿根廷卫冕冠军+近 5 场全胜状态火热',
-  '修正① 揭幕效应:阿根廷 2022 揭幕战曾爆冷负沙特 → 胜率略打折',
-  '修正② 阵容:阿尔及利亚有 Mahrez/Amoura/Gouiri 反击质量,但整体差距大',
-  '修正③ 实力差距真实 → 不过度逆向(①档热门基本会赢)',
-  '结论:阿 69%→62%、平 21%→23%、阿尔 10%→15% → 价值主要在 砍屠杀 + 小球(不反胜负)。⚡'],
+ 'belgium_egypt': [
+  ('市场基准 (锐庄去水位)', '比利时 ≈62% / 平 ≈24% / 埃及 ≈16%'),
+  ('分档:② 中热门', '比利时是黄金一代大牌,正是大众情绪最易高估的格口'),
+  ('修正① 揭幕效应', '世界杯首轮热门常熄火(本届巴西/瑞士已验证)→ 热门胜率打折'),
+  ('修正② 阵容相克', '比利时后防老化、转身慢;埃及有萨拉赫+马尔穆什速度反击 → 埃及上调'),
+  ('修正③ 交锋史', '埃及 4 次交锋胜 2,不怵比利时 → 平/埃及再上调'),
+  ('最终结论', '比利时 62%→50%、平 24%→27%、埃及 16%→23% → 价值锁定 平 / 埃及 / 小球')],
+ 'saudi_uruguay': [
+  ('市场基准 (锐庄去水位)', '乌拉圭 ≈66% / 平 ≈22% / 沙特 ≈12%'),
+  ('分档:① 悬殊', '乌66% 但带揭幕+冷门基因 → 按②的逆向思路处理'),
+  ('修正① 揭幕效应', '强热门首战遇硬骨头,易被拖入苦战'),
+  ('修正② 阵容', '乌拉圭后防伤兵多(Giménez/Araújo/Cáceres 存疑)→ 失球风险升,乌下调'),
+  ('修正③ 冷门基因', '沙特 2022 掀翻阿根廷,Al-Dawsari 反击犀利 → 沙特/平上调'),
+  ('最终结论', '乌 66%→56%、平 22%→26%、沙 12%→18% → 价值锁定 平 / 沙特受让 / 小球 ⚡')],
+ 'france_senegal': [
+  ('市场基准 (锐庄去水位)', '法国 ≈65% / 平 ≈21% / 塞内加尔 ≈13%'),
+  ('分档:① 临界 ②', '球星光环(姆巴佩)易被高估'),
+  ('修正① 揭幕效应', '法国揭幕翻车史(2002 正是负塞内加尔出局)'),
+  ('修正② 阵容', '塞内加尔高大强壮+反击快(Jackson/Ndiaye),实力被低估'),
+  ('修正③ 交锋史', '塞内加尔历史交锋占优(前 3 次胜 2)'),
+  ('最终结论', '法 65%→58%、平 21%→26%、塞 13%→16% → 价值锁定 平 / 塞内加尔 / 小球')],
+ 'argentina_algeria': [
+  ('市场基准 (锐庄去水位)', '阿根廷 ≈69% / 平 ≈21% / 阿尔及利亚 ≈10%'),
+  ('分档:① 悬殊', '阿根廷卫冕冠军+近 5 场全胜状态火热'),
+  ('修正① 揭幕效应', '阿根廷 2022 揭幕战曾爆冷负沙特 → 胜率略打折'),
+  ('修正② 阵容', '阿尔及利亚有 Mahrez/Amoura/Gouiri 反击质量,但整体差距大'),
+  ('修正③ 实力差距', '差距真实 → 不过度逆向(①档热门基本会赢)'),
+  ('最终结论', '阿 69%→62%、平 21%→23%、阿尔 10%→15% → 价值锁定 砍屠杀 + 小球 ⚡')],
 }
 
 CSS = """*{box-sizing:border-box}
@@ -132,7 +136,70 @@ tr.bad td{background:rgba(255,0,85,.09)}
 .nav{position:fixed;bottom:0;left:0;right:0;height:64px;display:flex;justify-content:space-around;align-items:center;background:rgba(2,6,23,.9);backdrop-filter:blur(14px);border-top:1px solid var(--line);z-index:50;max-width:520px;margin:0 auto}
 .nav a{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--sec);opacity:.55;font-family:'JetBrains Mono',monospace;font-size:11px}
 .nav a.on{color:var(--lime);opacity:1;font-weight:700}
-.foot{text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--sec);opacity:.5;margin:16px 0 4px}"""
+.foot{text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--sec);opacity:.5;margin:16px 0 4px}
+.sech{display:flex;align-items:center;gap:8px;margin:0 0 14px}
+.sech-ic{width:30px;height:30px;border-radius:7px;background:rgba(204,255,0,.12);color:var(--lime);display:flex;align-items:center;justify-content:center;flex:0 0 30px}
+.sech-ic .material-symbols-outlined{font-size:18px}
+.sech-t{font-size:17px;font-weight:800;letter-spacing:-.01em}
+.sech-sub{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--sec);opacity:.6}
+.vshead{position:relative}
+.hotpick{position:absolute;top:0;right:0;display:flex;align-items:center;gap:3px;background:var(--lime);color:var(--navy);font-weight:800;font-size:12px;padding:4px 10px;border-radius:6px;box-shadow:0 0 14px rgba(204,255,0,.4)}
+.vsrow{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin:6px 0 2px}
+.vsteam{display:flex;flex-direction:column;align-items:center;gap:6px;width:84px}
+.shield{width:54px;height:54px;border-radius:14px;background:var(--high);display:flex;align-items:center;justify-content:center}
+.shield .material-symbols-outlined{font-size:28px;color:#c9b97a}
+.tn{font-size:13px;color:var(--on);font-weight:500;text-align:center}
+.vsmid{flex:1;text-align:center;padding-top:6px}
+.kol{font-size:11px;color:var(--sec);opacity:.7}
+.kot{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:500;margin:2px 0 8px}
+.kot small{font-size:13px;color:var(--sec);opacity:.7}
+.tierpill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--lime);border:1px solid rgba(204,255,0,.4);background:rgba(204,255,0,.08);border-radius:999px;padding:3px 12px}
+.prob3{display:flex;gap:8px;margin-top:14px}
+.ph{flex:1;text-align:center}
+.ph-lbl{font-size:11px;color:var(--sec);opacity:.7}
+.ph-big{font-size:22px;font-weight:800;letter-spacing:-.03em;margin:2px 0}
+.ph-chg{font-size:11px}
+.pbar{display:flex;height:6px;overflow:hidden;margin-top:14px;gap:3px}
+.pbar>div{border-radius:2px}
+.evhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.evhead .l{display:flex;align-items:center;gap:7px;font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.04em;color:var(--lime)}
+.evhead .dot{width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
+.evhead .r{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--sec);opacity:.6}
+.evc{display:flex;align-items:center;gap:12px;background:rgba(13,28,45,.5);border:1px solid var(--line);border-radius:8px;padding:13px;margin-bottom:10px}
+.evc.val{border-color:var(--lime);box-shadow:0 0 14px rgba(204,255,0,.16)}
+.evc.bad{opacity:.55}
+.evbar{width:4px;align-self:stretch;border-radius:2px;background:var(--sec)}
+.evc.val .evbar{background:var(--lime)}
+.evc.bad .evbar{background:#475569}
+.evmain{flex:1}
+.evteam{font-size:18px;font-weight:700}
+.evstat{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sec);opacity:.85;margin-top:3px}
+.evright{text-align:right;flex:0 0 auto}
+.evev{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sec);margin-bottom:5px}
+.evc.val .evev{color:var(--lime);font-weight:700}
+.evtag{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;border:1px solid var(--line);color:var(--sec)}
+.evc.val .evtag{background:var(--lime);color:var(--navy);border-color:var(--lime)}
+.tl-item{display:flex;gap:12px;padding-bottom:18px;position:relative}
+.tl-item:not(:last-child)::before{content:'';position:absolute;left:17px;top:38px;bottom:0;width:2px;background:rgba(204,255,0,.22)}
+.tl-icon{width:36px;height:36px;flex:0 0 36px;border-radius:8px;background:var(--high);display:flex;align-items:center;justify-content:center;color:var(--sec);z-index:1}
+.tl-icon .material-symbols-outlined{font-size:19px}
+.tl-item.final .tl-icon{background:var(--lime);color:var(--navy);box-shadow:0 0 16px rgba(204,255,0,.5)}
+.tl-t{font-weight:700;font-size:15px;margin-bottom:3px}
+.tl-item.final .tl-t{color:var(--lime)}
+.tl-d{font-size:13px;color:var(--sec);opacity:.85;line-height:1.6}
+.scg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.scg-cell{background:rgba(13,28,45,.5);border:1px solid var(--line);border-radius:8px;padding:14px 6px;text-align:center}
+.scg-cell.hot{border-color:var(--lime);box-shadow:0 0 14px rgba(204,255,0,.2)}
+.scg-s{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;letter-spacing:.05em;color:var(--on)}
+.scg-cell.hot .scg-s{color:var(--lime)}
+.scg-p{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--sec);opacity:.85;margin-top:5px}
+.xg{display:flex;align-items:center;gap:10px;background:rgba(13,28,45,.5);border:1px solid var(--line);border-radius:8px;padding:12px;margin-top:12px}
+.xg-badge{background:var(--lime);color:var(--navy);font-weight:800;font-size:12px;padding:3px 8px;border-radius:5px}
+.xg-l{font-size:13px;color:var(--on)}
+.xg-v{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--sec)}
+table.so thead tr,table.so tr:first-child{background:rgba(255,255,255,.03)}
+table.so tr.val td{background:rgba(204,255,0,.1)}
+table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}"""
 
 def get(url):
     with urllib.request.urlopen(url, timeout=30) as r: return json.load(r)
@@ -344,12 +411,78 @@ def score_odds_html(rich, grid):
     so = rich.get('score_odds')
     if not so: return '<p class="note">逐比分赔率暂无(部分书商临近开赛才上盘)</p>'
     odds = so['odds']; top = sorted(odds.items(), key=lambda x: x[1])[:12]
-    h = (f'<div class="note" style="margin-bottom:8px">书商:{so["book"]} · 共 {len(odds)} 个比分 · EV=模型推测×盘口,&gt;1 即有价值</div>'
-         f'<table><tr><th>比分</th><th>盘口</th><th>模型推测</th><th>期望值</th></tr>')
+    h = (f'<div class="note" style="margin-bottom:10px">共 {len(odds)} 个比分 · 期望值=模型推测×盘口,&gt;1 即有价值</div>'
+         f'<table class="so"><thead><tr><th>比分</th><th>盘口</th><th>模型推测</th><th>期望值</th></tr></thead><tbody>')
     for s, o in top:
         pp = grid.get(s, 0); ev = pp*o
-        h += f'<tr class="{"val" if ev>1.05 else ""}"><td class="num">{s}</td><td class="num">{o}</td><td class="num">{pp*100:.0f}%</td><td class="num">{ev:.2f}</td></tr>'
-    return h + '</table>'
+        h += (f'<tr class="{"val" if ev>1.05 else ""}"><td class="num s">{s}</td><td class="num">{o}</td>'
+              f'<td class="num">{pp*100:.0f}%</td><td class="num e">{ev:.2f}</td></tr>')
+    return h + '</tbody></table>'
+
+CDSCRIPT = ('<script>(function(){var ko=new Date("__KO__").getTime();var e=document.getElementById("cd");'
+            'function t(){if(!e)return;var d=ko-Date.now();if(d<0){e.textContent="已开赛";return;}'
+            'var h=Math.floor(d/3.6e6),m=Math.floor(d%3.6e6/6e4);'
+            'e.innerHTML=("0"+h).slice(-2)+"<small>H</small> "+("0"+m).slice(-2)+"<small>M</small>";}'
+            't();setInterval(t,30000);})();</script>')
+
+def sec_head(icon, title, sub=''):
+    s = f'<span class="sech-sub">{sub}</span>' if sub else ''
+    return f'<div class="sech"><span class="sech-ic"><span class="material-symbols-outlined">{icon}</span></span><span class="sech-t">{title}</span>{s}</div>'
+
+def match_header(rows, cfg):
+    l = L(cfg); last = rows[-1]; first = rows[0]; d = last['devig']; mx = max(d, key=d.get)
+    hot = ('<div class="hotpick"><span class="material-symbols-outlined" style="font-size:14px">local_fire_department</span>HOT PICK</div>'
+           if '价值' in cfg['tier'] else '')
+    mins = max(0, (cfg['ko']-now).total_seconds()/60); ch = int(mins//60); cm = int(mins % 60)
+    tier = ' '.join(p.strip() for p in cfg['tier'].split('·')[:2])
+    def cell(k):
+        cur = d[k]*100; dv = (d[k]-first['devig'][k])*100
+        arr, ac = ('↑','#CCFF00') if dv >= .05 else (('↓','#FF0055') if dv <= -.05 else ('→','#8e9379'))
+        return (f'<div class="ph"><div class="ph-lbl">{l[k]}</div>'
+                f'<div class="ph-big" style="color:{"#CCFF00" if k==mx else "#d4e4fa"}">{cur:.1f}%</div>'
+                f'<div class="ph-chg mono" style="color:{ac}">{arr} {abs(dv):.1f}%</div></div>')
+    segs = ''.join(f'<div style="flex:{max(d[k]*100,3):.1f};background:{"#CCFF00" if k==mx else "#3f465c"}"></div>' for k in ('home','draw','away'))
+    return (f'<div class="glass vshead">{hot}<div class="vsrow">'
+            f'<div class="vsteam"><div class="shield"><span class="material-symbols-outlined">shield</span></div><div class="tn">{l["home"]}</div></div>'
+            f'<div class="vsmid"><div class="kol">距离开赛</div><div class="kot" id="cd">{ch:02d}<small>H</small> {cm:02d}<small>M</small></div>'
+            f'<div class="tierpill">{tier}</div></div>'
+            f'<div class="vsteam"><div class="shield"><span class="material-symbols-outlined">shield</span></div><div class="tn">{l["away"]}</div></div>'
+            f'</div><div class="prob3">{cell("home")}{cell("draw")}{cell("away")}</div>'
+            f'<div class="pbar">{segs}</div></div>')
+
+def ev_cards(rows, cfg):
+    l = L(cfg); p = rows[-1].get('pin_h2h')
+    if not p: return ''
+    out = ''
+    for k in ('home','draw','away'):
+        ev = cfg['my'][k]*p[k]
+        if ev > 1.03: cls, tag, ic = 'val', '有价值', 'check_circle'
+        elif ev > .99: cls, tag, ic = 'mid', '临界', 'remove'
+        else: cls, tag, ic = 'bad', '别碰', 'block'
+        out += (f'<div class="evc {cls}"><div class="evbar"></div>'
+                f'<div class="evmain"><div class="evteam">{l[k]}</div>'
+                f'<div class="evstat">我估: {cfg["my"][k]:.0%}　赔率: {p[k]}</div></div>'
+                f'<div class="evright"><div class="evev">期望值 {ev:.2f}</div>'
+                f'<div class="evtag"><span class="material-symbols-outlined" style="font-size:15px">{ic}</span>{tag}</div></div></div>')
+    return out
+
+def reasoning_timeline(cfg):
+    steps = REASON.get(cfg['slug'], [])
+    if not steps: return '<p class="note">暂无推理</p>'
+    ic = ['bar_chart','trending_up','new_releases','groups','tune']; out = ''; n = len(steps)
+    for i, (t, dsc) in enumerate(steps):
+        final = (i == n-1); icon = 'priority_high' if final else ic[min(i, len(ic)-1)]
+        out += (f'<div class="tl-item{" final" if final else ""}"><div class="tl-icon"><span class="material-symbols-outlined">{icon}</span></div>'
+                f'<div class="tl-body"><div class="tl-t">{t}</div><div class="tl-d">{dsc}</div></div></div>')
+    return out
+
+def scores_grid(lh, la, grid):
+    top = sorted(grid.items(), key=lambda x: -x[1])[:6]; cells = ''
+    for i, (s, p) in enumerate(top):
+        a, b = s.split('-')
+        cells += f'<div class="scg-cell{" hot" if i==0 else ""}"><div class="scg-s">{a} - {b}</div><div class="scg-p">{p*100:.1f}%</div></div>'
+    return (f'<div class="scg">{cells}</div><div class="xg"><span class="xg-badge">xG</span><span class="xg-l">预期进球</span>'
+            f'<span class="xg-v">主 <b style="color:#CCFF00">{lh:.2f}</b> / 客 <b style="color:#FF0055">{la:.2f}</b></span></div>')
 
 def markets_html(cfg, rows, rich):
     l = L(cfg); p = rows[-1].get('pin_h2h'); t = rich.get('tot') or rows[-1].get('pin_tot25'); r = ''
@@ -379,29 +512,32 @@ def reasoning_html(cfg):
     return ''.join(f'<div class="mtag"><b>{i+1}.</b> {s}</div>' for i, s in enumerate(steps))
 
 def build_detail(cfg, rows, rich):
-    l = L(cfg); title = f'{cfg["cn_h"]} vs {cfg["cn_a"]}'
+    l = L(cfg); title = f'{cfg["cn_h"]} vs {cfg["cn_a"]}'; script = ''
     if not rows:
-        inner = '<div class="glass"><p class="note">暂无数据(比赛可能已开赛或尚未采样)</p></div>'; hrs = n = updated = '?'
+        inner = '<div class="glass"><p class="note">暂无数据(比赛可能已开赛或尚未采样)</p></div>'; sub = cfg['tier']
     else:
-        last = rows[-1]; hrs = last['hrs_to_ko']; n = len(rows); updated = last['ts']
+        last = rows[-1]; n = len(rows); updated = last['ts']; sub = f'数据档数 {n} · 更新 {updated} UTC'
         d = last['devig']; t25 = last.get('pin_tot25') or {}
         up = devig({'over': t25['over'], 'under': t25['under']})['under'] if (t25.get('over') and t25.get('under')) else None
         lh, la, grid = poisson_calc(d['home'], d['away'], up)
-        inner = (f'<div class="row">{cards(rows, cfg)}</div>'
-                 f'<div class="glass"><h2 class="sec">移盘曲线</h2>{sparkline(rows)}'
+        bk = (rich.get('score_odds') or {}).get('book', '')
+        score_title = f'逐比分赔率{" ("+bk+")" if bk else ""}'
+        script = CDSCRIPT.replace('__KO__', cfg['ko'].isoformat())
+        inner = (f'{match_header(rows, cfg)}'
+                 f'<div class="glass">{sec_head("grid_view","比分概率 Top 6","模型推测 · 泊松分布")}{scores_grid(lh, la, grid)}</div>'
+                 f'<div class="glass">{sec_head("show_chart","移盘曲线")}{sparkline(rows)}'
                  f'<div class="note" style="margin-top:4px"><span style="color:{COL["home"]}">{l["home"]}</span> · <span style="color:{COL["draw"]}">平</span> · <span style="color:{COL["away"]}">{l["away"]}</span> · 左早→右临场</div></div>'
-                 f'<div class="glass"><h2 class="sec">实时 期望值</h2><table><tr><th>结果</th><th>我估</th><th>锐庄</th><th>期望值</th><th>判定</th></tr>{evtable(rows, cfg)}</table></div>'
-                 f'<div class="glass"><h2 class="sec">推理过程</h2>{reasoning_html(cfg)}</div>'
-                 f'<div class="glass"><h2 class="sec">逐比分赔率</h2>{score_odds_html(rich, grid)}</div>'
-                 f'<div class="glass"><h2 class="sec">比分概率 Top6</h2>{scores_html(lh, la, grid)}</div>'
-                 f'<div class="glass"><h2 class="sec">全盘口快照</h2>{markets_html(cfg, rows, rich)}</div>'
-                 f'<div class="glass"><h2 class="sec">对阵分析</h2>{analysis_html(cfg)}</div>')
+                 f'<div class="glass"><div class="evhead"><span class="l"><span class="dot"></span>实时 +EV 分析</span><span class="r">我的概率 × 锐庄赔率</span></div>{ev_cards(rows, cfg)}</div>'
+                 f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
+                 f'<div class="glass">{sec_head("view_list",score_title)}{score_odds_html(rich, grid)}</div>'
+                 f'<div class="glass">{sec_head("dashboard","全盘口快照")}{markets_html(cfg, rows, rich)}</div>'
+                 f'<div class="glass">{sec_head("analytics","对阵分析")}{analysis_html(cfg)}</div>')
     body = (f'{APPBAR}<main>'
             f'<a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
             f'<h1 class="title">{title}</h1>'
-            f'<div class="sub">{cfg["tier"]} · 距开赛 {hrs}h · 数据档数 {n} · {updated} UTC</div>'
+            f'<div class="sub">{sub}</div>'
             f'<div style="height:12px"></div>{inner}'
-            f'<div class="foot">自动每 3h 更新 · 仅供研究,非投注建议</div></main>')
+            f'<div class="foot">自动每 3h 更新 · 仅供研究,非投注建议</div></main>{script}')
     open(os.path.join(DOCS, cfg['slug']+'.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title)}</head><body>{body}</body></html>')
 
 def build_index(items):
