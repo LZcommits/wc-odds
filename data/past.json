@@ -1,0 +1,206 @@
+{
+"1489369": {
+"date": "2026-06-11T19:00:00+00:00",
+"h": "Mexico",
+"a": "South Africa",
+"gh": 2,
+"ga": 0,
+"devig": {
+"home": 0.6768,
+"draw": 0.211,
+"away": 0.1122
+},
+"tier": "①悬殊",
+"fav": "home",
+"dir": "砍屠杀 / 小球 / 弱队受让",
+"kind": "anti_blowout",
+"hit": false
+},
+"1538999": {
+"date": "2026-06-12T02:00:00+00:00",
+"h": "South Korea",
+"a": "Czechia",
+"gh": 2,
+"ga": 1,
+"devig": {
+"home": 0.369,
+"draw": 0.3114,
+"away": 0.3196
+},
+"tier": "③势均",
+"fav": "home",
+"dir": "平 / 弱队 / 小球",
+"kind": "anti_fav",
+"hit": false
+},
+"1539000": {
+"date": "2026-06-12T19:00:00+00:00",
+"h": "Canada",
+"a": "Bosnia & Herzegovina",
+"gh": 1,
+"ga": 1,
+"devig": {
+"home": 0.5309,
+"draw": 0.2721,
+"away": 0.197
+},
+"tier": "②中热门",
+"fav": "home",
+"dir": "平 / 弱队 / 小球",
+"kind": "anti_fav",
+"hit": true
+},
+"1489370": {
+"date": "2026-06-13T01:00:00+00:00",
+"h": "USA",
+"a": "Paraguay",
+"gh": 4,
+"ga": 1,
+"devig": {
+"home": 0.4638,
+"draw": 0.2993,
+"away": 0.2369
+},
+"tier": "②中热门",
+"fav": "home",
+"dir": "平 / 弱队 / 小球",
+"kind": "anti_fav",
+"hit": false
+},
+"1489373": {
+"date": "2026-06-13T19:00:00+00:00",
+"h": "Qatar",
+"a": "Switzerland",
+"gh": 1,
+"ga": 1,
+"devig": {
+"home": 0.0654,
+"draw": 0.1308,
+"away": 0.8039
+},
+"tier": "①悬殊",
+"fav": "away",
+"dir": "砍屠杀 / 小球 / 弱队受让",
+"kind": "anti_blowout",
+"hit": true
+},
+"1489371": {
+"date": "2026-06-13T22:00:00+00:00",
+"h": "Brazil",
+"a": "Morocco",
+"gh": 1,
+"ga": 1,
+"devig": {
+"home": 0.5731,
+"draw": 0.2517,
+"away": 0.1752
+},
+"tier": "②中热门",
+"fav": "home",
+"dir": "平 / 弱队 / 小球",
+"kind": "anti_fav",
+"hit": true
+},
+"1489372": {
+"date": "2026-06-14T01:00:00+00:00",
+"h": "Haiti",
+"a": "Scotland",
+"gh": 0,
+"ga": 1,
+"devig": {
+"home": 0.1569,
+"draw": 0.2064,
+"away": 0.6367
+},
+"tier": "②中热门",
+"fav": "away",
+"dir": "平 / 弱队 / 小球",
+"kind": "anti_fav",
+"hit": false
+},
+"1539001": {
+"date": "2026-06-14T04:00:00+00:00",
+"h": "Australia",
+"a": "Türkiye",
+"gh": 2,
+"ga": 0,
+"devig": {
+"home": 0.1767,
+"draw": 0.2551,
+"away": 0.5681
+},
+"tier": "②中热门",
+"fav": "away",
+"dir": "平 / 弱队 / 小球",
+"kind": "anti_fav",
+"hit": true
+},
+"1489374": {
+"date": "2026-06-14T17:00:00+00:00",
+"h": "Germany",
+"a": "Curaçao",
+"gh": 7,
+"ga": 1,
+"devig": {
+"home": 0.9364,
+"draw": 0.041,
+"away": 0.0226
+},
+"tier": "①悬殊",
+"fav": "home",
+"dir": "砍屠杀 / 小球 / 弱队受让",
+"kind": "anti_blowout",
+"hit": false
+},
+"1489376": {
+"date": "2026-06-14T20:00:00+00:00",
+"h": "Netherlands",
+"a": "Japan",
+"gh": 2,
+"ga": 2,
+"devig": {
+"home": 0.4636,
+"draw": 0.2803,
+"away": 0.2561
+},
+"tier": "②中热门",
+"fav": "home",
+"dir": "平 / 弱队 / 小球",
+"kind": "anti_fav",
+"hit": true
+},
+"1489375": {
+"date": "2026-06-14T23:00:00+00:00",
+"h": "Ivory Coast",
+"a": "Ecuador",
+"gh": 1,
+"ga": 0,
+"devig": {
+"home": 0.2947,
+"draw": 0.3362,
+"away": 0.3692
+},
+"tier": "③势均",
+"fav": "away",
+"dir": "平 / 弱队 / 小球",
+"kind": "anti_fav",
+"hit": true
+},
+"1539002": {
+"date": "2026-06-15T02:00:00+00:00",
+"h": "Sweden",
+"a": "Tunisia",
+"gh": 5,
+"ga": 1,
+"devig": {
+"home": 0.5063,
+"draw": 0.284,
+"away": 0.2097
+},
+"tier": "②中热门",
+"fav": "home",
+"dir": "平 / 弱队 / 小球",
+"kind": "anti_fav",
+"hit": false
+}
+}

@@ -59,9 +59,20 @@ MATCHES = [
 ]
 COL = {'home':'#CCFF00', 'draw':'#8e9379', 'away':'#FF0055'}  # 移盘曲线用色
 AFID = {'belgium_egypt':1489377, 'saudi_uruguay':1489379, 'france_senegal':1489383, 'argentina_algeria':1489381}
-# 队徽用国旗 emoji(按英文队名 cfg['home']/['away'] 映射);新增比赛缺旗则自动降级为中文大字
-FLAG = {'Belgium':'🇧🇪', 'Egypt':'🇪🇬', 'Saudi Arabia':'🇸🇦', 'Uruguay':'🇺🇾',
-        'France':'🇫🇷', 'Senegal':'🇸🇳', 'Argentina':'🇦🇷', 'Algeria':'🇩🇿'}
+# 全量球队表(API 英文名 → 中文名, 国旗 emoji);供未来比赛与过去赛果对账共用
+TEAM = {
+ 'Belgium':('比利时','🇧🇪'), 'Egypt':('埃及','🇪🇬'), 'Saudi Arabia':('沙特','🇸🇦'), 'Uruguay':('乌拉圭','🇺🇾'),
+ 'France':('法国','🇫🇷'), 'Senegal':('塞内加尔','🇸🇳'), 'Argentina':('阿根廷','🇦🇷'), 'Algeria':('阿尔及利亚','🇩🇿'),
+ 'Mexico':('墨西哥','🇲🇽'), 'South Africa':('南非','🇿🇦'), 'South Korea':('韩国','🇰🇷'), 'Czechia':('捷克','🇨🇿'),
+ 'Canada':('加拿大','🇨🇦'), 'Bosnia & Herzegovina':('波黑','🇧🇦'), 'USA':('美国','🇺🇸'), 'Paraguay':('巴拉圭','🇵🇾'),
+ 'Qatar':('卡塔尔','🇶🇦'), 'Switzerland':('瑞士','🇨🇭'), 'Brazil':('巴西','🇧🇷'), 'Morocco':('摩洛哥','🇲🇦'),
+ 'Haiti':('海地','🇭🇹'), 'Scotland':('苏格兰','🏴󠁧󠁢󠁳󠁣󠁴󠁿'), 'Australia':('澳大利亚','🇦🇺'), 'Türkiye':('土耳其','🇹🇷'),
+ 'Germany':('德国','🇩🇪'), 'Curaçao':('库拉索','🇨🇼'), 'Netherlands':('荷兰','🇳🇱'), 'Japan':('日本','🇯🇵'),
+ 'Ivory Coast':('科特迪瓦','🇨🇮'), 'Ecuador':('厄瓜多尔','🇪🇨'), 'Sweden':('瑞典','🇸🇪'), 'Tunisia':('突尼斯','🇹🇳'),
+}
+FLAG = {k: v[1] for k, v in TEAM.items()}  # 兼容旧引用
+def cn_of(en): return TEAM.get(en, (en, ''))[0]
+def flag_of(en): return TEAM.get(en, ('', ''))[1]
 def team_badge(team_en, cn):
     fg = FLAG.get(team_en)
     return f'<div class="shield">{f"""<span class="flag">{fg}</span>""" if fg else f"""<span class="bigtxt">{cn[0]}</span>"""}</div>'
@@ -243,18 +254,46 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .opta-tag{color:var(--sec);font-weight:500;margin-left:4px}
 .opta-bar{display:flex;gap:3px;height:8px;margin:12px 0 10px}
 .opta-bar i{display:block;border-radius:999px}
-.opta-val{font-style:italic;font-size:12.5px;color:var(--sec)}"""
+.opta-val{font-style:italic;font-size:12.5px;color:var(--sec)}
+.sec-h{display:flex;align-items:baseline;gap:8px;margin:24px 2px 12px}
+.sec-h .t{font-size:15px;font-weight:800;color:var(--on);letter-spacing:-.01em}
+.sec-h .c{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--sec);opacity:.7}
+.track{background:linear-gradient(135deg,rgba(204,255,0,.12),rgba(13,28,45,.7));border:1px solid rgba(204,255,0,.32);border-radius:12px;padding:14px 16px;margin-bottom:6px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.track-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.track-l{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:800;color:var(--on)}
+.track-l .material-symbols-outlined{color:var(--lime);font-size:20px}
+.track-r{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sec);white-space:nowrap}
+.track-r b{color:var(--lime);font-size:18px}
+.track-bar{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin:10px 0 8px}
+.track-bar i{display:block;height:100%;background:var(--lime);border-radius:3px}
+.track-note{font-size:11px;color:var(--sec);opacity:.7;font-style:italic;line-height:1.5}
+.pcard{background:rgba(13,28,45,.55);border:1px solid var(--line);border-left:3px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.ptop{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pteams{font-size:15px;font-weight:600;color:var(--on)}
+.psc{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;margin:0 6px;letter-spacing:.02em}
+.pres{flex:0 0 auto;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px}
+.pres.ok{color:var(--navy);background:var(--lime)}
+.pres.no{color:var(--sec);background:rgba(255,255,255,.08)}
+.pmeta{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pchip{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--sec);border:1px solid rgba(190,198,224,.2);border-radius:3px;padding:1px 6px}
+.pval{font-size:12px;color:var(--sec)}
+.pval b{color:var(--lime);font-weight:600}"""
 
 # ---------- API-Football 赔率源(单次 /odds 调用拿全 14 家书商×所有盘口)----------
 PIN = 4  # Pinnacle(锐庄)bookmaker id
+def af_get(url):  # 带重试的 API-Football GET(网络抖动时最多重试 3 次)
+    for k in range(3):
+        try:
+            req = urllib.request.Request(url, headers={'x-apisports-key': AFKEY})
+            return json.load(urllib.request.urlopen(req, timeout=45))
+        except Exception as e:
+            if k == 2: print('api-football error', e); return None
+    return None
 def fetch_af_odds(afid):
     """返回该场全部 bookmakers(每家含全部 bet 种类),失败返回 None。每场每次仅 1 个请求。"""
     if not AFKEY or not afid: return None
-    try:
-        req = urllib.request.Request(f"https://v3.football.api-sports.io/odds?fixture={afid}",
-                                     headers={'x-apisports-key': AFKEY})
-        d = json.load(urllib.request.urlopen(req, timeout=30))
-    except Exception as e: print('api-football error', e); return None
+    d = af_get(f"https://v3.football.api-sports.io/odds?fixture={afid}")
+    if not d: return None
     resp = d.get('response', [])
     return resp[0].get('bookmakers') if resp else None
 def af_book(bms, bid): return next((b for b in bms if b['id'] == bid), None) if bms else None
@@ -423,6 +462,56 @@ def process(cfg):
         rich['dc'] = af_pair(af_vals(bms, 12), ('Home/Draw', 'Home/Away', 'Draw/Away'))
         rich['score_odds'] = af_score(bms)
     return rich
+
+# ---------- 过去赛果对账(价值模型回测,纯赛前去水位赔率驱动,绝不看赛果)----------
+def value_call(d):
+    """输入赛前去水位概率 d{home/draw/away},输出 (分档, 热门方, 价值方向, 判定类型)。"""
+    fav = max(d, key=d.get); f = d[fav]
+    tier = '①悬殊' if f >= 0.65 else ('②中热门' if f >= 0.45 else '③势均')
+    if tier == '①悬殊':
+        return tier, fav, '砍屠杀 / 小球 / 弱队受让', 'anti_blowout'
+    return tier, fav, '平 / 弱队 / 小球', 'anti_fav'
+def call_hit(kind, fav, gh, ga):
+    """方向验证口径:②③档=热门没赢则中;①档(悬殊)=热门净胜≤1球(没被血洗)则中。"""
+    res = 'home' if gh > ga else ('away' if ga > gh else 'draw')
+    if kind == 'anti_fav': return res != fav
+    return abs(gh - ga) <= 1
+def fetch_fixtures():
+    if not AFKEY: return []
+    d = af_get("https://v3.football.api-sports.io/fixtures?league=1&season=2026")
+    return d.get('response', []) if d else []
+PAST_CACHE = os.path.join(DATA_DIR, 'past.json')
+def build_past():
+    """拉已结束比赛(赛果固定→缓存,只对新结束场次请求赔率),返回按时间倒序的对账列表。"""
+    cache = {}
+    if os.path.exists(PAST_CACHE):
+        try: cache = json.load(open(PAST_CACHE))
+        except Exception: cache = {}
+    fx = fetch_fixtures()
+    ft = [f for f in fx if f['fixture']['status']['short'] in ('FT', 'AET', 'PEN')]
+    for f in ft:
+        fid = str(f['fixture']['id'])
+        gh, ga = f['goals']['home'], f['goals']['away']
+        if gh is None or ga is None: continue
+        h, a = f['teams']['home']['name'], f['teams']['away']['name']
+        rec = cache.get(fid)
+        if rec and rec.get('gh') == gh and rec.get('ga') == ga and rec.get('devig'):
+            continue  # 已缓存且比分一致,跳过请求
+        bms = fetch_af_odds(int(fid))
+        mw = af_h2h(af_bet(af_book(bms, PIN), 1)) if bms else None
+        if not mw: mw = af_h2h(af_vals(bms, 1)) if bms else None
+        if not mw:  # 无赛前赔率,仅记赛果
+            cache[fid] = {'date': f['fixture']['date'], 'h': h, 'a': a, 'gh': gh, 'ga': ga, 'devig': None}
+            continue
+        d = {k: round(v, 4) for k, v in devig(mw).items()}
+        tier, fav, dirn, kind = value_call(d)
+        cache[fid] = {'date': f['fixture']['date'], 'h': h, 'a': a, 'gh': gh, 'ga': ga,
+                      'devig': d, 'tier': tier, 'fav': fav, 'dir': dirn, 'kind': kind,
+                      'hit': bool(call_hit(kind, fav, gh, ga))}
+    with open(PAST_CACHE, 'w') as fp: json.dump(cache, fp, ensure_ascii=False, indent=0)
+    out = list(cache.values())
+    out.sort(key=lambda x: x['date'], reverse=True)
+    return out
 
 def L(cfg): return {'home': cfg['cn_h'], 'draw': '平局', 'away': cfg['cn_a']}
 
@@ -654,6 +743,24 @@ def build_detail(cfg, rows, rich):
             f'<div class="foot">自动每 1h 更新 · 仅供研究,非投注建议</div></main>{script}')
     open(os.path.join(DOCS, cfg['slug']+'.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title)}</head><body>{body}</body></html>')
 
+def sec_h(t, c=''):
+    return f'<div class="sec-h"><span class="t">{t}</span><span class="c">{c}</span></div>'
+BJ = datetime.timezone(datetime.timedelta(hours=8))
+def past_card(p):
+    cnh = cn_of(p['h']); cna = cn_of(p['a']); fh = flag_of(p['h']); fa = flag_of(p['a'])
+    try:
+        bj = datetime.datetime.fromisoformat(p['date']).astimezone(BJ); ds = f'{bj.month}/{bj.day} {bj.hour:02d}:{bj.minute:02d}'
+    except Exception: ds = p['date'][:10]
+    teams = f'<span class="pteams">{fh} {cnh} <b class="psc">{p["gh"]}-{p["ga"]}</b> {cna} {fa}</span>'
+    if not p.get('devig'):
+        return (f'<div class="pcard"><div class="ptop">{teams}<span class="pres no">赛果</span></div>'
+                f'<div class="pmeta"><span class="pchip">{ds}</span><span class="pval">（无赛前赔率,仅记录比分）</span></div></div>')
+    ok = p.get('hit'); accent = '#CCFF00' if ok else 'rgba(255,255,255,.14)'
+    badge = '<span class="pres ok">✓ 命中</span>' if ok else '<span class="pres no">✗ 未中</span>'
+    return (f'<div class="pcard" style="border-left-color:{accent}"><div class="ptop">{teams}{badge}</div>'
+            f'<div class="pmeta"><span class="pchip">{ds}</span><span class="pchip">{p["tier"]}</span>'
+            f'<span class="pval">价值:<b>{p["dir"]}</b></span></div></div>')
+
 def build_index(items):
     mc = ''
     for cfg, rows, rich in items:
@@ -671,10 +778,22 @@ def build_index(items):
         last = rows[-1]; d = last['devig']
         mc += (f'<a class="mcard" style="border-left-color:{accent}" href="{cfg["slug"]}.html">'
                f'{topbar}{tier_chips(cfg, last["hrs_to_ko"])}{probrow(d, cfg)}{minibar(d)}</a>')
+    past = build_past()
+    scored = [p for p in past if p.get('devig')]
+    nhit = sum(1 for p in scored if p.get('hit')); ntot = len(scored)
+    pct = round(nhit/ntot*100) if ntot else 0
+    track = (f'<div class="track"><div class="track-top">'
+             f'<div class="track-l"><span class="material-symbols-outlined">verified</span>模型战绩 · 小组赛首轮回测</div>'
+             f'<div class="track-r">命中 <b>{nhit}/{ntot}</b> · <b>{pct}%</b></div></div>'
+             f'<div class="track-bar"><i style="width:{pct}%"></i></div>'
+             f'<div class="track-note">价值方向由各场赛前去水位赔率自动判定(不看赛果);价值≠会赢、长期高方差,逐场仅供参考。</div></div>')
+    pc = ''.join(past_card(p) for p in past)
     body = (f'{APPBAR}<main>'
-            f'<div class="sub" style="margin-top:4px">{len(items)} 场 · 每 1h 自动更新 · {now.isoformat(timespec="minutes")} UTC(北京 +8h)</div>'
-            f'<div style="height:14px"></div>{mc}'
-            f'<div class="glass"><h2 class="sec">读法指南</h2><p class="note">点卡片查看 <b>移盘曲线 / 实时期望值 / 比分概率 / 全盘口 / 对阵分析</b>。绿色=正价值方向。仅供研究,非投注建议。</p></div>'
+            f'<div class="sub" style="margin-top:4px">{now.isoformat(timespec="minutes")} UTC · 每 1h 自动更新</div>'
+            f'<div style="height:12px"></div>{track}'
+            f'{sec_h("即将开赛", f"{len(items)} 场 · 实时追踪")}{mc}'
+            f'{sec_h("已结束 · 战绩对账", f"{ntot} 场已结算")}{pc}'
+            f'<div class="glass"><h2 class="sec">读法指南</h2><p class="note">绿色=正价值方向。「即将开赛」点卡片看实时移盘 / 期望值 / 比分概率 / 对阵分析;「战绩对账」为赛前去水位赔率自动回测 vs 真实赛果。仅供研究,非投注建议。</p></div>'
             f'<div class="foot">API-Football Pro · GitHub Actions</div></main>')
     open(os.path.join(DOCS, 'index.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赔率追踪")}</head><body>{body}</body></html>')
 
