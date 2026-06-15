@@ -313,7 +313,20 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .form-dots{display:flex;gap:5px}
 .fdot{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--navy);font-family:'JetBrains Mono',monospace}
 .fdmin{font-size:12px;color:var(--sec);opacity:.6}
-.vs-note{font-size:11px;color:var(--sec);opacity:.6;margin-top:10px;font-style:italic;line-height:1.5}"""
+.vs-note{font-size:11px;color:var(--sec);opacity:.6;margin-top:10px;font-style:italic;line-height:1.5}
+.tp-pct{display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin-bottom:8px}
+.tp-bar{display:flex;gap:3px;height:8px;margin-bottom:14px}
+.tp-bar i{display:block;border-radius:2px}
+.tp-adv{display:flex;align-items:center;gap:8px;background:rgba(204,255,0,.08);border:1px solid rgba(204,255,0,.25);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--on);margin-bottom:14px}
+.tp-adv .material-symbols-outlined{color:var(--lime);font-size:18px}
+.cmp-blk{display:flex;flex-direction:column;gap:9px}
+.cmp-row{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:12px}
+.cmp-l,.cmp-r{flex:0 0 28px;color:var(--sec)}
+.cmp-l{text-align:right;color:var(--lime)}
+.cmp-r{text-align:left;color:var(--crim)}
+.cmp-bar{flex:1;height:6px;background:rgba(255,0,85,.35);border-radius:3px;overflow:hidden}
+.cmp-bar i{display:block;height:100%;background:var(--lime);border-radius:3px}
+.cmp-c{flex:0 0 56px;color:var(--sec);opacity:.7;font-size:11px}"""
 
 # ---------- API-Football 赔率源(单次 /odds 调用拿全 14 家书商×所有盘口)----------
 PIN = 4  # Pinnacle(锐庄)bookmaker id
@@ -497,6 +510,7 @@ def process(cfg):
         rich['btts'] = af_pair(af_vals(bms, 8), ('Yes', 'No'))
         rich['dc'] = af_pair(af_vals(bms, 12), ('Home/Draw', 'Home/Away', 'Draw/Away'))
         rich['score_odds'] = af_score(bms)
+        rich['pred'] = fetch_predictions(AFID.get(cfg['slug']))
     return rich
 
 # ---------- 过去赛果对账(价值模型回测,纯赛前去水位赔率驱动,绝不看赛果)----------
@@ -788,6 +802,46 @@ def strength_block(cfg):
             f'<div class="form-row"><span class="form-team">{cfg["cn_a"]}</span>{form_dots(fa)}</div></div>'
             f'<div class="vs-note">FIFA 排名 / 身价为赛前参考值(可校准);近 5 场含热身赛,左旧 → 右新(W 胜 / D 平 / L 负)</div>')
 
+def fetch_predictions(afid):
+    if not afid: return None
+    d = af_get(f"https://v3.football.api-sports.io/predictions?fixture={afid}")
+    r = d.get('response') if d else None
+    return r[0] if r else None
+def _pnum(s):
+    try: return float(str(s).replace('%', ''))
+    except Exception: return 0.0
+def cn_advice(adv, cfg):
+    adv = (adv or '')
+    for en, cn in [('Combo Double chance :', '组合双重机会:'), ('Double chance :', '双重机会:'),
+                   ('Winner :', '胜者:'), (' or ', ' 或 '), (' and ', ' 且 '), ('draw', '平局')]:
+        adv = adv.replace(en, cn)
+    return adv.replace(cfg['home'], cfg['cn_h']).replace(cfg['away'], cfg['cn_a'])
+def third_party_block(cfg, pred):
+    if not pred: return ''
+    pr = pred.get('predictions', {}); pct = pr.get('percent', {})
+    h, d, a = _pnum(pct.get('home')), _pnum(pct.get('draw')), _pnum(pct.get('away'))
+    adv = cn_advice(pr.get('advice', ''), cfg)
+    row = (f'<div class="tp-pct"><span style="color:#CCFF00">{cfg["cn_h"]} {h:.0f}%</span>'
+           f'<span style="color:#8e9379">平 {d:.0f}%</span>'
+           f'<span style="color:#FF0055">{cfg["cn_a"]} {a:.0f}%</span></div>'
+           f'<div class="tp-bar"><i style="flex:{max(h,3):.0f};background:#CCFF00"></i>'
+           f'<i style="flex:{max(d,3):.0f};background:#3f465c"></i><i style="flex:{max(a,3):.0f};background:#FF0055"></i></div>')
+    cmap = {'total':'综合实力','goals':'进球预期','h2h':'交锋历史','form':'近期状态','att':'进攻','def':'防守','poisson_distribution':'泊松模型'}
+    cp = pred.get('comparison', {}); rows = ''
+    for k, label in cmap.items():
+        v = cp.get(k)
+        if not v: continue
+        hh, aa = _pnum(v.get('home')), _pnum(v.get('away'))
+        if hh == 0 and aa == 0: continue
+        w = hh/(hh+aa)*100 if (hh+aa) else 50
+        rows += (f'<div class="cmp-row"><span class="cmp-l">{hh:.0f}</span>'
+                 f'<div class="cmp-bar"><i style="width:{w:.0f}%"></i></div>'
+                 f'<span class="cmp-r">{aa:.0f}</span><span class="cmp-c">{label}</span></div>')
+    adv_html = f'<div class="tp-adv"><span class="material-symbols-outlined">tips_and_updates</span>算法建议:{adv}</div>' if adv else ''
+    cmp_html = f'<div class="cmp-blk">{rows}</div>' if rows else ''
+    return (f'{sec_head("hub","第三方参照 · API 官方预测")}{row}{adv_html}{cmp_html}'
+            f'<div class="vs-note">API-Football 机器学习预测,与本页「市场去水位 / 价值模型」相互参照(部分维度国家队数据缺省已隐藏)</div>')
+
 def build_detail(cfg, rows, rich):
     l = L(cfg); title = f'{cfg["cn_h"]} vs {cfg["cn_a"]}'; script = ''
     if not rows:
@@ -800,6 +854,8 @@ def build_detail(cfg, rows, rich):
         bk = (rich.get('score_odds') or {}).get('book', '')
         score_title = f'逐比分赔率{" ("+bk+")" if bk else ""}'
         script = CDSCRIPT.replace('__KO__', cfg['ko'].isoformat()) + UNLOCK_JS
+        tp = third_party_block(cfg, rich.get('pred'))
+        tp_html = f'<div class="glass">{tp}</div>' if tp else ''
         inner = (f'{match_header(rows, cfg)}'
                  f'<div class="glass">{sec_head("grid_view","比分概率 Top 6")}'
                  f'<div class="lockbox" id="lock-scores"><div class="locked">{scores_grid(lh, la, grid)}</div>'
@@ -808,6 +864,7 @@ def build_detail(cfg, rows, rich):
                  f'<div class="lockrow"><input class="lockinput" type="tel" inputmode="numeric" maxlength="6" placeholder="输入验证码"><button class="lockbtn">解锁</button></div>'
                  f'<div class="lockhint"></div></div></div></div>'
                  f'<div class="glass"><div class="evhead"><span class="l"><span class="dot"></span>实时 +EV 分析</span></div>{ev_cards(rows, cfg)}</div>'
+                 f'{tp_html}'
                  f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
                  f'<div class="glass">{sec_head("view_list",score_title)}{score_odds_html(rich, grid)}</div>'
                  f'<div class="glass">{sec_head("dashboard","全盘口快照")}{markets_html(cfg, rows, rich)}</div>'
