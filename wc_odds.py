@@ -730,8 +730,6 @@ def build_detail(cfg, rows, rich):
         script = CDSCRIPT.replace('__KO__', cfg['ko'].isoformat())
         inner = (f'{match_header(rows, cfg)}'
                  f'<div class="glass">{sec_head("grid_view","比分概率 Top 6")}{scores_grid(lh, la, grid)}</div>'
-                 f'<div class="glass">{sec_head("show_chart","移盘曲线")}{sparkline(rows)}'
-                 f'<div class="note" style="margin-top:4px"><span style="color:{COL["home"]}">{l["home"]}</span> · <span style="color:{COL["draw"]}">平</span> · <span style="color:{COL["away"]}">{l["away"]}</span> · 左早→右临场</div></div>'
                  f'<div class="glass"><div class="evhead"><span class="l"><span class="dot"></span>实时 +EV 分析</span></div>{ev_cards(rows, cfg)}</div>'
                  f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
                  f'<div class="glass">{sec_head("view_list",score_title)}{score_odds_html(rich, grid)}</div>'
@@ -794,7 +792,7 @@ def build_index(items):
             f'<div style="height:12px"></div>{track}'
             f'{sec_h("即将开赛", f"{len(items)} 场 · 实时追踪")}{mc}'
             f'{sec_h("已结束 · 战绩对账", f"{ntot} 场已结算")}{pc}'
-            f'<div class="glass"><h2 class="sec">读法指南</h2><p class="note">绿色=正价值方向。「即将开赛」点卡片看实时移盘 / 期望值 / 比分概率 / 对阵分析;「战绩对账」为赛前去水位赔率自动回测 vs 真实赛果。仅供研究,非投注建议。</p></div>'
+            f'<div class="glass"><h2 class="sec">读法指南</h2><p class="note">绿色=正价值方向。「即将开赛」点卡片看实时期望值 / 比分概率 / 全盘口 / 对阵分析;「战绩对账」为赛前去水位赔率自动回测 vs 真实赛果。仅供研究,非投注建议。</p></div>'
             f'<div class="foot">API-Football Pro · GitHub Actions</div></main>')
     open(os.path.join(DOCS, 'index.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赔率追踪")}</head><body>{body}</body></html>')
 
