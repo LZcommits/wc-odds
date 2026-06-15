@@ -54,6 +54,38 @@ MATCHES = [
 ]
 COL = {'home':'#2563eb','draw':'#6b7280','away':'#d97706'}
 
+# 每场"我估"的推理链(为什么这么估)
+REASON = {
+ 'belgium_egypt': [
+  '市场基准(锐庄去水位):比利时 ≈62% / 平 ≈24% / 埃及 ≈16%',
+  '分档:② 中热门——比利时是黄金一代大牌,正是大众情绪最易高估的格口',
+  '修正① 揭幕效应:世界杯首轮热门常熄火(本届巴西/瑞士已被逼平)→ 热门胜率打折',
+  '修正② 阵容相克:比利时后防老化、转身慢;埃及有萨拉赫+马尔穆什速度反击 → 埃及上调',
+  '修正③ 交锋史:埃及 4 次交锋胜 2,不怵比利时 → 平/埃及再上调',
+  '结论:比利时 62%→50%、平 24%→27%、埃及 16%→23% → 价值在 平 / 埃及 / 小球'],
+ 'saudi_uruguay': [
+  '市场基准:乌拉圭 ≈66% / 平 ≈22% / 沙特 ≈12%',
+  '分档:① 悬殊(乌66%),但带揭幕+冷门基因 → 按②的逆向思路处理',
+  '修正① 揭幕效应:强热门首战遇硬骨头,易被拖入苦战',
+  '修正② 阵容:乌拉圭后防伤兵多(Giménez/Araújo/Cáceres 存疑)→ 失球风险升,乌下调',
+  '修正③ 冷门基因:沙特 2022 掀翻阿根廷,Al-Dawsari 反击犀利 → 沙特/平上调',
+  '结论:乌 66%→56%、平 22%→26%、沙 12%→18% → 价值在 平 / 沙特受让 / 小球。⚡'],
+ 'france_senegal': [
+  '市场基准:法国 ≈65% / 平 ≈21% / 塞内加尔 ≈13%',
+  '分档:① 临界 ②(法65%),球星光环(姆巴佩)易被高估',
+  '修正① 揭幕效应 + 法国揭幕翻车史(2002 正是负塞内加尔出局)',
+  '修正② 阵容:塞内加尔高大强壮+反击快(Jackson/Ndiaye),实力被低估',
+  '修正③ 交锋史:塞内加尔历史交锋占优(前 3 次胜 2)',
+  '结论:法 65%→58%、平 21%→26%、塞 13%→16% → 价值在 平 / 塞内加尔 / 小球'],
+ 'argentina_algeria': [
+  '市场基准:阿根廷 ≈69% / 平 ≈21% / 阿尔及利亚 ≈10%',
+  '分档:① 悬殊(阿69%),阿根廷卫冕冠军+近 5 场全胜状态火热',
+  '修正① 揭幕效应:阿根廷 2022 揭幕战曾爆冷负沙特 → 胜率略打折',
+  '修正② 阵容:阿尔及利亚有 Mahrez/Amoura/Gouiri 反击质量,但整体差距大',
+  '修正③ 实力差距真实 → 不过度逆向(①档热门基本会赢)',
+  '结论:阿 69%→62%、平 21%→23%、阿尔 10%→15% → 价值主要在 砍屠杀 + 小球(不反胜负)。⚡'],
+}
+
 CSS = """body{font-family:-apple-system,system-ui,sans-serif;margin:0;background:#f7f7f8;color:#1a1a1a;padding:16px;max-width:480px;margin:0 auto}
 h1{font-size:19px;font-weight:600;margin:0 0 2px}a{color:inherit;text-decoration:none}
 .sub{color:#666;font-size:13px;margin-bottom:16px}
@@ -266,6 +298,11 @@ def analysis_html(cfg):
             f'<div class="mtag" style="margin-top:6px"><b>关键对位:</b></div>{mu}'
             f'<div class="note" style="margin-top:8px;color:#b45309">{s["note"]}</div>')
 
+def reasoning_html(cfg):
+    steps = REASON.get(cfg['slug'], [])
+    if not steps: return '<p class="note">暂无推理</p>'
+    return ''.join(f'<div class="mtag"><b>{i+1}.</b> {s}</div>' for i, s in enumerate(steps))
+
 def build_detail(cfg, rows, rich):
     l = L(cfg); title = f'{cfg["cn_h"]} vs {cfg["cn_a"]}'
     if not rows:
@@ -276,6 +313,7 @@ def build_detail(cfg, rows, rich):
                 f'<div class="panel"><h2>移盘曲线(锐庄去水位概率)</h2>{sparkline(rows)}'
                 f'<div style="font-size:12px;color:#666;margin-top:2px"><span style="color:#2563eb">{l["home"]}</span> <span style="color:#6b7280">平</span> <span style="color:#d97706">{l["away"]}</span> · 左早→右临场</div></div>'
                 f'<div class="panel"><h2>实时 +EV(我的概率 × 锐庄赔率)</h2><table><tr><th>结果</th><th>我估</th><th>锐庄</th><th>EV</th><th>判定</th></tr>{evtable(rows, cfg)}</table></div>'
+                f'<div class="panel"><h2>推理过程:"我估"是怎么来的</h2>{reasoning_html(cfg)}</div>'
                 f'<div class="panel"><h2>比分概率(泊松反推 Top6)</h2>{scores_html(rows)}</div>'
                 f'<div class="panel"><h2>全盘口快照(锐庄)</h2>{markets_html(cfg, rows, rich)}</div>'
                 f'<div class="panel"><h2>对阵分析</h2>{analysis_html(cfg)}</div>')
