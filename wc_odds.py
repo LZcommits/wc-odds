@@ -110,18 +110,25 @@ h1.title{font-size:24px;font-weight:800;letter-spacing:-.02em;color:var(--lime);
 .back{display:inline-flex;align-items:center;gap:2px;color:var(--sec);font-family:'JetBrains Mono',monospace;font-size:12px;margin-bottom:10px;opacity:.8}
 .glass{background:rgba(13,28,45,.7);border:1px solid var(--line);backdrop-filter:blur(10px);border-radius:8px;padding:16px;margin-bottom:16px}
 h2.sec{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--lime);margin:0 0 12px}
-.mcard{display:block;background:rgba(13,28,45,.7);border:1px solid var(--line);backdrop-filter:blur(10px);border-radius:8px;padding:16px;margin-bottom:14px}
-.mtitle{font-size:20px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:4px}
-.chev{color:var(--sec);opacity:.5;font-size:18px}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.mcard{display:block;position:relative;background:linear-gradient(145deg,rgba(20,35,52,.85),rgba(9,21,36,.72));border:1px solid var(--line);border-left:3px solid var(--line);backdrop-filter:blur(10px);border-radius:10px;padding:15px 16px;margin-bottom:14px;box-shadow:0 6px 20px rgba(0,0,0,.28);transition:transform .15s ease,box-shadow .15s ease}
+.mcard:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(0,0,0,.36)}
+.mtop{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mtitle{font-size:20px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:5px}
+.mvs{color:var(--sec);opacity:.5;font-weight:600;margin:0 1px}
+.chev{color:var(--sec);opacity:.5;font-size:20px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
 .chip{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 6px;border-radius:3px;border:1px solid rgba(190,198,224,.2);color:var(--sec);letter-spacing:.03em}
 .chip.val{border-color:rgba(204,255,0,.4);color:var(--lime);background:rgba(204,255,0,.06)}
 .chip.warn{border-color:rgba(255,0,85,.45);color:var(--crim);background:rgba(255,0,85,.06)}
 .chip.dim{border:none;color:rgba(190,198,224,.55)}
-.probrow{display:flex;gap:10px;margin:14px 0;font-size:14px}
+.probrow{display:flex;gap:10px;margin:13px 0 9px}
 .probrow>div{flex:1}
-.fav{color:var(--lime);font-weight:700}
-.dimv{color:var(--sec);opacity:.6}
+.pn{font-size:12px;opacity:.85}
+.pv{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;margin-left:2px}
+.fav{color:var(--lime)}
+.dimv{color:var(--sec);opacity:.65}
+.minibar{display:flex;gap:3px;height:6px;border-radius:3px;overflow:hidden;margin-bottom:1px}
+.minibar i{display:block;border-radius:2px}
 .pills{display:flex;flex-wrap:wrap;gap:8px}
 .pill{background:var(--lime);color:var(--navy);font-weight:700;font-size:14px;padding:6px 12px;border-radius:9999px;box-shadow:0 0 12px rgba(204,255,0,.25)}
 .pill.none{background:var(--high);color:var(--sec);box-shadow:none}
@@ -443,8 +450,13 @@ def tier_chips(cfg, hrs):
     return f'<div class="chips">{out}</div>'
 def probrow(d, cfg):
     l = L(cfg); mx = max(d, key=d.get); al = {'home':'left','draw':'center','away':'right'}
-    cells = ''.join(f'<div class="{"fav" if k==mx else "dimv"}" style="text-align:{al[k]}">{l[k]} {d[k]*100:.0f}%</div>' for k in ('home','draw','away'))
+    cells = ''.join(f'<div class="{"fav" if k==mx else "dimv"}" style="text-align:{al[k]}">'
+                    f'<span class="pn">{l[k]}</span><b class="pv">{d[k]*100:.0f}%</b></div>' for k in ('home','draw','away'))
     return f'<div class="probrow">{cells}</div>'
+def minibar(d):  # 主/平/客比例条(主青柠·平灰·客猩红)
+    col = {'home':'#CCFF00','draw':'#3f465c','away':'#FF0055'}
+    segs = ''.join(f'<i style="flex:{max(d[k]*100,4):.1f};background:{col[k]}"></i>' for k in ('home','draw','away'))
+    return f'<div class="minibar">{segs}</div>'
 def value_pills(p, cfg):
     l = L(cfg); pills = ''
     for k in ('home','draw','away'):
@@ -635,7 +647,7 @@ def build_detail(cfg, rows, rich):
             f'<h1 class="title">{title}</h1>'
             f'<div class="sub">{sub}</div>'
             f'<div style="height:12px"></div>{inner}'
-            f'<div class="foot">自动每 3h 更新 · 仅供研究,非投注建议</div></main>{script}')
+            f'<div class="foot">自动每 1h 更新 · 仅供研究,非投注建议</div></main>{script}')
     open(os.path.join(DOCS, cfg['slug']+'.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title)}</head><body>{body}</body></html>')
 
 def build_index(items):
@@ -644,13 +656,17 @@ def build_index(items):
         fh = FLAG.get(cfg['home']); fa = FLAG.get(cfg['away'])
         hh = f'{fh} {cfg["cn_h"]}' if fh else cfg['cn_h']
         aa = f'{cfg["cn_a"]} {fa}' if fa else cfg['cn_a']
-        title = f'{hh} vs {aa}'
+        title = f'{hh}<span class="mvs">vs</span>{aa}'
+        t = cfg['tier']
+        accent = '#CCFF00' if '价值' in t else ('#FF0055' if ('冷门' in t or '警报' in t) else 'rgba(255,255,255,.12)')
+        topbar = (f'<div class="mtop"><div class="mtitle">{title}</div>'
+                  f'<span class="material-symbols-outlined chev">chevron_right</span></div>')
         if not rows:
-            mc += f'<a class="mcard" href="{cfg["slug"]}.html"><div class="mtitle">{title}</div>{tier_chips(cfg, 0)}</a>'; continue
-        last = rows[-1]; d = last['devig']; p = last.get('pin_h2h') or {}
-        mc += (f'<a class="mcard" href="{cfg["slug"]}.html">'
-               f'<div class="mtitle">{title} <span class="material-symbols-outlined chev">chevron_right</span></div>'
-               f'{tier_chips(cfg, last["hrs_to_ko"])}{probrow(d, cfg)}</a>')
+            mc += (f'<a class="mcard" style="border-left-color:{accent}" href="{cfg["slug"]}.html">'
+                   f'{topbar}{tier_chips(cfg, 0)}</a>'); continue
+        last = rows[-1]; d = last['devig']
+        mc += (f'<a class="mcard" style="border-left-color:{accent}" href="{cfg["slug"]}.html">'
+               f'{topbar}{tier_chips(cfg, last["hrs_to_ko"])}{probrow(d, cfg)}{minibar(d)}</a>')
     body = (f'{APPBAR}<main>'
             f'<div class="sub" style="margin-top:4px">{len(items)} 场 · 每 1h 自动更新 · {now.isoformat(timespec="minutes")} UTC(北京 +8h)</div>'
             f'<div style="height:14px"></div>{mc}'
