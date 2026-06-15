@@ -84,7 +84,7 @@ REASON = {
 
 CSS = """*{box-sizing:border-box}
 :root{--navy:#020617;--bg:#051424;--low:#0d1c2d;--surf:#122131;--high:#1c2b3c;--on:#d4e4fa;--sec:#bec6e0;--lime:#CCFF00;--crim:#FF0055;--line:rgba(255,255,255,.1)}
-body{margin:0 auto;max-width:520px;background:var(--bg);color:var(--on);font-family:Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;padding:70px 16px 84px}
+body{margin:0 auto;max-width:520px;background:var(--bg);color:var(--on);font-family:Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;padding:70px 16px 24px}
 a{color:inherit;text-decoration:none}
 .mono{font-family:'JetBrains Mono',monospace}
 .material-symbols-outlined{font-family:'Material Symbols Outlined';font-weight:400;font-size:20px;line-height:1;vertical-align:middle}
@@ -401,7 +401,7 @@ def build_detail(cfg, rows, rich):
             f'<h1 class="title">{title}</h1>'
             f'<div class="sub">{cfg["tier"]} · 距开赛 {hrs}h · 数据档数 {n} · {updated} UTC</div>'
             f'<div style="height:12px"></div>{inner}'
-            f'<div class="foot">自动每 3h 更新 · 仅供研究,非投注建议</div></main>{nav("value")}')
+            f'<div class="foot">自动每 3h 更新 · 仅供研究,非投注建议</div></main>')
     open(os.path.join(DOCS, cfg['slug']+'.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title)}</head><body>{body}</body></html>')
 
 def build_index(items):
@@ -413,13 +413,13 @@ def build_index(items):
         last = rows[-1]; d = last['devig']; p = last.get('pin_h2h') or {}
         mc += (f'<a class="mcard" href="{cfg["slug"]}.html">'
                f'<div class="mtitle">{title} <span class="material-symbols-outlined chev">chevron_right</span></div>'
-               f'{tier_chips(cfg, last["hrs_to_ko"])}{probrow(d, cfg)}{value_pills(p, cfg)}</a>')
+               f'{tier_chips(cfg, last["hrs_to_ko"])}{probrow(d, cfg)}</a>')
     body = (f'{APPBAR}<main>'
             f'<h1 class="title">世界杯赔率价值追踪</h1>'
             f'<div class="sub">{len(items)} 场 · 每 3h 自动更新 · {now.isoformat(timespec="minutes")} UTC(北京 +8h)</div>'
             f'<div style="height:14px"></div>{mc}'
-            f'<div class="glass"><h2 class="sec">读法指南</h2><p class="note"><b>绿药丸</b> = 模型算出的 +EV 方向(价值投注机会);点卡片看移盘曲线 / 比分概率 / 全盘口 / 对阵分析。仅供研究,非投注建议。</p></div>'
-            f'<div class="foot">The Odds API · API-Football · GitHub Actions</div></main>{nav("value")}')
+            f'<div class="glass"><h2 class="sec">读法指南</h2><p class="note">点卡片查看 <b>移盘曲线 / 实时期望值 / 比分概率 / 全盘口 / 对阵分析</b>。绿色=正价值方向。仅供研究,非投注建议。</p></div>'
+            f'<div class="foot">The Odds API · API-Football · GitHub Actions</div></main>')
     open(os.path.join(DOCS, 'index.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赔率追踪")}</head><body>{body}</body></html>')
 
 items = []
