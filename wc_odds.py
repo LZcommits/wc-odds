@@ -75,7 +75,7 @@ def cn_of(en): return TEAM.get(en, (en, ''))[0]
 def flag_of(en): return TEAM.get(en, ('', ''))[1]
 def team_badge(team_en, cn):
     fg = FLAG.get(team_en)
-    return f'<div class="shield">{f"""<span class="flag">{fg}</span>""" if fg else f"""<span class="bigtxt">{cn[0]}</span>"""}</div>'
+    return f'<span class="flag-xl">{fg}</span>' if fg else f'<span class="bigtxt-xl">{cn[0]}</span>'
 REASON = {
  'belgium_egypt': [
   ('市场基准 (锐庄去水位)', '比利时 ≈62% / 平 ≈24% / 埃及 ≈16%'),
@@ -178,6 +178,8 @@ tr.bad td{background:rgba(255,0,85,.09)}
 .shield .material-symbols-outlined{font-size:28px;color:#c9b97a}
 .shield .flag{font-size:38px;line-height:1}
 .shield .bigtxt{font-size:24px;font-weight:800;color:var(--on)}
+.flag-xl{font-size:60px;line-height:1}
+.bigtxt-xl{font-size:38px;font-weight:800;color:var(--on)}
 .tn{font-size:13px;color:var(--on);font-weight:500;text-align:center}
 .vsmid{flex:1;text-align:center;padding-top:6px}
 .kol{font-size:11px;color:var(--sec);opacity:.7}
@@ -737,7 +739,6 @@ def build_detail(cfg, rows, rich):
                  f'{sec_head("analytics","对阵分析")}{matchup_analysis(cfg)}')
     body = (f'{APPBAR}<main>'
             f'<a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
-            f'<h1 class="title">{title}</h1>'
             f'<div class="sub">{sub}</div>'
             f'<div style="height:12px"></div>{inner}'
             f'<div class="foot">自动每 1h 更新 · 仅供研究,非投注建议</div></main>{script}')
