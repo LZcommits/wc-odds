@@ -12,6 +12,17 @@ TZ = datetime.timezone.utc
 def ko(y, mo, d, h): return datetime.datetime(y, mo, d, h, 0, 0, tzinfo=TZ)
 
 MATCHES = [
+ {'slug': 'spain_capeverde', 'home': 'Spain', 'away': 'Cape Verde Islands', 'cn_h': '西班牙', 'cn_a': '佛得角',
+  'ko': ko(2026,6,15,16), 'tier': '①悬殊 · 砍屠杀', 'my': {'home':0.87,'draw':0.09,'away':0.04},
+  'st': {'h2h':'双方历史无任何交锋记录——佛得角首次跻身世界杯决赛圈,这是两队首次正式碰面。',
+   'fh':'4-3-3','fa':'4-4-2(低位防反)',
+   'xh':'2024 欧洲杯冠军班底:亚马尔边路爆点、佩德里组织,技术控球渗透流,板凳深度世界顶级。',
+   'xa':'非洲岛国"蓝鲨",球员多旅欧(葡超/葡甲为主),身体强壮、纪律性好,主打密集防守+快速反击,世界杯首秀拼劲足。',
+   'mu':['西班牙控球渗透 vs 佛得角密集铁桶:能否撕开低位防线是看点',
+         '亚马尔/边路速度 vs 佛得角边后卫:西班牙打开局面的胜负手',
+         '佛得角反击速度 vs 西班牙高位防线身后:爆冷唯一火种'],
+   'oh':91,'oa':3,'osrc':'去水位','otag':'西班牙一边倒','val':'砍屠杀 / 小球 / 佛得角高让受',
+   'note':'①档极悬殊(西91%)。西班牙实力碾压、胜负无悬念;市场赌血洗(大2.5@1.29),价值在反向小球+佛得角高让受。'}},
  {'slug': 'belgium_egypt', 'home': 'Belgium', 'away': 'Egypt', 'cn_h': '比利时', 'cn_a': '埃及',
   'ko': ko(2026,6,15,19), 'tier': '②中热门 · 价值区', 'my': {'home':0.50,'draw':0.27,'away':0.23},
   'st': {'h2h':'4 次友谊赛交锋,埃及胜 2(2022年2-1、2005年4-0),比利时最大胜2018年3-0。埃及交锋不落下风。',
@@ -58,14 +69,11 @@ MATCHES = [
    'note':'①档(阿71%)。阿根廷强,但揭幕战警惕(2022曾负沙特);价值在砍屠杀+小球。⚡冷门警报'}},
 ]
 COL = {'home':'#CCFF00', 'draw':'#8e9379', 'away':'#FF0055'}  # 移盘曲线用色
-AFID = {'belgium_egypt':1489377, 'saudi_uruguay':1489379, 'france_senegal':1489383, 'argentina_algeria':1489381}
-# 球队实力静态表:FIFA 世界排名 + 阵容总身价(百万欧,赛前参考值,可校准)+ API-Football team id
-STREN = {
- 'Belgium':{'rank':8,'val':480,'tid':1},  'Egypt':{'rank':36,'val':140,'tid':32},
- 'Saudi Arabia':{'rank':58,'val':35,'tid':23}, 'Uruguay':{'rank':15,'val':430,'tid':7},
- 'France':{'rank':2,'val':1100,'tid':2}, 'Senegal':{'rank':18,'val':320,'tid':13},
- 'Argentina':{'rank':1,'val':700,'tid':26}, 'Algeria':{'rank':37,'val':200,'tid':1532},
-}
+AFID = {'belgium_egypt':1489377, 'saudi_uruguay':1489379, 'france_senegal':1489383,
+        'argentina_algeria':1489381, 'spain_capeverde':1489380}
+# API-Football team id(供"最近5场"调用;FIFA排名/身价静态表已弃用,数据不准)
+TID = {'Belgium':1, 'Egypt':32, 'Saudi Arabia':23, 'Uruguay':7, 'France':2, 'Senegal':13,
+       'Argentina':26, 'Algeria':1532, 'Spain':9, 'Cape Verde Islands':1533}
 # 全量球队表(API 英文名 → 中文名, 国旗 emoji);供未来比赛与过去赛果对账共用
 TEAM = {
  'Belgium':('比利时','🇧🇪'), 'Egypt':('埃及','🇪🇬'), 'Saudi Arabia':('沙特','🇸🇦'), 'Uruguay':('乌拉圭','🇺🇾'),
@@ -76,6 +84,7 @@ TEAM = {
  'Haiti':('海地','🇭🇹'), 'Scotland':('苏格兰','🏴󠁧󠁢󠁳󠁣󠁴󠁿'), 'Australia':('澳大利亚','🇦🇺'), 'Türkiye':('土耳其','🇹🇷'),
  'Germany':('德国','🇩🇪'), 'Curaçao':('库拉索','🇨🇼'), 'Netherlands':('荷兰','🇳🇱'), 'Japan':('日本','🇯🇵'),
  'Ivory Coast':('科特迪瓦','🇨🇮'), 'Ecuador':('厄瓜多尔','🇪🇨'), 'Sweden':('瑞典','🇸🇪'), 'Tunisia':('突尼斯','🇹🇳'),
+ 'Spain':('西班牙','🇪🇸'), 'Cape Verde Islands':('佛得角','🇨🇻'),
 }
 FLAG = {k: v[1] for k, v in TEAM.items()}  # 兼容旧引用
 def cn_of(en): return TEAM.get(en, (en, ''))[0]
@@ -84,6 +93,13 @@ def team_badge(team_en, cn):
     fg = FLAG.get(team_en)
     return f'<span class="flag-xl">{fg}</span>' if fg else f'<span class="bigtxt-xl">{cn[0]}</span>'
 REASON = {
+ 'spain_capeverde': [
+  ('市场基准 (锐庄去水位)', '西班牙 ≈91% / 平 ≈7% / 佛得角 ≈3%'),
+  ('分档:① 极悬殊', '西班牙是夺冠大热、2024 欧洲杯冠军,实力碾压'),
+  ('修正① 揭幕效应', '首轮热门常交学费,但西班牙与佛得角差距过大,胜负无悬念'),
+  ('修正② 市场过热(大球)', '大 2.5 仅 1.29,市场一边倒赌血洗 → 反向小球出现价值'),
+  ('修正③ ①档铁律', '①档只反屠杀、不反胜负 → 不押佛得角赢,只在让球/大小球找价值'),
+  ('最终结论', '西班牙稳胜;价值锁定 砍屠杀(佛得角高让受) + 小球')],
  'belgium_egypt': [
   ('市场基准 (锐庄去水位)', '比利时 ≈62% / 平 ≈24% / 埃及 ≈16%'),
   ('分档:② 中热门', '比利时是黄金一代大牌,正是大众情绪最易高估的格口'),
@@ -786,21 +802,16 @@ def form_dots(form):
     col = {'W':'#CCFF00','D':'#8e9379','L':'#FF0055'}
     if not form: return '<span class="form-dots"><span class="fdmin">暂无</span></span>'
     return '<span class="form-dots">' + ''.join(f'<span class="fdot" style="background:{col.get(r,"#888")}">{r}</span>' for r in form) + '</span>'
-def strength_block(cfg):
-    sh = STREN.get(cfg['home']); sa = STREN.get(cfg['away'])
-    if not sh or not sa: return ''
-    rh = 'vstrong' if sh['rank'] <= sa['rank'] else ''; ra = 'vstrong' if sa['rank'] < sh['rank'] else ''
-    vh = 'vstrong' if sh['val'] >= sa['val'] else ''; va = 'vstrong' if sa['val'] > sh['val'] else ''
-    fh = fetch_last5(sh['tid']); fa = fetch_last5(sa['tid'])
-    return (f'{sec_head("military_tech","实力对比")}'
-            f'<table class="vstat">'
-            f'<tr><td class="vh {rh}">第 {sh["rank"]} 位</td><td class="vc">FIFA 世界排名</td><td class="va {ra}">第 {sa["rank"]} 位</td></tr>'
-            f'<tr><td class="vh {vh}">{sh["val"]/100:.1f} 亿欧</td><td class="vc">阵容总身价</td><td class="va {va}">{sa["val"]/100:.1f} 亿欧</td></tr>'
-            f'</table>'
+def form_block(cfg):
+    th = TID.get(cfg['home']); ta = TID.get(cfg['away'])
+    if not th or not ta: return ''
+    fh = fetch_last5(th); fa = fetch_last5(ta)
+    if not fh and not fa: return ''
+    return (f'{sec_head("trending_up","近 5 场状态")}'
             f'<div class="form-blk">'
             f'<div class="form-row"><span class="form-team">{cfg["cn_h"]}</span>{form_dots(fh)}</div>'
             f'<div class="form-row"><span class="form-team">{cfg["cn_a"]}</span>{form_dots(fa)}</div></div>'
-            f'<div class="vs-note">FIFA 排名 / 身价为赛前参考值(可校准);近 5 场含热身赛,左旧 → 右新(W 胜 / D 平 / L 负)</div>')
+            f'<div class="vs-note">近 5 场含热身赛 · 左旧 → 右新 · W 胜 / D 平 / L 负</div>')
 
 def fetch_predictions(afid):
     if not afid: return None
@@ -820,6 +831,7 @@ def third_party_block(cfg, pred):
     if not pred: return ''
     pr = pred.get('predictions', {}); pct = pr.get('percent', {})
     h, d, a = _pnum(pct.get('home')), _pnum(pct.get('draw')), _pnum(pct.get('away'))
+    if 'No prediction' in (pr.get('advice') or '') or (h == d == a): return ''  # API 无有效预测,隐藏
     adv = cn_advice(pr.get('advice', ''), cfg)
     row = (f'<div class="tp-pct"><span style="color:#CCFF00">{cfg["cn_h"]} {h:.0f}%</span>'
            f'<span style="color:#8e9379">平 {d:.0f}%</span>'
@@ -856,6 +868,8 @@ def build_detail(cfg, rows, rich):
         script = CDSCRIPT.replace('__KO__', cfg['ko'].isoformat()) + UNLOCK_JS
         tp = third_party_block(cfg, rich.get('pred'))
         tp_html = f'<div class="glass">{tp}</div>' if tp else ''
+        fb = form_block(cfg)
+        fb_html = f'<div class="glass">{fb}</div>' if fb else ''
         inner = (f'{match_header(rows, cfg)}'
                  f'<div class="glass">{sec_head("grid_view","比分概率 Top 6")}'
                  f'<div class="lockbox" id="lock-scores"><div class="locked">{scores_grid(lh, la, grid)}</div>'
@@ -868,7 +882,7 @@ def build_detail(cfg, rows, rich):
                  f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
                  f'<div class="glass">{sec_head("view_list",score_title)}{score_odds_html(rich, grid)}</div>'
                  f'<div class="glass">{sec_head("dashboard","全盘口快照")}{markets_html(cfg, rows, rich)}</div>'
-                 f'<div class="glass">{strength_block(cfg)}</div>'
+                 f'{fb_html}'
                  f'{sec_head("analytics","对阵分析")}{matchup_analysis(cfg)}')
     body = (f'{APPBAR}<main>'
             f'<a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
