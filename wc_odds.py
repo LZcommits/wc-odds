@@ -641,7 +641,10 @@ def build_detail(cfg, rows, rich):
 def build_index(items):
     mc = ''
     for cfg, rows, rich in items:
-        title = f'{cfg["cn_h"]} vs {cfg["cn_a"]}'
+        fh = FLAG.get(cfg['home']); fa = FLAG.get(cfg['away'])
+        hh = f'{fh} {cfg["cn_h"]}' if fh else cfg['cn_h']
+        aa = f'{cfg["cn_a"]} {fa}' if fa else cfg['cn_a']
+        title = f'{hh} vs {aa}'
         if not rows:
             mc += f'<a class="mcard" href="{cfg["slug"]}.html"><div class="mtitle">{title}</div>{tier_chips(cfg, 0)}</a>'; continue
         last = rows[-1]; d = last['devig']; p = last.get('pin_h2h') or {}
@@ -649,10 +652,10 @@ def build_index(items):
                f'<div class="mtitle">{title} <span class="material-symbols-outlined chev">chevron_right</span></div>'
                f'{tier_chips(cfg, last["hrs_to_ko"])}{probrow(d, cfg)}</a>')
     body = (f'{APPBAR}<main>'
-            f'<div class="sub" style="margin-top:4px">{len(items)} 场 · 每 3h 自动更新 · {now.isoformat(timespec="minutes")} UTC(北京 +8h)</div>'
+            f'<div class="sub" style="margin-top:4px">{len(items)} 场 · 每 1h 自动更新 · {now.isoformat(timespec="minutes")} UTC(北京 +8h)</div>'
             f'<div style="height:14px"></div>{mc}'
             f'<div class="glass"><h2 class="sec">读法指南</h2><p class="note">点卡片查看 <b>移盘曲线 / 实时期望值 / 比分概率 / 全盘口 / 对阵分析</b>。绿色=正价值方向。仅供研究,非投注建议。</p></div>'
-            f'<div class="foot">The Odds API · API-Football · GitHub Actions</div></main>')
+            f'<div class="foot">API-Football Pro · GitHub Actions</div></main>')
     open(os.path.join(DOCS, 'index.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赔率追踪")}</head><body>{body}</body></html>')
 
 items = []
