@@ -21,6 +21,7 @@ MATCHES = [
    'mu':['德布劳内创造力 vs 埃及密集中场:能否撕开铁桶是胜负手',
          '萨拉赫/马尔穆什速度 vs 比利时老化后防(转身慢):埃及反击最大威胁',
          '卢卡库支点 vs 埃及中卫身体对抗'],
+   'oh':37,'oa':36,'osrc':'OPTA','otag':'几乎五五开','val':'平局 / 小球 / 埃及受让',
    'note':'Opta:比利时37% vs 埃及36%(几乎五五开)→②档价值区铁证。价值:平/小球/埃及受让'}},
  {'slug': 'saudi_uruguay', 'home': 'Saudi Arabia', 'away': 'Uruguay', 'cn_h': '沙特', 'cn_a': '乌拉圭',
   'ko': ko(2026,6,15,22), 'tier': '①悬殊 · ⚡冷门警报', 'my': {'home':0.18,'draw':0.26,'away':0.56},
@@ -31,6 +32,7 @@ MATCHES = [
    'mu':['乌拉圭中场三人组(Valverde/Ugarte/Bentancur)控场 vs 沙特',
          'Al-Dawsari反击 vs 乌拉圭边路:沙特爆冷的火种(他2022掀翻阿根廷)',
          '乌拉圭后防伤兵 → 沙特定位球/反击有机会'],
+   'oh':12,'oa':66,'osrc':'去水位','otag':'乌强但隐患多','val':'平局 / 沙特受让 / 小球 ⚡',
    'note':'①档(乌66%)但乌后防伤兵+沙特爆冷基因+揭幕效应→平/沙受让/小球。⚡冷门警报'}},
  {'slug': 'france_senegal', 'home': 'France', 'away': 'Senegal', 'cn_h': '法国', 'cn_a': '塞内加尔',
   'ko': ko(2026,6,16,19), 'tier': '①临界② · 已追踪', 'my': {'home':0.58,'draw':0.26,'away':0.16},
@@ -41,6 +43,7 @@ MATCHES = [
    'mu':['姆巴佩(速度) vs 塞内加尔中卫(转身):法国边路爆点的胜负手',
          '塞内加尔反击箭头 vs 法国回追:法国压上易被打身后',
          '中场对抗:法国技术 vs 塞内加尔身体'],
+   'oh':65,'oa':13,'osrc':'去水位','otag':'法占优·塞被低估','val':'平局 / 塞内加尔 / 小球',
    'note':'死亡之组;法国揭幕战有翻车史(2002负塞)。①档(法65%)但塞实力被低估→平/塞/小球有价值'}},
  {'slug': 'argentina_algeria', 'home': 'Argentina', 'away': 'Algeria', 'cn_h': '阿根廷', 'cn_a': '阿尔及利亚',
   'ko': ko(2026,6,17,1), 'tier': '①悬殊 · ⚡冷门警报', 'my': {'home':0.62,'draw':0.23,'away':0.15},
@@ -51,6 +54,7 @@ MATCHES = [
    'mu':['梅西 vs 马赫雷斯:两队头牌的隔空对决',
          '阿尔及利亚Amoura/Gouiri速度 vs 阿根廷中卫:反击能否打身后',
          '马赫雷斯(右路) vs Tagliafico(阿左后卫)'],
+   'oh':69,'oa':10,'osrc':'去水位','otag':'阿大热·防屠杀','val':'砍屠杀 / 小球 ⚡',
    'note':'①档(阿71%)。阿根廷强,但揭幕战警惕(2022曾负沙特);价值在砍屠杀+小球。⚡冷门警报'}},
 ]
 COL = {'home':'#CCFF00', 'draw':'#8e9379', 'away':'#FF0055'}  # 移盘曲线用色
@@ -199,7 +203,32 @@ tr.bad td{background:rgba(255,0,85,.09)}
 .xg-v{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--sec)}
 table.so thead tr,table.so tr:first-child{background:rgba(255,255,255,.03)}
 table.so tr.val td{background:rgba(204,255,0,.1)}
-table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}"""
+table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
+.muah{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+.muah .material-symbols-outlined{font-size:20px;color:var(--lime)}
+.muah-t{font-size:16px;font-weight:800;letter-spacing:-.01em;color:var(--on)}
+.mua-h2h{background:rgba(13,28,45,.7);border:1.5px solid rgba(204,255,0,.55);border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 0 18px rgba(204,255,0,.18)}
+.mua-h2h p{margin:0;font-size:13px;color:var(--sec);line-height:1.7}
+.mua-forms{display:flex;gap:10px;margin-bottom:14px}
+.mua-fc{flex:1;border-radius:12px;padding:14px;border:1.5px solid}
+.mua-fc.home{border-color:rgba(204,255,0,.4);background:rgba(204,255,0,.06)}
+.mua-fc.away{border-color:rgba(255,0,85,.4);background:rgba(255,0,85,.06)}
+.mua-fc h4{margin:0 0 8px;font-size:15px;font-weight:800;letter-spacing:-.01em}
+.mua-fc.home h4{color:var(--lime)}
+.mua-fc.away h4{color:var(--crim)}
+.mua-fc p{margin:0;font-size:12.5px;color:var(--sec);line-height:1.65}
+.mua-div{height:1px;background:rgba(255,255,255,.08);margin:12px 0}
+.mua-mu{list-style:none;margin:0;padding:0}
+.mua-mu li{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--on);line-height:1.6;margin:9px 0}
+.mudot{flex:0 0 6px;width:6px;height:6px;border-radius:50%;background:var(--lime);margin-top:7px}
+.muvs{color:var(--lime);font-weight:700;font-style:normal}
+.opta-row{display:flex;align-items:center;gap:10px}
+.opta-pill{background:var(--lime);color:var(--navy);font-weight:800;font-size:12px;letter-spacing:.05em;padding:3px 10px;border-radius:6px;flex:0 0 auto}
+.opta-txt{font-size:14px;color:var(--on);font-weight:600}
+.opta-tag{color:var(--sec);font-weight:500;margin-left:4px}
+.opta-bar{display:flex;gap:3px;height:8px;margin:12px 0 10px}
+.opta-bar i{display:block;border-radius:999px}
+.opta-val{font-style:italic;font-size:12.5px;color:var(--sec)}"""
 
 def get(url):
     with urllib.request.urlopen(url, timeout=30) as r: return json.load(r)
@@ -496,15 +525,32 @@ def markets_html(cfg, rows, rich):
         r += f'<tr><td>双重机会</td><td class="num">{" · ".join(f"{k} {v}" for k,v in rich["dc"].items())}</td></tr>'
     return f'<table>{r}</table>' if r else '<p class="note">暂无盘口数据</p>'
 
-def analysis_html(cfg):
-    s = cfg['st']; l = L(cfg)
-    mu = ''.join(f'<div class="mtag">• {x}</div>' for x in s['mu'])
-    return (f'<div class="mtag"><b>历史交锋:</b>{s["h2h"]}</div>'
-            f'<div class="mtag"><b>阵型:</b>{l["home"]} {s["fh"]} ｜ {l["away"]} {s["fa"]}</div>'
-            f'<div class="mtag"><b>{l["home"]}:</b>{s["xh"]}</div>'
-            f'<div class="mtag"><b>{l["away"]}:</b>{s["xa"]}</div>'
-            f'<div class="mtag" style="margin-top:6px"><b>关键对位:</b></div>{mu}'
-            f'<div class="note" style="margin-top:8px;color:var(--lime)">{s["note"]}</div>')
+def matchup_analysis(cfg):
+    s = cfg['st']; ch = cfg['cn_h']; ca = cfg['cn_a']
+    lis = ''
+    for x in s['mu']:
+        x = x.replace(' vs ', ' <b class="muvs">vs</b> ')
+        lis += f'<li><span class="mudot"></span><span>{x}</span></li>'
+    oh = s['oh']; oa = s['oa']; tot = (oh + oa) or 1
+    hw = oh / tot * 100  # 主队胜率在条形中所占宽度
+    head = (f'<b style="color:var(--lime)">{oh}%</b> vs '
+            f'<b style="color:var(--crim)">{oa}%</b>'
+            f'<span class="opta-tag">({s["otag"]})</span>')
+    return (
+        f'<div class="mua-h2h"><div class="muah">'
+        f'<span class="material-symbols-outlined">history</span><span class="muah-t">历史交锋</span></div>'
+        f'<p>{s["h2h"]}</p></div>'
+        f'<div class="mua-forms">'
+        f'<div class="mua-fc home"><h4>{ch} {s["fh"]}</h4><p>{s["xh"]}</p></div>'
+        f'<div class="mua-fc away"><h4>{ca} {s["fa"]}</h4><p>{s["xa"]}</p></div></div>'
+        f'<div class="glass mua-key"><div class="muah">'
+        f'<span class="material-symbols-outlined">gps_fixed</span><span class="muah-t">关键对位</span></div>'
+        f'<div class="mua-div"></div><ul class="mua-mu">{lis}</ul><div class="mua-div"></div>'
+        f'<div class="opta-row"><span class="opta-pill">{s.get("osrc","OPTA")}</span>'
+        f'<span class="opta-txt">{head}</span></div>'
+        f'<div class="opta-bar"><i style="width:{hw:.1f}%;background:var(--lime)"></i>'
+        f'<i style="flex:1;background:var(--crim)"></i></div>'
+        f'<div class="opta-val"><i>价值结论:{s["val"]}</i></div></div>')
 
 def reasoning_html(cfg):
     steps = REASON.get(cfg['slug'], [])
@@ -531,7 +577,7 @@ def build_detail(cfg, rows, rich):
                  f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
                  f'<div class="glass">{sec_head("view_list",score_title)}{score_odds_html(rich, grid)}</div>'
                  f'<div class="glass">{sec_head("dashboard","全盘口快照")}{markets_html(cfg, rows, rich)}</div>'
-                 f'<div class="glass">{sec_head("analytics","对阵分析")}{analysis_html(cfg)}</div>')
+                 f'{sec_head("analytics","对阵分析")}{matchup_analysis(cfg)}')
     body = (f'{APPBAR}<main>'
             f'<a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
             f'<h1 class="title">{title}</h1>'
