@@ -626,7 +626,7 @@ def build_detail(cfg, rows, rich):
     if not rows:
         inner = '<div class="glass"><p class="note">暂无数据(比赛可能已开赛或尚未采样)</p></div>'; sub = cfg['tier']
     else:
-        last = rows[-1]; n = len(rows); updated = last['ts']; sub = f'数据档数 {n} · 更新 {updated} UTC'
+        last = rows[-1]; n = len(rows); updated = last['ts']; sub = f'更新 {updated}'
         d = last['devig']; t25 = last.get('pin_tot25') or {}
         up = devig({'over': t25['over'], 'under': t25['under']})['under'] if (t25.get('over') and t25.get('under')) else None
         lh, la, grid = poisson_calc(d['home'], d['away'], up)
@@ -634,10 +634,10 @@ def build_detail(cfg, rows, rich):
         score_title = f'逐比分赔率{" ("+bk+")" if bk else ""}'
         script = CDSCRIPT.replace('__KO__', cfg['ko'].isoformat())
         inner = (f'{match_header(rows, cfg)}'
-                 f'<div class="glass">{sec_head("grid_view","比分概率 Top 6","模型推测 · 泊松分布")}{scores_grid(lh, la, grid)}</div>'
+                 f'<div class="glass">{sec_head("grid_view","比分概率 Top 6")}{scores_grid(lh, la, grid)}</div>'
                  f'<div class="glass">{sec_head("show_chart","移盘曲线")}{sparkline(rows)}'
                  f'<div class="note" style="margin-top:4px"><span style="color:{COL["home"]}">{l["home"]}</span> · <span style="color:{COL["draw"]}">平</span> · <span style="color:{COL["away"]}">{l["away"]}</span> · 左早→右临场</div></div>'
-                 f'<div class="glass"><div class="evhead"><span class="l"><span class="dot"></span>实时 +EV 分析</span><span class="r">我的概率 × 锐庄赔率</span></div>{ev_cards(rows, cfg)}</div>'
+                 f'<div class="glass"><div class="evhead"><span class="l"><span class="dot"></span>实时 +EV 分析</span></div>{ev_cards(rows, cfg)}</div>'
                  f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
                  f'<div class="glass">{sec_head("view_list",score_title)}{score_odds_html(rich, grid)}</div>'
                  f'<div class="glass">{sec_head("dashboard","全盘口快照")}{markets_html(cfg, rows, rich)}</div>'
