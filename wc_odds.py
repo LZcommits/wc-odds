@@ -59,6 +59,12 @@ MATCHES = [
 ]
 COL = {'home':'#CCFF00', 'draw':'#8e9379', 'away':'#FF0055'}  # 移盘曲线用色
 AFID = {'belgium_egypt':1489377, 'saudi_uruguay':1489379, 'france_senegal':1489383, 'argentina_algeria':1489381}
+# 队徽用国旗 emoji(按英文队名 cfg['home']/['away'] 映射);新增比赛缺旗则自动降级为中文大字
+FLAG = {'Belgium':'🇧🇪', 'Egypt':'🇪🇬', 'Saudi Arabia':'🇸🇦', 'Uruguay':'🇺🇾',
+        'France':'🇫🇷', 'Senegal':'🇸🇳', 'Argentina':'🇦🇷', 'Algeria':'🇩🇿'}
+def team_badge(team_en, cn):
+    fg = FLAG.get(team_en)
+    return f'<div class="shield">{f"""<span class="flag">{fg}</span>""" if fg else f"""<span class="bigtxt">{cn[0]}</span>"""}</div>'
 REASON = {
  'belgium_egypt': [
   ('市场基准 (锐庄去水位)', '比利时 ≈62% / 平 ≈24% / 埃及 ≈16%'),
@@ -152,6 +158,8 @@ tr.bad td{background:rgba(255,0,85,.09)}
 .vsteam{display:flex;flex-direction:column;align-items:center;gap:6px;width:84px}
 .shield{width:54px;height:54px;border-radius:14px;background:var(--high);display:flex;align-items:center;justify-content:center}
 .shield .material-symbols-outlined{font-size:28px;color:#c9b97a}
+.shield .flag{font-size:38px;line-height:1}
+.shield .bigtxt{font-size:24px;font-weight:800;color:var(--on)}
 .tn{font-size:13px;color:var(--on);font-weight:500;text-align:center}
 .vsmid{flex:1;text-align:center;padding-top:6px}
 .kol{font-size:11px;color:var(--sec);opacity:.7}
@@ -515,10 +523,10 @@ def match_header(rows, cfg):
                 f'<div class="ph-chg mono" style="color:{ac}">{arr} {abs(dv):.1f}%</div></div>')
     segs = ''.join(f'<div style="flex:{max(d[k]*100,3):.1f};background:{"#CCFF00" if k==mx else "#3f465c"}"></div>' for k in ('home','draw','away'))
     return (f'<div class="glass vshead">{hot}<div class="vsrow">'
-            f'<div class="vsteam"><div class="shield"><span class="material-symbols-outlined">shield</span></div><div class="tn">{l["home"]}</div></div>'
+            f'<div class="vsteam">{team_badge(cfg["home"], l["home"])}<div class="tn">{l["home"]}</div></div>'
             f'<div class="vsmid"><div class="kol">距离开赛</div><div class="kot" id="cd">{ch:02d}<small>H</small> {cm:02d}<small>M</small></div>'
             f'<div class="tierpill">{tier}</div></div>'
-            f'<div class="vsteam"><div class="shield"><span class="material-symbols-outlined">shield</span></div><div class="tn">{l["away"]}</div></div>'
+            f'<div class="vsteam">{team_badge(cfg["away"], l["away"])}<div class="tn">{l["away"]}</div></div>'
             f'</div><div class="prob3">{cell("home")}{cell("draw")}{cell("away")}</div>'
             f'<div class="pbar">{segs}</div></div>')
 
