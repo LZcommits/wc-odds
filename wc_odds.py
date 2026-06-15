@@ -305,6 +305,11 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .track-bar{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin:10px 0 8px}
 .track-bar i{display:block;height:100%;background:var(--lime);border-radius:3px}
 .track-note{font-size:11px;color:var(--sec);opacity:.7;font-style:italic;line-height:1.5}
+.track-grid{display:flex;gap:8px;margin:12px 0 10px}
+.tg{flex:1;text-align:center;background:rgba(0,0,0,.18);border-radius:8px;padding:10px 4px}
+.tg-v{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--lime)}
+.tg-l{font-size:11px;color:var(--on);margin-top:3px}
+.tg-n{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--sec);opacity:.6;margin-top:2px}
 .pcard{display:block;background:rgba(13,28,45,.55);border:1px solid var(--line);border-left:3px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;transition:background .15s}
 .pcard:hover{background:rgba(20,38,58,.7)}
 .pmore{margin-left:auto;font-size:11px;color:var(--lime);font-weight:600;white-space:nowrap}
@@ -321,6 +326,9 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .pva-vs{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--sec);opacity:.5;flex:0 0 auto}
 .pva-note{font-size:12px;color:var(--sec);line-height:1.6;border-top:1px solid rgba(255,255,255,.06);padding-top:10px}
 .pva-note b{color:var(--lime)}
+.pva-hits{display:flex;gap:6px;justify-content:center;margin-bottom:12px}
+.ph3{font-size:11px;padding:4px 9px;border-radius:999px;font-weight:700;background:rgba(255,255,255,.06);color:var(--sec)}
+.ph3.y{background:rgba(204,255,0,.15);color:var(--lime)}
 .ptop{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .pteams{font-size:15px;font-weight:600;color:var(--on)}
 .psc{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;margin:0 6px;letter-spacing:.02em}
@@ -592,7 +600,15 @@ def build_past():
     with open(PAST_CACHE, 'w') as fp: json.dump(cache, fp, ensure_ascii=False, indent=0)
     out = []
     for fid, v in cache.items():
-        v = dict(v); v['fid'] = fid; out.append(v)  # 注入 fixture id 供详情页链接
+        v = dict(v); v['fid'] = fid
+        if v.get('devig'):  # 纯计算:泊松最可能比分 → 胜平负命中 / 比分精确命中(不耗请求)
+            d = v['devig']; lh, la, grid = poisson_calc(d['home'], d['away'], None)
+            ph, pa = map(int, sorted(grid.items(), key=lambda x: -x[1])[0][0].split('-'))
+            v['pred'] = f'{ph}-{pa}'
+            pr = 'home' if ph > pa else ('away' if pa > ph else 'draw')
+            ar = 'home' if v['gh'] > v['ga'] else ('away' if v['ga'] > v['gh'] else 'draw')
+            v['wdl_hit'] = (pr == ar); v['score_hit'] = (ph == v['gh'] and pa == v['ga'])
+        out.append(v)
     out.sort(key=lambda x: x['date'], reverse=True)
     return out
 
@@ -935,7 +951,10 @@ def build_past_detail(p):
     except Exception: ds = p['date'][:10]
     lh, la, grid = poisson_calc(d['home'], d['away'], None)
     pred = sorted(grid.items(), key=lambda x: -x[1])[0][0]; pred_sc = pred.replace('-', ' - ')
-    ok = p.get('hit'); badge = '<span class="pres ok">✓ 方向命中</span>' if ok else '<span class="pres no">✗ 方向未中</span>'
+    ok = p.get('hit'); wh = p.get('wdl_hit'); sh = p.get('score_hit')
+    badge = '<span class="pres ok">✓ 方向命中</span>' if ok else '<span class="pres no">✗ 方向未中</span>'
+    def h3(label, hit): return f'<span class="ph3 {"y" if hit else ""}">{label} {"✓" if hit else "✗"}</span>'
+    hits = f'<div class="pva-hits">{h3("比分", sh)}{h3("胜平负", wh)}{h3("价值方向", ok)}</div>'
     title = f'{cnh} vs {cna}'
     dv = lambda k: f'{d[k]*100:.0f}%'
     head_card = (f'<div class="glass" style="text-align:center">'
@@ -949,6 +968,7 @@ def build_past_detail(p):
            f'<div class="pva-vs">VS</div>'
            f'<div class="pva-col"><div class="pva-lbl">实际比分</div>'
            f'<div class="pva-sc">{gh} - {ga}</div><div class="pva-sub">真实赛果</div></div></div>'
+           f'{hits}'
            f'<div class="pva-note">价值方向:<b>{p["dir"]}</b> &nbsp;→&nbsp; {"✓ 命中" if ok else "✗ 未中"}'
            f'(口径:{"①档悬殊看热门没被血洗、净胜≤1" if p["kind"]=="anti_blowout" else "②③档看热门没赢、出现平或冷门"})</div></div>')
     grid_card = f'<div class="glass">{sec_head("grid_view","模型推测比分分布 Top 6")}{scores_grid(lh, la, grid)}</div>'
@@ -988,13 +1008,18 @@ def build_index(items):
     past = build_past()
     for p in past: build_past_detail(p)  # 为每场已结束比赛生成"推测vs实际"复盘页
     scored = [p for p in past if p.get('devig')]
-    nhit = sum(1 for p in scored if p.get('hit')); ntot = len(scored)
-    pct = round(nhit/ntot*100) if ntot else 0
-    track = (f'<div class="track"><div class="track-top">'
+    ntot = len(scored) or 1
+    nval = sum(1 for p in scored if p.get('hit'))
+    nwdl = sum(1 for p in scored if p.get('wdl_hit'))
+    nsc = sum(1 for p in scored if p.get('score_hit'))
+    def metric(label, n):
+        pc = round(n/ntot*100)
+        return (f'<div class="tg"><div class="tg-v">{pc}%</div><div class="tg-l">{label}</div>'
+                f'<div class="tg-n">{n}/{len(scored)}</div></div>')
+    track = (f'<div class="track">'
              f'<div class="track-l"><span class="material-symbols-outlined">verified</span>模型战绩 · 小组赛首轮回测</div>'
-             f'<div class="track-r">命中 <b>{nhit}/{ntot}</b> · <b>{pct}%</b></div></div>'
-             f'<div class="track-bar"><i style="width:{pct}%"></i></div>'
-             f'<div class="track-note">价值方向由各场赛前去水位赔率自动判定(不看赛果);价值≠会赢、长期高方差,逐场仅供参考。</div></div>')
+             f'<div class="track-grid">{metric("价值方向", nval)}{metric("胜平负", nwdl)}{metric("比分精确", nsc)}</div>'
+             f'<div class="track-note">价值方向=逆势找性价比(赛前去水位自动判);胜平负 / 比分=泊松顺势预测的准度。价值≠会赢、长期高方差,逐场仅供参考。</div></div>')
     pc = ''.join(past_card(p) for p in past)
     body = (f'{APPBAR}<main>'
             f'<div class="sub" style="margin-top:4px">{now.isoformat(timespec="minutes")} UTC · 每 1h 自动更新</div>'
