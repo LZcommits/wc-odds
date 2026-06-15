@@ -275,12 +275,12 @@ def L(cfg): return {'home': cfg['cn_h'], 'draw': '平局', 'away': cfg['cn_a']}
 # ---------- UI 组件 ----------
 def head(title):
     return ('<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-            f'<title>{title} · PRO ANALYTICS</title>'
+            f'<title>{title} · 世界杯推演分析</title>'
             '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
             '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">'
             '<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet">'
             f'<style>{CSS}</style>')
-APPBAR = ('<header class="appbar"><div class="brand"><span class="material-symbols-outlined">analytics</span>PRO ANALYTICS</div>'
+APPBAR = ('<header class="appbar"><div class="brand"><span class="material-symbols-outlined">analytics</span>世界杯推演分析</div>'
           '<div class="barIcons"><span class="material-symbols-outlined">search</span>'
           '<span class="material-symbols-outlined">notifications</span></div></header>')
 def nav(active='value'):
@@ -415,8 +415,7 @@ def build_index(items):
                f'<div class="mtitle">{title} <span class="material-symbols-outlined chev">chevron_right</span></div>'
                f'{tier_chips(cfg, last["hrs_to_ko"])}{probrow(d, cfg)}</a>')
     body = (f'{APPBAR}<main>'
-            f'<h1 class="title">世界杯赔率价值追踪</h1>'
-            f'<div class="sub">{len(items)} 场 · 每 3h 自动更新 · {now.isoformat(timespec="minutes")} UTC(北京 +8h)</div>'
+            f'<div class="sub" style="margin-top:4px">{len(items)} 场 · 每 3h 自动更新 · {now.isoformat(timespec="minutes")} UTC(北京 +8h)</div>'
             f'<div style="height:14px"></div>{mc}'
             f'<div class="glass"><h2 class="sec">读法指南</h2><p class="note">点卡片查看 <b>移盘曲线 / 实时期望值 / 比分概率 / 全盘口 / 对阵分析</b>。绿色=正价值方向。仅供研究,非投注建议。</p></div>'
             f'<div class="foot">The Odds API · API-Football · GitHub Actions</div></main>')
