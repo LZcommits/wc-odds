@@ -146,7 +146,26 @@ CROWD_DATA = {
  'brazil_morocco':     {'n':149, 'top':[('1-1',22),('2-1',4),('1-2',4),('2-2',3),('0-1',3),('0-0',2)]},
  'southkorea_czechia': {'n':148, 'top':[('2-1',19),('1-0',4),('1-1',3),('1-2',2),('2-0',1),('3-1',1)]},
  'mexico_southafrica': {'n':148, 'top':[('2-0',21),('2-1',9),('3-0',5),('1-0',5),('3-1',5),('1-1',3)]},
+ 'argentina_algeria': {'n':502, 'scored':163, 'top':[('2-2',16),('2-0',14),('1-2',14),('3-1',14),('1-1',13),('0-1',12),('7-0',10),('1-0',9)]},
+ 'france_senegal':    {'n':505, 'scored':200, 'top':[('2-0',25),('0-1',22),('3-1',21),('1-0',15),('0-0',15),('1-1',13),('3-3',11),('3-0',11)]},
+ 'iraq_norway':       {'n':500, 'scored':141, 'top':[('2-0',24),('1-5',22),('0-2',22),('0-1',12),('1-1',9),('1-2',8),('0-3',8),('0-0',4)]},
 }
+# 精确比分赔率(Pinnacle，bet=10)：用于计算大众/庄家价差比
+CROWD_SCORE_ODDS = {
+ 'argentina_algeria': {'2-2':21.0,'2-0':6.0,'1-2':21.0,'3-1':13.0,'1-1':8.5,'0-1':17.0,'7-0':101.0,'1-0':6.0},
+ 'france_senegal':    {'2-0':7.0,'0-1':15.0,'3-1':11.0,'1-0':7.0,'0-0':13.0,'1-1':8.5,'3-3':34.0,'3-0':10.5},
+ 'iraq_norway':       {'2-0':41.0,'1-5':26.0,'0-2':6.0,'0-1':7.5,'1-1':13.0,'1-2':10.0,'0-3':6.5,'0-0':17.0},
+}
+# 万人竞猜回测：6场已结束小组赛，赔率来源 Pinnacle/Bet365
+# 西班牙/伊朗已做赛前时间戳过滤；荷兰/巴西 ⚠️ 含赛后评论风险
+BACKTEST = [
+ {'cn':'墨西哥 vs 南非',   'p1':('2-0',5.40), 'p2':('2-1',8.50),  'actual':'2-0'},
+ {'cn':'韩国 vs 捷克',     'p1':('2-1',11.0), 'p2':('1-0',7.50),  'actual':'2-1'},
+ {'cn':'巴西 vs 摩洛哥',   'p1':('1-1',6.75), 'p2':('0-0',10.0),  'actual':'1-1', 'warn':1},
+ {'cn':'荷兰 vs 日本',     'p1':('2-2',12.5), 'p2':('2-0',9.00),  'actual':'2-2', 'warn':1},
+ {'cn':'西班牙 vs 佛得角', 'p1':('4-1',17.0), 'p2':('0-0',29.0),  'actual':'0-0', 'vr':3.2},
+ {'cn':'伊朗 vs 新西兰',   'p1':('2-0',7.50), 'p2':('2-1',9.50),  'actual':'2-2'},
+]
 AFID = {'belgium_egypt':1489377, 'saudi_uruguay':1489379, 'france_senegal':1489383,
         'argentina_algeria':1489381, 'spain_capeverde':1489380,
         'iraq_norway':1539016, 'austria_jordan':1489382, 'portugal_congodr':1539003,
@@ -1159,6 +1178,7 @@ def crowd_block(slug, grid):
     if not cd: return ''
     total_votes = sum(v for _, v in cd['top'])
     if total_votes == 0: return ''
+    scored_n = cd.get('scored', total_votes)  # 有效含比分评论总数
     # 计算众选 WDL 分布
     wdl = {'home': 0, 'draw': 0, 'away': 0}
     for s, v in cd['top']:
@@ -1170,6 +1190,7 @@ def crowd_block(slug, grid):
     top3 = cd['top'][:3]
     so_model = sorted(grid.items(), key=lambda x: -x[1])[:1]
     model_top = so_model[0][0] if so_model else ''
+    slug_odds = CROWD_SCORE_ODDS.get(slug, {})
     for i, (s, votes) in enumerate(top3):
         sc = s.replace('-', ':')
         pct = votes / total_votes * 100
@@ -1180,10 +1201,21 @@ def crowd_block(slug, grid):
         bar_bg = 'var(--lime)' if i == 0 else 'var(--sec)'
         bar_op = '1' if i == 0 else '0.5'
         model_tag = ' <span style="color:var(--lime);font-size:12px">⚡模型一致</span>' if match_model else ''
+        # 价差比：大众隐含概率 / 庄家隐含概率
+        od = slug_odds.get(s)
+        vr_tag = ''
+        if od:
+            ratio = (votes / scored_n) / (1 / od)
+            if ratio >= 2.0:
+                vr_tag = f' <span style="color:var(--lime);font-size:11px">价差{ratio:.1f}x @{od}</span>'
+            elif ratio >= 1.5:
+                vr_tag = f' <span style="color:#BA7517;font-size:11px">{ratio:.1f}x @{od}</span>'
+            else:
+                vr_tag = f' <span style="color:rgba(255,255,255,.3);font-size:11px">@{od}</span>'
         rows += (f'<div style="margin:6px 0">'
                  f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">'
                  f'<span style="font-size:15px;font-weight:{fw};color:{fg}">#{i+1} <b>{sc}</b>{model_tag}</span>'
-                 f'<span style="font-size:13px;color:var(--sec)">{votes} 票 · {pct:.0f}%</span></div>'
+                 f'<span style="font-size:13px;color:var(--sec)">{votes} 票 · {pct:.0f}%{vr_tag}</span></div>'
                  f'<div style="height:4px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden">'
                  f'<div style="height:100%;width:{bar_w}%;background:{bar_bg};border-radius:2px;opacity:{bar_op}"></div></div></div>')
     # WDL 小结
@@ -1192,8 +1224,52 @@ def crowd_block(slug, grid):
                f'<span>主胜 {wdl["home"]/wdl_total*100:.0f}%</span>'
                f'<span>平局 {wdl["draw"]/wdl_total*100:.0f}%</span>'
                f'<span>客胜 {wdl["away"]/wdl_total*100:.0f}%</span>'
-               f'<span style="margin-left:auto">共 {cd["n"]} 条评论 · {total_votes} 票含比分</span></div>')
+               f'<span style="margin-left:auto">共 {cd["n"]} 条评论 · {scored_n} 票含比分</span></div>')
     return f'<div class="glass">{sec_head("groups","万人竞猜")}{rows}{wdl_row}</div>'
+
+def crowd_backtest_block():
+    inv = len(BACKTEST) * 100
+    ret1 = ret2 = h1 = h2 = 0
+    rows_html = ''
+    for b in BACKTEST:
+        actual = b['actual']
+        s1, o1 = b['p1']; s2, o2 = b['p2']
+        hit1 = s1 == actual; hit2 = s2 == actual
+        if hit1: h1 += 1; ret1 += o1 * 100
+        if hit2: h2 += 1; ret2 += o2 * 100
+        t1 = '<span style="color:var(--lime)">命中</span>' if hit1 else '<span style="color:var(--sec)">✗</span>'
+        t2 = '<span style="color:var(--lime)">命中</span>' if hit2 else '<span style="color:var(--sec)">✗</span>'
+        vr = f'<span style="color:var(--lime);font-size:10px"> {b["vr"]}x↑</span>' if b.get('vr') else ''
+        wn = '<span style="font-size:10px;color:#BA7517"> ⚠</span>' if b.get('warn') else ''
+        rows_html += (
+            f'<div style="padding:8px 0;border-bottom:.5px solid rgba(255,255,255,.07);font-size:12px">'
+            f'<div style="display:flex;justify-content:space-between;color:var(--sec);font-size:11px;margin-bottom:4px">'
+            f'<span>{b["cn"]}{wn}</span>'
+            f'<span>实际 <b style="color:var(--fg)">{actual.replace("-",":")}</b></span></div>'
+            f'<div style="display:flex;gap:14px">'
+            f'<span>众#1 <b>{s1.replace("-",":")}</b> @{o1} {t1}</span>'
+            f'<span>众#2 <b>{s2.replace("-",":")}</b> @{o2} {t2}{vr}</span>'
+            f'</div></div>')
+    roi1 = round((ret1 - inv) / inv * 100)
+    roi2 = round((ret2 - inv) / inv * 100)
+    n = len(BACKTEST)
+    def sc(label, roi, hits, note=''):
+        col = 'var(--lime)' if roi >= 0 else '#FF0055'
+        sg = '+' if roi >= 0 else ''
+        return (f'<div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px;text-align:center">'
+                f'<div style="font-size:10px;color:var(--sec);margin-bottom:3px">{label}</div>'
+                f'<div style="font-size:20px;font-weight:700;color:{col}">{sg}{roi}%</div>'
+                f'<div style="font-size:10px;color:var(--sec);margin-top:2px">{hits}/{n} 命中{note}</div></div>')
+    strats = (f'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px">'
+              f'{sc("买众#1",roi1,h1)}{sc("买众#2",roi2,h2," · @29大冷")}{sc("买最少票",-100,0)}</div>')
+    insight = (f'<div style="margin-top:10px;padding:8px 10px;border-left:2px solid rgba(204,255,0,.35);'
+               f'background:rgba(204,255,0,.04);font-size:11px;color:var(--sec);line-height:1.6">'
+               f'价值信号：大众票占比 ÷ 庄家隐含概率 ≥ 2 才有正期望。'
+               f'西班牙 0:0 大众 10.8% / 庄家 3.4% = 3.2x，唯一明确价差盘，@29 命中。</div>')
+    dnote = (f'<div style="font-size:10px;color:#BA7517;margin-top:8px;line-height:1.5">'
+             f'⚠ 荷兰/巴西评论可能含赛后数据；西班牙/伊朗已做赛前时间戳过滤。{n} 场样本极小，勿过度推断。</div>')
+    hd = sec_head('query_stats', f'众选回测 · {n} 场')
+    return f'<div class="glass">{hd}{rows_html}{strats}{insight}{dnote}</div>'
 
 def score_top3_block(rich, my, grid):
     """比分推荐 TOP3：Poisson 模型概率最高的3个比分 + 真实赔率。"""
@@ -1502,8 +1578,9 @@ def build_index(items):
     js = ('<script>(function(){if(location.hash)return;'
           'var t=document.getElementById("tickets");'
           'if(t)setTimeout(function(){t.scrollIntoView({block:"start"});},80);})();</script>')
+    bt = crowd_backtest_block()
     body = (f'<main>'
-            f'<div style="height:12px"></div>{track}{filt}{tl}'
+            f'<div style="height:12px"></div>{track}{filt}{tl}{bt}'
             f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{js}')
     open(os.path.join(DOCS, 'index.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赔率追踪")}</head><body>{body}</body></html>')
 
