@@ -249,7 +249,7 @@ REASON = {
 
 CSS = """*{box-sizing:border-box}
 :root{--navy:#020617;--bg:#051424;--low:#0d1c2d;--surf:#122131;--high:#1c2b3c;--on:#d4e4fa;--sec:#bec6e0;--lime:#CCFF00;--crim:#FF0055;--line:rgba(255,255,255,.1)}
-body{margin:0 auto;max-width:520px;background:var(--bg);color:var(--on);font-family:Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;padding:70px 16px 24px}
+body{margin:0 auto;max-width:520px;background:var(--bg);color:var(--on);font-family:Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;padding:12px 16px 24px}
 a{color:inherit;text-decoration:none}
 .mono{font-family:'JetBrains Mono',monospace}
 .material-symbols-outlined{font-family:'Material Symbols Outlined';font-weight:400;font-size:20px;line-height:1;vertical-align:middle}
@@ -446,7 +446,7 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .fx-vs{color:var(--sec);opacity:.5;font-size:12px;margin:0 4px}
 .mtime{display:flex;align-items:center;gap:6px;margin-top:9px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sec)}
 .mtime .material-symbols-outlined{font-size:14px;opacity:.7}
-.filt{position:sticky;top:56px;z-index:40;display:flex;gap:8px;padding:10px 0;background:var(--bg)}
+.filt{position:sticky;top:0;z-index:40;display:flex;gap:8px;padding:10px 0;background:var(--bg)}
 .filt a{flex:1;text-align:center;font-size:13px;font-weight:700;color:var(--sec);background:rgba(13,28,45,.8);border:1px solid var(--line);border-radius:8px;padding:9px 0}
 .round-head{scroll-margin-top:112px;display:flex;align-items:center;gap:7px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800;color:var(--lime);margin:20px 2px 10px}
 .round-head .material-symbols-outlined{font-size:17px}
@@ -926,7 +926,7 @@ def scores_html(lh, la, grid):
 def score_odds_html(rich, grid):
     so = rich.get('score_odds')
     if not so: return '<p class="note">逐比分赔率暂无(部分书商临近开赛才上盘)</p>'
-    odds = so['odds']; top = sorted(odds.items(), key=lambda x: x[1])[:12]
+    odds = so['odds']; top = sorted(odds.items(), key=lambda x: x[1])
     h = (f'<div class="note" style="margin-bottom:10px">共 {len(odds)} 个比分 · 期望值=模型推测×盘口,&gt;1 即有价值</div>'
          f'<table class="so"><thead><tr><th>比分</th><th>盘口</th><th>模型推测</th><th>期望值</th></tr></thead><tbody>')
     for s, o in top:
@@ -967,8 +967,7 @@ def match_header(rows, cfg):
     segs = ''.join(f'<div style="flex:{max(d[k]*100,3):.1f};background:{"#CCFF00" if k==mx else "#3f465c"}"></div>' for k in ('home','draw','away'))
     return (f'<div class="glass vshead">{hot}<div class="vsrow">'
             f'<div class="vsteam">{team_badge(cfg["home"], l["home"])}<div class="tn">{l["home"]}</div></div>'
-            f'<div class="vsmid"><div class="kol">距离开赛</div><div class="kot" id="cd">{ch:02d}<small>H</small> {cm:02d}<small>M</small></div>'
-            f'<div class="tierpill">{tier}</div></div>'
+            f'<div class="vsmid"><div class="kol">距离开赛</div><div class="kot" id="cd">{ch:02d}<small>H</small> {cm:02d}<small>M</small></div></div>'
             f'<div class="vsteam">{team_badge(cfg["away"], l["away"])}<div class="tn">{l["away"]}</div></div>'
             f'</div><div class="prob3">{cell("home")}{cell("draw")}{cell("away")}</div>'
             f'<div class="pbar">{segs}</div></div>')
@@ -1142,23 +1141,67 @@ def bet_plan(rich, my, kind, fav, cnh, cna):
         if not odd: odd = round(1/prob, 2) if prob > 0 else 0  # 赔率暂缺→用我的概率反推兜底
         out.append({'tag': tag, 'lbl': lbl, 'prob': prob, 'odd': round(odd, 2), 'stake': stake, 'ret': round(stake*odd)})
     return out
-def plan_block(rich, my, kind, fav, cnh, cna, dirn):
-    bets = bet_plan(rich, my, kind, fav, cnh, cna)
+def score_top3_block(rich, my, grid):
+    """比分推荐 TOP3：Poisson 模型概率最高的3个比分 + 真实赔率。"""
+    top3 = sorted(grid.items(), key=lambda x: -x[1])[:3]
+    so = (rich.get('score_odds') or {}).get('odds', {})
     rows = ''
-    for b in bets:
-        cls = ' main' if b['tag'] == '主注' else ''
-        rows += (f'<div class="bet{cls}"><span class="bet-tag">{b["tag"]}</span>'
-                 f'<div class="bet-mid"><b>{b["lbl"]}</b><span class="bet-od">@{b["odd"]} · 我估 {b["prob"]*100:.0f}%</span></div>'
-                 f'<span class="bet-amt">¥{b["stake"]}<small>中→¥{b["ret"]}</small></span></div>')
-    maxret = max(b['ret'] for b in bets)
-    inner = (f'<div class="locked">{rows}'
-             f'<div class="plan-sum">本金 ¥100 → 押中主注稳一手;押中任一比分最高博到 <b>¥{maxret}</b>。逻辑:{dirn}。</div></div>'
-             f'<div class="lockmask"><span class="material-symbols-outlined lockicon">lock</span>'
-             f'<div class="lockttl">竞猜方案 · 付费内容</div>'
-             f'<div class="lockrow"><input class="lockinput" type="tel" inputmode="numeric" maxlength="6" placeholder="输入验证码"><button class="lockbtn">解锁</button></div>'
-             f'<div class="lockhint"></div></div>')
-    return (f'<div class="glass">{sec_head("payments","假设 100 元 · 我的竞猜方案")}'
-            f'<div class="lockbox" id="lock-scores">{inner}</div></div>')
+    for i, (s, prob) in enumerate(top3):
+        sc_disp = s.replace('-', ':')
+        od = so.get(s)
+        od_txt = f'@{od}' if od else ''
+        rows += (f'<div class="bet{" main" if i==0 else ""}"><span class="bet-tag">TOP{i+1}</span>'
+                 f'<div class="bet-mid"><b>{sc_disp}</b>'
+                 f'<span class="bet-od">我估 {prob*100:.1f}%{" · " + od_txt if od_txt else ""}</span></div></div>')
+    return f'<div class="glass">{sec_head("scoreboard","比分推荐 TOP3")}{rows}</div>'
+
+def wdl_rec_block(rows, cfg):
+    """胜平负推荐：基于去水位赔率 × 我的概率，给出价值方向。"""
+    p = rows[-1].get('pin_h2h')
+    if not p: return ''
+    l = L(cfg); out = ''
+    for k in ('home', 'draw', 'away'):
+        ev = cfg['my'][k] * p[k]
+        if ev > 1.03: cls, tag, ic = 'val', '✅ 推荐', 'check_circle'
+        elif ev > .99: cls, tag, ic = 'mid', '⚪ 临界', 'remove'
+        else: cls, tag, ic = 'bad', '❌ 不推荐', 'block'
+        out += (f'<div class="evc {cls}"><div class="evbar"></div>'
+                f'<div class="evmain"><div class="evteam">{l[k]}</div>'
+                f'<div class="evstat">我估: {cfg["my"][k]:.0%}　赔率: {p[k]}</div></div>'
+                f'<div class="evright"><div class="evev">EV {ev:.2f}</div>'
+                f'<div class="evtag"><span class="material-symbols-outlined" style="font-size:15px">{ic}</span>{tag}</div></div></div>')
+    return f'<div class="glass">{sec_head("how_to_vote","胜平负推荐")}{out}</div>'
+
+def goals_block(rich, my, grid):
+    """进球推荐：大小球 2.5 + BTTS + xG 预期。"""
+    t25 = rich.get('tot') or {}
+    btts = rich.get('btts') or {}
+    lh = sum(i * sum(grid.get(f'{i}-{jj}', 0) for jj in range(8)) for i in range(8))
+    la = sum(jj * sum(grid.get(f'{ii}-{jj}', 0) for ii in range(8)) for jj in range(8))
+    ov_prob = sum(p for s, p in grid.items() if sum(map(int, s.split('-'))) > 2)
+    un_prob = 1 - ov_prob
+    btts_prob = sum(p for s, p in grid.items() if int(s.split('-')[0]) > 0 and int(s.split('-')[1]) > 0)
+    rows = ''
+    # 大球
+    over_od = t25.get('over'); over_txt = f'@{over_od}' if over_od else ''
+    rows += (f'<div class="bet{"" if ov_prob < un_prob else " main"}"><span class="bet-tag">大球</span>'
+             f'<div class="bet-mid"><b>总进球 ≥ 3</b>'
+             f'<span class="bet-od">我估 {ov_prob*100:.0f}%{" · "+over_txt if over_txt else ""}</span></div></div>')
+    # 小球
+    under_od = t25.get('under'); under_txt = f'@{under_od}' if under_od else ''
+    rows += (f'<div class="bet{"" if ov_prob >= un_prob else " main"}"><span class="bet-tag">小球</span>'
+             f'<div class="bet-mid"><b>总进球 ≤ 2</b>'
+             f'<span class="bet-od">我估 {un_prob*100:.0f}%{" · "+under_txt if under_txt else ""}</span></div></div>')
+    # BTTS
+    if btts:
+        by = btts.get('Yes'); bn = btts.get('No')
+        rows += (f'<div class="bet"><span class="bet-tag">双进</span>'
+                 f'<div class="bet-mid"><b>双方均进球</b>'
+                 f'<span class="bet-od">我估 {btts_prob*100:.0f}%'
+                 f'{" · 是@"+str(by) if by else ""}{" · 否@"+str(bn) if bn else ""}</span></div></div>')
+    rows += (f'<div style="margin-top:10px;font-family:JetBrains Mono,monospace;font-size:12px;color:var(--sec)">'
+             f'xG 预期：主 <b style="color:#CCFF00">{lh:.2f}</b> / 客 <b style="color:#FF0055">{la:.2f}</b>（泊松模型）</div>')
+    return f'<div class="glass">{sec_head("sports_score","进球推荐")}{rows}</div>'
 
 def build_detail(cfg, rows, rich):
     l = L(cfg); title = f'{cfg["cn_h"]} vs {cfg["cn_a"]}'; script = ''
@@ -1169,22 +1212,18 @@ def build_detail(cfg, rows, rich):
         d = last['devig']; t25 = last.get('pin_tot25') or {}
         up = devig({'over': t25['over'], 'under': t25['under']})['under'] if (t25.get('over') and t25.get('under')) else None
         lh, la, grid = poisson_calc(d['home'], d['away'], up)
-        bk = (rich.get('score_odds') or {}).get('book', '')
-        score_title = f'逐比分赔率{" ("+bk+")" if bk else ""}'
-        script = CDSCRIPT.replace('__KO__', cfg['ko'].isoformat()) + UNLOCK_JS
+        script = CDSCRIPT.replace('__KO__', cfg['ko'].isoformat())
         tp = third_party_block(cfg, rich.get('pred'))
         tp_html = f'<div class="glass">{tp}</div>' if tp else ''
         fb = form_block(cfg)
         fb_html = f'<div class="glass">{fb}</div>' if fb else ''
-        _fav = max(cfg['my'], key=cfg['my'].get)  # 未来比赛用我的手工判断(my 概率 + 价值方向)
-        _kind = 'anti_blowout' if '砍屠杀' in cfg['st'].get('val', '') else 'anti_fav'
-        plan_html = plan_block(rich, cfg['my'], _kind, _fav, cfg['cn_h'], cfg['cn_a'], cfg['st'].get('val', ''))
         inner = (f'{match_header(rows, cfg)}'
-                 f'{plan_html}'
-                 f'<div class="glass"><div class="evhead"><span class="l"><span class="dot"></span>实时 +EV 分析</span></div>{ev_cards(rows, cfg)}</div>'
+                 f'{score_top3_block(rich, cfg["my"], grid)}'
+                 f'{wdl_rec_block(rows, cfg)}'
+                 f'{goals_block(rich, cfg["my"], grid)}'
                  f'{tp_html}'
                  f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
-                 f'<div class="glass">{sec_head("view_list",score_title)}{score_odds_html(rich, grid)}</div>'
+                 f'<div class="glass">{sec_head("view_list","比分赔率")}{score_odds_html(rich, grid)}</div>'
                  f'<div class="glass">{sec_head("dashboard","全盘口快照")}{markets_html(cfg, rows, rich)}</div>'
                  f'{fb_html}'
                  f'{sec_head("analytics","对阵分析")}{matchup_analysis(cfg)}')
@@ -1307,8 +1346,9 @@ def build_tickets(up):
         body = ''.join(f'<div class="tk-leg"><span class="tk-vs">{m["fh"]} {m["cnh"]} vs {m["cna"]} {m["fa"]}</span>'
                        f'<span class="tk-bet">{bet} <b>@{od}</b></span></div>' for m, bet, od in legs)
         ph = f'命中约 {prob*100:.0f}%' if prob >= 0.01 else f'命中约 {prob*100:.1f}%'
+        mult_x = f'{ret/stake:.1f}x' if stake else '—'
         return (f'<div class="tk {cls}"><div class="tk-top"><span class="tk-tag">{tag}</span>'
-                f'<span class="tk-stake">参考 ¥{stake} · 全中赢 <b>¥{ret}</b></span></div>{body}'
+                f'<span class="tk-stake">全中倍数 <b>{mult_x}</b></span></div>{body}'
                 f'<div class="tk-foot">{ph} · {note}</div></div>')
     # 🟡 平衡:3 串 1(价值方向双重机会)
     three = up[:3]; legs = []; mult = 1.0; cp = 1.0
@@ -1338,10 +1378,12 @@ def line_row(f, pmap, cur_fid, prob_map):
         gh, ga = f['goals']['home'], f['goals']['away']
         teams = f'<span class="tl-tt">{th} <span class="tl-sc">{gh}-{ga}</span> {ta}</span>'
         p = pmap.get(str(fid))
-        if p and p.get('pl') is not None:
-            pl = p['pl']; pc = 'pos' if pl >= 0 else 'neg'; sg = '+' if pl >= 0 else '−'
+        if p and p.get('wdl_hit') is not None:
+            hit = p['wdl_hit']
+            lbl = '中' if hit else '未中'
+            lbl_style = 'color:var(--lime);font-weight:800' if hit else 'color:var(--sec);opacity:.6'
             return (f'<a class="tl-row done{cc}"{ida} href="past_{fid}.html"><span class="tl-tm">{tm}</span>'
-                    f'{teams}<span class="tl-pl {pc}">{sg}¥{abs(pl)}</span></a>')
+                    f'{teams}<span class="tl-pl" style="{lbl_style}">{lbl}</span></a>')
         return f'<div class="tl-row done{cc}"{ida}><span class="tl-tm">{tm}</span>{teams}<span class="tl-pl" style="color:var(--sec)">完场</span></div>'
     # 未进行 / 进行中:大气卡(增加高度,留分析占位)
     live = st not in ('NS',)
@@ -1377,7 +1419,7 @@ def build_index(items):
     # ---------- 本期购彩参考(嵌入时间线过去/未来分界处)----------
     up = fetch_upcoming(hours=48, limit=3)
     tickets = build_tickets(up)
-    ticket_sec = f'{sec_h("今日串关推荐", "最近 3 场 · 2 注串关")}{tickets}' if tickets else ''
+    ticket_sec = f'<div id="tickets">{sec_h("今日串关推荐", "最近 3 场 · 2 注串关")}{tickets}</div>' if tickets else ''
     # ---------- 统一时间线(全部小组赛按时间从上到下)----------
     prob_map = {}  # 精选场 fid → (cfg, 最新去水位),供大气卡底部展示概率条
     for cfg, rows, rich in items:
@@ -1402,8 +1444,9 @@ def build_index(items):
         tl += line_row(f, pmap, cur_fid, prob_map)
     if not crossed: tl += ticket_sec  # 全部比赛已结束时追加到末尾
     filt = '<div class="filt"><a href="#r1">第 1 轮</a><a href="#r2">第 2 轮</a><a href="#r3">第 3 轮</a></div>'
-    js = ('<script>(function(){var e=document.getElementById("cur");'
-          'if(e&&!location.hash)setTimeout(function(){e.scrollIntoView({block:"center"});},80);})();</script>')
+    js = ('<script>(function(){if(location.hash)return;'
+          'var t=document.getElementById("tickets");'
+          'if(t)setTimeout(function(){t.scrollIntoView({block:"start"});},80);})();</script>')
     body = (f'<main>'
             f'<div style="height:12px"></div>{track}{filt}{tl}'
             f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{js}')
