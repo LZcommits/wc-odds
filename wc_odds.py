@@ -1310,9 +1310,6 @@ def build_tickets(up):
         return (f'<div class="tk {cls}"><div class="tk-top"><span class="tk-tag">{tag}</span>'
                 f'<span class="tk-stake">参考 ¥{stake} · 全中赢 <b>¥{ret}</b></span></div>{body}'
                 f'<div class="tk-foot">{ph} · {note}</div></div>')
-    # 🟢 稳健:最悬殊场,热门不败双重机会
-    safe = max(up, key=lambda m: max(m['d'].values())); sl, so, sp = dc_pick(safe)
-    g_safe = card('green', '🟢 稳健 · 单关', 20, [(safe, sl, so)], round(20*so), sp, '热门不败,小赔率求稳')
     # 🟡 平衡:3 串 1(价值方向双重机会)
     three = up[:3]; legs = []; mult = 1.0; cp = 1.0
     for m in three:
@@ -1326,7 +1323,7 @@ def build_tickets(up):
         od = _od(m['score'], sc.replace(':', '-'), pr); slegs.append((m, f'比分 {sc}', od)); smult *= od; sprob *= pr
     g_bold = card('red', '🔴 博胆 · 比分串', 5, slegs, round(5*smult), sprob, '押被低估的平局/砍屠杀,小钱搏大') if len(two) >= 2 else ''
     warn = '<div class="tk-warn">⚠️ 仅供参考娱乐 · 理性购彩 · 量力而行 · 未成年人禁止购彩。竞彩返还率低,长期期望为负,切勿当作赚钱工具。</div>'
-    return f'<div class="tkwrap">{g_safe}{g_bal}{g_bold}{warn}</div>'
+    return f'<div class="tkwrap">{g_bal}{g_bold}{warn}</div>'
 def line_row(f, pmap, cur_fid, prob_map):
     """时间线单行:已结束=比分+盈亏(可点复盘);精选未来=⭐可点详情;其余=赛程行。"""
     fid = f['fixture']['id']; st = f['fixture']['status']['short']
@@ -1374,13 +1371,13 @@ def build_index(items):
     roi = round(pl/invest*100) if invest else 0
     pcls = 'pos' if pl >= 0 else 'neg'; sign = '+' if pl >= 0 else '−'
     track = (f'<div class="track">'
-             f'<div class="pnl {pcls}">{sign} ¥{abs(pl)}<small>净盈亏</small></div>'
+             f'<div class="pnl {pcls}">ROI {sign}{abs(roi)}%<small></small></div>'
              f'<div class="pnl-row"><span>本金 ¥{invest}</span><span>收回 ¥{won}</span>'
-             f'<span>ROI {sign}{abs(roi)}%</span><span>胜负中 {nwin}/{ntot}</span></div></div>')
-    # ---------- 本期购彩参考(三档)----------
-    up = fetch_upcoming()
+             f'<span>净盈亏 {sign}¥{abs(pl)}</span><span>胜负中 {nwin}/{ntot}</span></div></div>')
+    # ---------- 本期购彩参考(嵌入时间线过去/未来分界处)----------
+    up = fetch_upcoming(hours=48, limit=3)
     tickets = build_tickets(up)
-    ticket_sec = f'{sec_h("本期购彩参考", "近期 " + str(len(up)) + " 场 · 三档可选")}{tickets}' if tickets else ''
+    ticket_sec = f'{sec_h("今日串关推荐", "最近 3 场 · 2 注串关")}{tickets}' if tickets else ''
     # ---------- 统一时间线(全部小组赛按时间从上到下)----------
     prob_map = {}  # 精选场 fid → (cfg, 最新去水位),供大气卡底部展示概率条
     for cfg, rows, rich in items:
@@ -1389,8 +1386,12 @@ def build_index(items):
     fx = sorted(fetch_fixtures(), key=lambda f: f['fixture']['date'])
     cur_fid = next((f['fixture']['id'] for f in fx if f['fixture']['status']['short'] not in ('FT', 'AET', 'PEN')), None)
     RMAP = {'Group Stage - 1': ('r1', '小组赛 · 第 1 轮'), 'Group Stage - 2': ('r2', '小组赛 · 第 2 轮'), 'Group Stage - 3': ('r3', '小组赛 · 第 3 轮')}
-    tl = ''; cur_round = None; cur_day = None
+    tl = ''; cur_round = None; cur_day = None; crossed = False
     for f in fx:
+        st = f['fixture']['status']['short']
+        # 在"最后一场已结束"→"第一场未开赛"边界插入串关推荐
+        if not crossed and st not in ('FT', 'AET', 'PEN'):
+            tl += ticket_sec; crossed = True
         rd = f['league']['round']; rid, rname = RMAP.get(rd, ('rx', rd))
         if rd != cur_round:
             tl += f'<div class="round-head" id="{rid}"><span class="material-symbols-outlined">sports_soccer</span>{rname}</div>'; cur_round = rd; cur_day = None
@@ -1399,11 +1400,12 @@ def build_index(items):
         wd = '一二三四五六日'[bj.weekday()]; day = f'{bj.month}/{bj.day} 周{wd}'
         if day != cur_day: tl += f'<div class="tl-day">{day}</div>'; cur_day = day
         tl += line_row(f, pmap, cur_fid, prob_map)
+    if not crossed: tl += ticket_sec  # 全部比赛已结束时追加到末尾
     filt = '<div class="filt"><a href="#r1">第 1 轮</a><a href="#r2">第 2 轮</a><a href="#r3">第 3 轮</a></div>'
     js = ('<script>(function(){var e=document.getElementById("cur");'
           'if(e&&!location.hash)setTimeout(function(){e.scrollIntoView({block:"center"});},80);})();</script>')
     body = (f'<main>'
-            f'<div style="height:12px"></div>{track}{ticket_sec}{filt}{tl}'
+            f'<div style="height:12px"></div>{track}{filt}{tl}'
             f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{js}')
     open(os.path.join(DOCS, 'index.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赔率追踪")}</head><body>{body}</body></html>')
 
