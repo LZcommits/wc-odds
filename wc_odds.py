@@ -320,6 +320,22 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .fx-vs{color:var(--sec);opacity:.5;font-size:12px;margin:0 4px}
 .mtime{display:flex;align-items:center;gap:6px;margin-top:9px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sec)}
 .mtime .material-symbols-outlined{font-size:14px;opacity:.7}
+.filt{position:sticky;top:56px;z-index:40;display:flex;gap:8px;padding:10px 0;background:var(--bg)}
+.filt a{flex:1;text-align:center;font-size:13px;font-weight:700;color:var(--sec);background:rgba(13,28,45,.8);border:1px solid var(--line);border-radius:8px;padding:9px 0}
+.round-head{scroll-margin-top:112px;display:flex;align-items:center;gap:7px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800;color:var(--lime);margin:20px 2px 10px}
+.round-head .material-symbols-outlined{font-size:17px}
+.tl-day{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--sec);opacity:.65;margin:14px 2px 6px}
+.tl-row{display:flex;align-items:center;gap:10px;padding:11px 12px;background:rgba(13,28,45,.45);border:1px solid var(--line);border-radius:8px;margin-bottom:6px}
+.tl-row.done{opacity:.82}
+.tl-tm{flex:0 0 42px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--sec)}
+.tl-tt{flex:1;font-size:14px;color:var(--on)}
+.tl-sc{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--on);margin:0 5px}
+.tl-vs{color:var(--sec);opacity:.5;font-size:12px;margin:0 4px}
+.tl-pl{flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800}
+.tl-pl.pos{color:var(--lime)} .tl-pl.neg{color:var(--crim)}
+.tl-go{flex:0 0 auto;color:var(--lime);font-size:12px;font-weight:600;white-space:nowrap}
+.tl-live{flex:0 0 auto;color:var(--crim);font-size:11px;font-weight:700}
+.tl-row.cur{border-color:rgba(204,255,0,.55);box-shadow:0 0 14px rgba(204,255,0,.18)}
 .track-grid{display:flex;gap:8px;margin:12px 0 10px}
 .tg{flex:1;text-align:center;background:rgba(0,0,0,.18);border-radius:8px;padding:10px 4px}
 .tg-v{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--lime)}
@@ -1100,72 +1116,70 @@ def build_past_detail(p):
     open(os.path.join(DOCS, f'past_{fid}.html'), 'w').write(
         f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title)}</head><body>{body}</body></html>')
 
-def schedule_block(items):
-    """全部小组赛赛程:从 fixtures 列所有未开赛(NS)比赛,按北京日期分组;手动精选场排除(已在上方精选区)。"""
-    fx = fetch_fixtures()
-    ns = sorted([f for f in fx if f['fixture']['status']['short'] == 'NS'], key=lambda f: f['fixture']['date'])
-    picked = set(AFID.values())
-    out = ''; cur = None; n = 0
-    for f in ns:
-        fid = f['fixture']['id']
-        if fid in picked: continue  # 精选场已在上方
-        try: bj = datetime.datetime.fromisoformat(f['fixture']['date']).astimezone(BJ)
-        except Exception: continue
-        wd = '一二三四五六日'[bj.weekday()]; day = f'{bj.month}/{bj.day} 周{wd}'
-        if day != cur: out += f'<div class="fxday">{day}</div>'; cur = day
-        h = f['teams']['home']['name']; a = f['teams']['away']['name']
-        teams = f'{flag_of(h)} {cn_of(h)} <span class="fx-vs">vs</span> {cn_of(a)} {flag_of(a)}'
-        out += (f'<div class="fxrow"><span class="fx-tm">{bj.hour:02d}:{bj.minute:02d}</span>'
-                f'<span class="fx-tt">{teams}</span></div>'); n += 1
-    return out, n
+FID2SLUG = {v: k for k, v in AFID.items()}
+def line_row(f, pmap, cur_fid):
+    """时间线单行:已结束=比分+盈亏(可点复盘);精选未来=⭐可点详情;其余=赛程行。"""
+    fid = f['fixture']['id']; st = f['fixture']['status']['short']
+    h = f['teams']['home']['name']; a = f['teams']['away']['name']
+    try: bj = datetime.datetime.fromisoformat(f['fixture']['date']).astimezone(BJ)
+    except Exception: return ''
+    tm = f'{bj.hour:02d}:{bj.minute:02d}'
+    cc = ' cur' if fid == cur_fid else ''; ida = ' id="cur"' if fid == cur_fid else ''
+    th = f'{flag_of(h)} {cn_of(h)}'; ta = f'{cn_of(a)} {flag_of(a)}'
+    if st in ('FT', 'AET', 'PEN'):
+        gh, ga = f['goals']['home'], f['goals']['away']
+        teams = f'<span class="tl-tt">{th} <span class="tl-sc">{gh}-{ga}</span> {ta}</span>'
+        p = pmap.get(str(fid))
+        if p and p.get('pl') is not None:
+            pl = p['pl']; pc = 'pos' if pl >= 0 else 'neg'; sg = '+' if pl >= 0 else '−'
+            return (f'<a class="tl-row done{cc}"{ida} href="past_{fid}.html"><span class="tl-tm">{tm}</span>'
+                    f'{teams}<span class="tl-pl {pc}">{sg}¥{abs(pl)}</span></a>')
+        return f'<div class="tl-row done{cc}"{ida}><span class="tl-tm">{tm}</span>{teams}<span class="tl-pl" style="color:var(--sec)">完场</span></div>'
+    teams = f'<span class="tl-tt">{th} <span class="tl-vs">vs</span> {ta}</span>'
+    if st == 'NS':
+        slug = FID2SLUG.get(fid)
+        if slug:
+            return f'<a class="tl-row{cc}"{ida} href="{slug}.html"><span class="tl-tm">{tm}</span>{teams}<span class="tl-go">⭐分析 ›</span></a>'
+        return f'<div class="tl-row{cc}"{ida}><span class="tl-tm">{tm}</span>{teams}</div>'
+    return f'<div class="tl-row{cc}"{ida}><span class="tl-tm">{tm}</span>{teams}<span class="tl-live">● 进行中</span></div>'
 
 def build_index(items):
-    mc = ''; nup = 0
-    for cfg, rows, rich in items:
-        if cfg['ko'] <= now: continue  # 已开赛/结束 → 不在精选区,自动归入下方「战绩对账」
-        nup += 1
-        fh = FLAG.get(cfg['home']); fa = FLAG.get(cfg['away'])
-        hh = f'{fh} {cfg["cn_h"]}' if fh else cfg['cn_h']
-        aa = f'{cfg["cn_a"]} {fa}' if fa else cfg['cn_a']
-        title = f'{hh}<span class="mvs">vs</span>{aa}'
-        t = cfg['tier']
-        accent = '#CCFF00' if '价值' in t else ('#FF0055' if ('冷门' in t or '警报' in t) else 'rgba(255,255,255,.12)')
-        topbar = (f'<div class="mtop"><div class="mtitle">{title}</div>'
-                  f'<span class="material-symbols-outlined chev">chevron_right</span></div>')
-        bj = cfg['ko'].astimezone(BJ); wd = '一二三四五六日'[bj.weekday()]
-        hrs = (cfg['ko'] - now).total_seconds() / 3600
-        mtime = (f'<div class="mtime"><span class="material-symbols-outlined">schedule</span>'
-                 f'{bj.month}/{bj.day} 周{wd} {bj.hour:02d}:{bj.minute:02d}(北京) · 距开赛 {hrs:.0f}h</div>')
-        if not rows:
-            mc += (f'<a class="mcard" style="border-left-color:{accent}" href="{cfg["slug"]}.html">'
-                   f'{topbar}{mtime}</a>'); continue
-        last = rows[-1]; d = last['devig']
-        mc += (f'<a class="mcard" style="border-left-color:{accent}" href="{cfg["slug"]}.html">'
-               f'{topbar}{mtime}{probrow(d, cfg)}{minibar(d)}</a>')
     past = build_past()
-    for p in past: build_past_detail(p)  # 为每场已结束比赛生成"推测vs实际"复盘页
+    for p in past: build_past_detail(p)
+    pmap = {str(p['fid']): p for p in past}
     scored = [p for p in past if p.get('devig')]
     ntot = len(scored); nwin = sum(1 for p in scored if p.get('wdl_hit'))
     invest = ntot * 100; won = sum(p.get('won', 0) for p in scored); pl = won - invest
     roi = round(pl/invest*100) if invest else 0
     pcls = 'pos' if pl >= 0 else 'neg'; sign = '+' if pl >= 0 else '−'
     track = (f'<div class="track"><div class="track-l"><span class="material-symbols-outlined">savings</span>'
-             f'模拟下注战绩 · 每场 ¥100</div>'
+             f'模拟下注战绩 · 每场 ¥100 · 已结算 {ntot} 场</div>'
              f'<div class="pnl {pcls}">{sign} ¥{abs(pl)}<small>净盈亏</small></div>'
              f'<div class="pnl-row"><span>本金 ¥{invest}</span><span>收回 ¥{won}</span>'
              f'<span>ROI {sign}{abs(roi)}%</span><span>胜负中 {nwin}/{ntot}</span></div>'
-             f'<div class="track-note">按「假设 ¥100 方案」(主注50 + 2比分注30/20)用各场真实赔率回测 {ntot} 场。价值投注高方差,看长期累计、非单场。仅研究、非投注建议。</div></div>')
-    pc = ''.join(past_card(p) for p in past)
-    sched, nsched = schedule_block(items)
-    up_sec = (f'{sec_h("即将开赛 · 精选分析", f"{nup} 场 · 实时追踪")}{mc}') if nup else ''
-    sched_sec = (f'{sec_h("全部小组赛 · 赛程", f"{nsched} 场未开赛")}{sched}') if nsched else ''
+             f'<div class="track-note">按「假设 ¥100 方案」用各场真实赔率回测。价值投注高方差,看长期累计。仅研究、非投注建议。</div></div>')
+    # ---------- 统一时间线(全部小组赛按时间从上到下)----------
+    fx = sorted(fetch_fixtures(), key=lambda f: f['fixture']['date'])
+    cur_fid = next((f['fixture']['id'] for f in fx if f['fixture']['status']['short'] not in ('FT', 'AET', 'PEN')), None)
+    RMAP = {'Group Stage - 1': ('r1', '小组赛 · 第 1 轮'), 'Group Stage - 2': ('r2', '小组赛 · 第 2 轮'), 'Group Stage - 3': ('r3', '小组赛 · 第 3 轮')}
+    tl = ''; cur_round = None; cur_day = None
+    for f in fx:
+        rd = f['league']['round']; rid, rname = RMAP.get(rd, ('rx', rd))
+        if rd != cur_round:
+            tl += f'<div class="round-head" id="{rid}"><span class="material-symbols-outlined">sports_soccer</span>{rname}</div>'; cur_round = rd; cur_day = None
+        try: bj = datetime.datetime.fromisoformat(f['fixture']['date']).astimezone(BJ)
+        except Exception: continue
+        wd = '一二三四五六日'[bj.weekday()]; day = f'{bj.month}/{bj.day} 周{wd}'
+        if day != cur_day: tl += f'<div class="tl-day">{day}</div>'; cur_day = day
+        tl += line_row(f, pmap, cur_fid)
+    filt = '<div class="filt"><a href="#r1">第 1 轮</a><a href="#r2">第 2 轮</a><a href="#r3">第 3 轮</a></div>'
+    js = ('<script>(function(){var e=document.getElementById("cur");'
+          'if(e&&!location.hash)setTimeout(function(){e.scrollIntoView({block:"center"});},80);})();</script>')
     body = (f'{APPBAR}<main>'
             f'<div class="sub" style="margin-top:4px">{now.isoformat(timespec="minutes")} UTC · 每 1h 自动更新</div>'
-            f'<div style="height:12px"></div>{track}'
-            f'{up_sec}{sched_sec}'
-            f'{sec_h("已结束 · 战绩对账", f"{ntot} 场已结算")}{pc}'
-            f'<div class="glass"><h2 class="sec">读法指南</h2><p class="note">「精选分析」点卡片看竞猜方案 / 全盘口 / 对阵分析;「全部小组赛」为完整赛程(北京时间);「战绩对账」按每场 ¥100 真实赔率回测,点卡片看推荐 vs 实际。仅供研究,非投注建议。</p></div>'
-            f'<div class="foot">API-Football Pro · GitHub Actions</div></main>')
+            f'<div style="height:12px"></div>{track}{filt}{tl}'
+            f'<div class="glass" style="margin-top:14px"><h2 class="sec">读法指南</h2><p class="note">全部小组赛按北京时间从早到晚排列,进入页面自动定位到最近一场(青柠高亮)。⭐ 为有深度分析的场(可点看竞猜方案);已结束场显示比分 + 本场盈亏(可点看推荐 vs 实际)。仅供研究、非投注建议。</p></div>'
+            f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{js}')
     open(os.path.join(DOCS, 'index.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赔率追踪")}</head><body>{body}</body></html>')
 
 items = []
