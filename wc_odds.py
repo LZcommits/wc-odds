@@ -305,6 +305,10 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .track-bar{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin:10px 0 8px}
 .track-bar i{display:block;height:100%;background:var(--lime);border-radius:3px}
 .track-note{font-size:11px;color:var(--sec);opacity:.7;font-style:italic;line-height:1.5}
+.pnl{font-family:'JetBrains Mono',monospace;font-size:34px;font-weight:800;margin:8px 0 4px;display:flex;align-items:baseline;gap:8px}
+.pnl.pos{color:var(--lime)} .pnl.neg{color:var(--crim)}
+.pnl small{font-size:12px;font-weight:500;color:var(--sec);opacity:.8}
+.pnl-row{display:flex;flex-wrap:wrap;gap:4px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sec);margin-bottom:8px}
 .track-grid{display:flex;gap:8px;margin:12px 0 10px}
 .tg{flex:1;text-align:center;background:rgba(0,0,0,.18);border-radius:8px;padding:10px 4px}
 .tg-v{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--lime)}
@@ -605,6 +609,21 @@ def wdl_text(wdl, cnh, cna):
 def wdl_hit(wdl, gh, ga):
     mode, fav = wdl; res = _res(gh, ga)
     return (res == fav) if mode == 'win' else (res != fav)
+def settle100(v):
+    """模拟每场 ¥100(主注50 + 2比分注30/20),用真实赔率按实际结果结算,返回 (赢回, 盈亏)。"""
+    d = v['devig']; kind = v['kind']; fav = v['fav']; gh, ga = v['gh'], v['ga']; res = _res(gh, ga); won = 0.0
+    if kind == 'anti_blowout':                       # 主注押小球
+        hit = (gh + ga) <= 2; odd = v.get('tot_u')
+    else:                                            # 主注押"非热门不败"双重机会
+        dc = v.get('dc') or {}
+        if fav == 'home': hit, odd = res != 'home', dc.get('Draw/Away')
+        else: hit, odd = res != 'away', dc.get('Home/Draw')
+    if hit and odd: won += 50 * odd
+    po = v.get('po') or {}; picks, _ = value_picks(d, kind, fav)
+    for i, sc in enumerate(picks):
+        key = sc.replace(':', '-')
+        if f'{gh}-{ga}' == key and po.get(key): won += [30, 20][i] * po[key]
+    return round(won), round(won) - 100
 def fetch_fixtures():
     if not AFKEY: return []
     d = af_get("https://v3.football.api-sports.io/fixtures?league=1&season=2026")
@@ -624,8 +643,8 @@ def build_past():
         if gh is None or ga is None: continue
         h, a = f['teams']['home']['name'], f['teams']['away']['name']
         rec = cache.get(fid)
-        if rec and rec.get('gh') == gh and rec.get('ga') == ga and rec.get('devig'):
-            continue  # 已缓存且比分一致,跳过请求
+        if rec and rec.get('gh') == gh and rec.get('ga') == ga and rec.get('devig') and rec.get('dc') is not None:
+            continue  # 已缓存且比分一致、含下注赔率,跳过请求
         bms = fetch_af_odds(int(fid))
         mw = af_h2h(af_bet(af_book(bms, PIN), 1)) if bms else None
         if not mw: mw = af_h2h(af_vals(bms, 1)) if bms else None
@@ -634,18 +653,25 @@ def build_past():
             continue
         d = {k: round(v, 4) for k, v in devig(mw).items()}
         tier, fav, dirn, kind = value_call(d)
+        dcd = af_pair(af_vals(bms, 12), ('Home/Draw', 'Home/Away', 'Draw/Away')) or {}
+        totd = af_tot(af_bet(af_book(bms, PIN), 5)) or af_tot(af_vals(bms, 5)) or {}
+        scd = (af_score(bms) or {}).get('odds', {})
+        pk, _w = value_picks(d, kind, fav)
+        po = {sc.replace(':', '-'): scd.get(sc.replace(':', '-')) for sc in pk}
         cache[fid] = {'date': f['fixture']['date'], 'h': h, 'a': a, 'gh': gh, 'ga': ga,
                       'devig': d, 'tier': tier, 'fav': fav, 'dir': dirn, 'kind': kind,
-                      'hit': bool(call_hit(kind, fav, gh, ga))}
+                      'hit': bool(call_hit(kind, fav, gh, ga)),
+                      'dc': dcd, 'tot_u': totd.get('under'), 'po': po}
     with open(PAST_CACHE, 'w') as fp: json.dump(cache, fp, ensure_ascii=False, indent=0)
     out = []
     for fid, v in cache.items():
         v = dict(v); v['fid'] = fid
-        if v.get('devig'):  # 纯计算:顺价值方向产出 2 推荐比分 + 胜负倾向,按具体结果判命中
+        if v.get('devig'):  # 纯计算:顺价值方向产出 2 推荐比分 + 胜负倾向,并模拟 ¥100 下注结算
             picks, wdl = value_picks(v['devig'], v['kind'], v['fav'])
             v['picks'] = picks; v['wdl_txt'] = wdl_text(wdl, cn_of(v['h']), cn_of(v['a']))
             v['wdl_hit'] = bool(wdl_hit(wdl, v['gh'], v['ga']))
             v['score2_hit'] = (f"{v['gh']}:{v['ga']}" in picks)
+            v['won'], v['pl'] = settle100(v)
         out.append(v)
     out.sort(key=lambda x: x['date'], reverse=True)
     return out
@@ -1013,8 +1039,8 @@ def past_card(p):
     if not p.get('devig'):
         return (f'<div class="pcard"><div class="ptop">{teams}<span class="pres no">赛果</span></div>'
                 f'<div class="pmeta"><span class="pchip">{ds}</span><span class="pval">（无赛前赔率,仅记录比分）</span></div></div>')
-    ok = p.get('wdl_hit'); accent = '#CCFF00' if ok else 'rgba(255,255,255,.14)'
-    badge = '<span class="pres ok">✓ 胜负中</span>' if ok else '<span class="pres no">✗ 胜负失</span>'
+    pl = p.get('pl', 0); pos = pl >= 0; accent = '#CCFF00' if pos else 'rgba(255,255,255,.14)'
+    badge = f'<span class="pres {"ok" if pos else "no"}">{"+" if pos else "−"}¥{abs(pl)}</span>'
     sc_tag = '<span class="pchip" style="border-color:rgba(204,255,0,.4);color:var(--lime)">比分也中</span>' if p.get('score2_hit') else ''
     return (f'<a class="pcard" style="border-left-color:{accent}" href="past_{p["fid"]}.html"><div class="ptop">{teams}{badge}</div>'
             f'<div class="pmeta"><span class="pchip">{ds}</span>{sc_tag}'
@@ -1083,13 +1109,16 @@ def build_index(items):
     past = build_past()
     for p in past: build_past_detail(p)  # 为每场已结束比赛生成"推测vs实际"复盘页
     scored = [p for p in past if p.get('devig')]
-    ntot = len(scored); nwin = sum(1 for p in scored if p.get('wdl_hit')); nsc = sum(1 for p in scored if p.get('score2_hit'))
-    pct = round(nwin/ntot*100) if ntot else 0; pcs = round(nsc/ntot*100) if ntot else 0
-    track = (f'<div class="track"><div class="track-top">'
-             f'<div class="track-l"><span class="material-symbols-outlined">verified</span>模型战绩 · 胜负命中</div>'
-             f'<div class="track-r">胜负 <b>{nwin}/{ntot}</b> · <b>{pct}%</b></div></div>'
-             f'<div class="track-bar"><i style="width:{pct}%"></i></div>'
-             f'<div class="track-note">每场给「胜负倾向 + 2 推荐比分」,按具体结果判命中。比分(2选)命中 {nsc}/{ntot} ≈ {pcs}%。仅研究、非投注建议。</div></div>')
+    ntot = len(scored); nwin = sum(1 for p in scored if p.get('wdl_hit'))
+    invest = ntot * 100; won = sum(p.get('won', 0) for p in scored); pl = won - invest
+    roi = round(pl/invest*100) if invest else 0
+    pcls = 'pos' if pl >= 0 else 'neg'; sign = '+' if pl >= 0 else '−'
+    track = (f'<div class="track"><div class="track-l"><span class="material-symbols-outlined">savings</span>'
+             f'模拟下注战绩 · 每场 ¥100</div>'
+             f'<div class="pnl {pcls}">{sign} ¥{abs(pl)}<small>净盈亏</small></div>'
+             f'<div class="pnl-row"><span>本金 ¥{invest}</span><span>收回 ¥{won}</span>'
+             f'<span>ROI {sign}{abs(roi)}%</span><span>胜负中 {nwin}/{ntot}</span></div>'
+             f'<div class="track-note">按「假设 ¥100 方案」(主注50 + 2比分注30/20)用各场真实赔率回测 {ntot} 场。价值投注高方差,看长期累计、非单场。仅研究、非投注建议。</div></div>')
     pc = ''.join(past_card(p) for p in past)
     body = (f'{APPBAR}<main>'
             f'<div class="sub" style="margin-top:4px">{now.isoformat(timespec="minutes")} UTC · 每 1h 自动更新</div>'
