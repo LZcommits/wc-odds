@@ -951,10 +951,8 @@ def build_past_detail(p):
     except Exception: ds = p['date'][:10]
     lh, la, grid = poisson_calc(d['home'], d['away'], None)
     pred = sorted(grid.items(), key=lambda x: -x[1])[0][0]; pred_sc = pred.replace('-', ' - ')
-    ok = p.get('hit'); wh = p.get('wdl_hit'); sh = p.get('score_hit')
+    ok = p.get('hit')
     badge = '<span class="pres ok">✓ 方向命中</span>' if ok else '<span class="pres no">✗ 方向未中</span>'
-    def h3(label, hit): return f'<span class="ph3 {"y" if hit else ""}">{label} {"✓" if hit else "✗"}</span>'
-    hits = f'<div class="pva-hits">{h3("比分", sh)}{h3("胜平负", wh)}{h3("价值方向", ok)}</div>'
     title = f'{cnh} vs {cna}'
     dv = lambda k: f'{d[k]*100:.0f}%'
     head_card = (f'<div class="glass" style="text-align:center">'
@@ -968,7 +966,6 @@ def build_past_detail(p):
            f'<div class="pva-vs">VS</div>'
            f'<div class="pva-col"><div class="pva-lbl">实际比分</div>'
            f'<div class="pva-sc">{gh} - {ga}</div><div class="pva-sub">真实赛果</div></div></div>'
-           f'{hits}'
            f'<div class="pva-note">价值方向:<b>{p["dir"]}</b> &nbsp;→&nbsp; {"✓ 命中" if ok else "✗ 未中"}'
            f'(口径:{"①档悬殊看热门没被血洗、净胜≤1" if p["kind"]=="anti_blowout" else "②③档看热门没赢、出现平或冷门"})</div></div>')
     grid_card = f'<div class="glass">{sec_head("grid_view","模型推测比分分布 Top 6")}{scores_grid(lh, la, grid)}</div>'
@@ -1008,18 +1005,13 @@ def build_index(items):
     past = build_past()
     for p in past: build_past_detail(p)  # 为每场已结束比赛生成"推测vs实际"复盘页
     scored = [p for p in past if p.get('devig')]
-    ntot = len(scored) or 1
-    nval = sum(1 for p in scored if p.get('hit'))
-    nwdl = sum(1 for p in scored if p.get('wdl_hit'))
-    nsc = sum(1 for p in scored if p.get('score_hit'))
-    def metric(label, n):
-        pc = round(n/ntot*100)
-        return (f'<div class="tg"><div class="tg-v">{pc}%</div><div class="tg-l">{label}</div>'
-                f'<div class="tg-n">{n}/{len(scored)}</div></div>')
-    track = (f'<div class="track">'
-             f'<div class="track-l"><span class="material-symbols-outlined">verified</span>模型战绩 · 小组赛首轮回测</div>'
-             f'<div class="track-grid">{metric("价值方向", nval)}{metric("胜平负", nwdl)}{metric("比分精确", nsc)}</div>'
-             f'<div class="track-note">价值方向=逆势找性价比(赛前去水位自动判);胜平负 / 比分=泊松顺势预测的准度。价值≠会赢、长期高方差,逐场仅供参考。</div></div>')
+    ntot = len(scored); nval = sum(1 for p in scored if p.get('hit'))
+    pct = round(nval/ntot*100) if ntot else 0
+    track = (f'<div class="track"><div class="track-top">'
+             f'<div class="track-l"><span class="material-symbols-outlined">verified</span>模型战绩 · 价值方向命中</div>'
+             f'<div class="track-r">命中 <b>{nval}/{ntot}</b> · <b>{pct}%</b></div></div>'
+             f'<div class="track-bar"><i style="width:{pct}%"></i></div>'
+             f'<div class="track-note">价值方向由各场赛前去水位赔率自动判定(不看赛果);价值≠会赢、长期高方差,逐场仅供参考。</div></div>')
     pc = ''.join(past_card(p) for p in past)
     body = (f'{APPBAR}<main>'
             f'<div class="sub" style="margin-top:4px">{now.isoformat(timespec="minutes")} UTC · 每 1h 自动更新</div>'
