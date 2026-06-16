@@ -1075,9 +1075,8 @@ def build_detail(cfg, rows, rich):
                  f'<div class="glass">{sec_head("dashboard","全盘口快照")}{markets_html(cfg, rows, rich)}</div>'
                  f'{fb_html}'
                  f'{sec_head("analytics","对阵分析")}{matchup_analysis(cfg)}')
-    body = (f'{APPBAR}<main>'
+    body = (f'<main>'
             f'<a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
-            f'<div class="sub">{sub}</div>'
             f'<div style="height:12px"></div>{inner}'
             f'<div class="foot">自动每 1h 更新 · 仅供研究,非投注建议</div></main>{script}')
     open(os.path.join(DOCS, cfg['slug']+'.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title)}</head><body>{body}</body></html>')
@@ -1136,9 +1135,9 @@ def build_past_detail(p):
                   f'<i style="flex:{max(d["draw"]*100,3):.0f};background:#3f465c"></i>'
                   f'<i style="flex:{max(d["away"]*100,3):.0f};background:#FF0055"></i></div>'
                   f'<div class="vs-note">这是赛前市场对该场的真实定价(去水位);模型据此反推价值方向,再与实际赛果对账。</div></div>')
-    body = (f'{APPBAR}<main>'
+    body = (f'<main>'
             f'<a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
-            f'<div class="sub">战绩复盘 · {ds}</div><div style="height:12px"></div>'
+            f'<div style="height:12px"></div>'
             f'{head_card}{pva}{grid_card}{devig_card}'
             f'<div class="foot">价值≠会赢、看长期;赛前去水位自动判定方向,逐场仅供参考</div></main>')
     open(os.path.join(DOCS, f'past_{fid}.html'), 'w').write(
@@ -1239,7 +1238,7 @@ def line_row(f, pmap, cur_fid, prob_map):
     hrs = (dt - now).total_seconds() / 3600
     when = f'{tm} 北京 · 进行中' if live else f'{tm} 北京 · 距开赛 {hrs:.0f}h'
     slug = FID2SLUG.get(fid)
-    tag = '<span class="fxbig-tag">⭐ 精选分析</span>' if slug else ''
+    tag = ''
     if slug and prob_map.get(fid):           # 精选场:展示去水位概率行 + 比例条
         pcfg, pd = prob_map[fid]; bottom = f'{probrow(pd, pcfg)}{minibar(pd)}'
     elif slug:                               # 精选场但暂无采样数据
@@ -1290,8 +1289,7 @@ def build_index(items):
     filt = '<div class="filt"><a href="#r1">第 1 轮</a><a href="#r2">第 2 轮</a><a href="#r3">第 3 轮</a></div>'
     js = ('<script>(function(){var e=document.getElementById("cur");'
           'if(e&&!location.hash)setTimeout(function(){e.scrollIntoView({block:"center"});},80);})();</script>')
-    body = (f'{APPBAR}<main>'
-            f'<div class="sub" style="margin-top:4px">{now.isoformat(timespec="minutes")} UTC · 每 1h 自动更新</div>'
+    body = (f'<main>'
             f'<div style="height:12px"></div>{track}{ticket_sec}{filt}{tl}'
             f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{js}')
     open(os.path.join(DOCS, 'index.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赔率追踪")}</head><body>{body}</body></html>')
