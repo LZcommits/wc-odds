@@ -1178,12 +1178,10 @@ def build_index(items):
     invest = ntot * 100; won = sum(p.get('won', 0) for p in scored); pl = won - invest
     roi = round(pl/invest*100) if invest else 0
     pcls = 'pos' if pl >= 0 else 'neg'; sign = '+' if pl >= 0 else '−'
-    track = (f'<div class="track"><div class="track-l"><span class="material-symbols-outlined">savings</span>'
-             f'模拟下注战绩 · 每场 ¥100 · 已结算 {ntot} 场</div>'
+    track = (f'<div class="track">'
              f'<div class="pnl {pcls}">{sign} ¥{abs(pl)}<small>净盈亏</small></div>'
              f'<div class="pnl-row"><span>本金 ¥{invest}</span><span>收回 ¥{won}</span>'
-             f'<span>ROI {sign}{abs(roi)}%</span><span>胜负中 {nwin}/{ntot}</span></div>'
-             f'<div class="track-note">按「假设 ¥100 方案」用各场真实赔率回测。价值投注高方差,看长期累计。仅研究、非投注建议。</div></div>')
+             f'<span>ROI {sign}{abs(roi)}%</span><span>胜负中 {nwin}/{ntot}</span></div></div>')
     # ---------- 统一时间线(全部小组赛按时间从上到下)----------
     prob_map = {}  # 精选场 fid → (cfg, 最新去水位),供大气卡底部展示概率条
     for cfg, rows, rich in items:
@@ -1208,7 +1206,6 @@ def build_index(items):
     body = (f'{APPBAR}<main>'
             f'<div class="sub" style="margin-top:4px">{now.isoformat(timespec="minutes")} UTC · 每 1h 自动更新</div>'
             f'<div style="height:12px"></div>{track}{filt}{tl}'
-            f'<div class="glass" style="margin-top:14px"><h2 class="sec">读法指南</h2><p class="note">全部小组赛按北京时间从早到晚排列,进入页面自动定位到最近一场(青柠高亮)。⭐ 为有深度分析的场(可点看竞猜方案);已结束场显示比分 + 本场盈亏(可点看推荐 vs 实际)。仅供研究、非投注建议。</p></div>'
             f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{js}')
     open(os.path.join(DOCS, 'index.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赔率追踪")}</head><body>{body}</body></html>')
 
