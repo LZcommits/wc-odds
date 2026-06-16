@@ -336,6 +336,21 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .tl-go{flex:0 0 auto;color:var(--lime);font-size:12px;font-weight:600;white-space:nowrap}
 .tl-live{flex:0 0 auto;color:var(--crim);font-size:11px;font-weight:700}
 .tl-row.cur{border-color:rgba(204,255,0,.55);box-shadow:0 0 14px rgba(204,255,0,.18)}
+.fxbig{display:block;background:linear-gradient(150deg,rgba(20,35,52,.82),rgba(9,21,36,.72));border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px;box-shadow:0 4px 16px rgba(0,0,0,.22);transition:transform .15s,box-shadow .15s}
+a.fxbig.star{border-color:rgba(204,255,0,.35)}
+a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
+.fxbig.cur{border-color:rgba(204,255,0,.6);box-shadow:0 0 18px rgba(204,255,0,.2)}
+.fxbig-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.fxbig-tm{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sec)}
+.fxbig-tm .material-symbols-outlined{font-size:14px;opacity:.7}
+.fxbig-tag{font-size:11px;font-weight:700;color:var(--lime);background:rgba(204,255,0,.1);border:1px solid rgba(204,255,0,.3);border-radius:5px;padding:2px 8px}
+.fxbig-vs{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:16px}
+.fxbig-team{flex:1;font-size:18px;font-weight:700;color:var(--on);text-align:center;letter-spacing:-.01em}
+.fxbig-mid{flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--sec);opacity:.5}
+.fxbig-ph{display:flex;align-items:center;justify-content:center;gap:7px;height:40px;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.13);border-radius:8px;font-size:12px;color:var(--sec);opacity:.65}
+.fxbig-ph .material-symbols-outlined{font-size:15px}
+.fxbig-cta{display:flex;align-items:center;justify-content:center;gap:6px;height:40px;background:rgba(204,255,0,.1);border:1px solid rgba(204,255,0,.3);border-radius:8px;font-size:13px;font-weight:700;color:var(--lime)}
+.fxbig-cta .material-symbols-outlined{font-size:16px}
 .track-grid{display:flex;gap:8px;margin:12px 0 10px}
 .tg{flex:1;text-align:center;background:rgba(0,0,0,.18);border-radius:8px;padding:10px 4px}
 .tg-v{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--lime)}
@@ -1121,11 +1136,12 @@ def line_row(f, pmap, cur_fid):
     """时间线单行:已结束=比分+盈亏(可点复盘);精选未来=⭐可点详情;其余=赛程行。"""
     fid = f['fixture']['id']; st = f['fixture']['status']['short']
     h = f['teams']['home']['name']; a = f['teams']['away']['name']
-    try: bj = datetime.datetime.fromisoformat(f['fixture']['date']).astimezone(BJ)
+    try: dt = datetime.datetime.fromisoformat(f['fixture']['date']); bj = dt.astimezone(BJ)
     except Exception: return ''
     tm = f'{bj.hour:02d}:{bj.minute:02d}'
     cc = ' cur' if fid == cur_fid else ''; ida = ' id="cur"' if fid == cur_fid else ''
     th = f'{flag_of(h)} {cn_of(h)}'; ta = f'{cn_of(a)} {flag_of(a)}'
+    # 已结束:保持紧凑行(比分 + 盈亏,可点复盘)
     if st in ('FT', 'AET', 'PEN'):
         gh, ga = f['goals']['home'], f['goals']['away']
         teams = f'<span class="tl-tt">{th} <span class="tl-sc">{gh}-{ga}</span> {ta}</span>'
@@ -1135,13 +1151,19 @@ def line_row(f, pmap, cur_fid):
             return (f'<a class="tl-row done{cc}"{ida} href="past_{fid}.html"><span class="tl-tm">{tm}</span>'
                     f'{teams}<span class="tl-pl {pc}">{sg}¥{abs(pl)}</span></a>')
         return f'<div class="tl-row done{cc}"{ida}><span class="tl-tm">{tm}</span>{teams}<span class="tl-pl" style="color:var(--sec)">完场</span></div>'
-    teams = f'<span class="tl-tt">{th} <span class="tl-vs">vs</span> {ta}</span>'
-    if st == 'NS':
-        slug = FID2SLUG.get(fid)
-        if slug:
-            return f'<a class="tl-row{cc}"{ida} href="{slug}.html"><span class="tl-tm">{tm}</span>{teams}<span class="tl-go">⭐分析 ›</span></a>'
-        return f'<div class="tl-row{cc}"{ida}><span class="tl-tm">{tm}</span>{teams}</div>'
-    return f'<div class="tl-row{cc}"{ida}><span class="tl-tm">{tm}</span>{teams}<span class="tl-live">● 进行中</span></div>'
+    # 未进行 / 进行中:大气卡(增加高度,留分析占位)
+    live = st not in ('NS',)
+    hrs = (dt - now).total_seconds() / 3600
+    when = f'{tm} 北京 · 进行中' if live else f'{tm} 北京 · 距开赛 {hrs:.0f}h'
+    slug = FID2SLUG.get(fid)
+    tag = '<span class="fxbig-tag">⭐ 精选分析</span>' if slug else ''
+    if slug: bottom = '<div class="fxbig-cta">⭐ 查看竞猜方案<span class="material-symbols-outlined">arrow_forward</span></div>'
+    else: bottom = '<div class="fxbig-ph"><span class="material-symbols-outlined">hourglass_empty</span>竞猜分析筹备中,赛前补充</div>'
+    inner = (f'<div class="fxbig-top"><span class="fxbig-tm"><span class="material-symbols-outlined">schedule</span>{when}</span>{tag}</div>'
+             f'<div class="fxbig-vs"><span class="fxbig-team">{th}</span><span class="fxbig-mid">VS</span><span class="fxbig-team">{ta}</span></div>'
+             f'{bottom}')
+    if slug: return f'<a class="fxbig star{cc}"{ida} href="{slug}.html">{inner}</a>'
+    return f'<div class="fxbig{cc}"{ida}>{inner}</div>'
 
 def build_index(items):
     past = build_past()
