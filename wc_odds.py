@@ -135,6 +135,18 @@ MATCHES = [
    'note':'①档(哥68%)。哥伦比亚攻击强悍,但乌兹别克首届世界杯防守求稳,总进球≤2有价值;价值在小球。'}},
 ]
 COL = {'home':'#CCFF00', 'draw':'#8e9379', 'away':'#FF0055'}  # 移盘曲线用色
+# 抖音评论区万人竞猜数据 (2026-06-16 采集, ~150条/场)
+CROWD_DATA = {
+ 'spain_capeverde':    {'n':349, 'top':[('0-0',41),('1-1',4),('1-0',2),('3-0',2),('4-0',2)]},
+ 'iran_newzealand':    {'n':147, 'top':[('2-2',17),('2-0',4),('1-0',3),('3-1',2),('0-0',2),('0-1',2)]},
+ 'belgium_egypt':      {'n':150, 'top':[('1-1',2),('0-1',2),('2-1',1),('0-2',1),('1-2',1)]},
+ 'netherlands_japan':  {'n':149, 'top':[('2-2',23),('1-1',6),('2-1',5),('1-2',3),('3-3',2),('3-1',2)]},
+ 'germany_curacao':    {'n':147, 'top':[('7-1',33),('4-1',7),('2-0',5),('6-1',5),('3-1',4),('4-0',3)]},
+ 'qatar_switzerland':  {'n':148, 'top':[('1-1',14),('0-1',4),('0-3',3),('0-2',2),('3-0',2),('0-5',1)]},
+ 'brazil_morocco':     {'n':149, 'top':[('1-1',22),('2-1',4),('1-2',4),('2-2',3),('0-1',3),('0-0',2)]},
+ 'southkorea_czechia': {'n':148, 'top':[('2-1',19),('1-0',4),('1-1',3),('1-2',2),('2-0',1),('3-1',1)]},
+ 'mexico_southafrica': {'n':148, 'top':[('2-0',21),('2-1',9),('3-0',5),('1-0',5),('3-1',5),('1-1',3)]},
+}
 AFID = {'belgium_egypt':1489377, 'saudi_uruguay':1489379, 'france_senegal':1489383,
         'argentina_algeria':1489381, 'spain_capeverde':1489380,
         'iraq_norway':1539016, 'austria_jordan':1489382, 'portugal_congodr':1539003,
@@ -1141,6 +1153,48 @@ def bet_plan(rich, my, kind, fav, cnh, cna):
         if not odd: odd = round(1/prob, 2) if prob > 0 else 0  # 赔率暂缺→用我的概率反推兜底
         out.append({'tag': tag, 'lbl': lbl, 'prob': prob, 'odd': round(odd, 2), 'stake': stake, 'ret': round(stake*odd)})
     return out
+def crowd_block(slug, grid):
+    """万人竞猜：抖音评论众选比分 vs 我的 Poisson 模型。"""
+    cd = CROWD_DATA.get(slug)
+    if not cd: return ''
+    total_votes = sum(v for _, v in cd['top'])
+    if total_votes == 0: return ''
+    # 计算众选 WDL 分布
+    wdl = {'home': 0, 'draw': 0, 'away': 0}
+    for s, v in cd['top']:
+        h, a = map(int, s.split('-'))
+        if h > a: wdl['home'] += v
+        elif h == a: wdl['draw'] += v
+        else: wdl['away'] += v
+    rows = ''
+    top3 = cd['top'][:3]
+    so_model = sorted(grid.items(), key=lambda x: -x[1])[:1]
+    model_top = so_model[0][0] if so_model else ''
+    for i, (s, votes) in enumerate(top3):
+        sc = s.replace('-', ':')
+        pct = votes / total_votes * 100
+        bar_w = int(pct / max(cd['top'][0][1] / total_votes * 100, 1) * 100)
+        match_model = s == model_top
+        fw = '800' if i == 0 else '500'
+        fg = 'var(--fg)' if i == 0 else 'var(--sec)'
+        bar_bg = 'var(--lime)' if i == 0 else 'var(--sec)'
+        bar_op = '1' if i == 0 else '0.5'
+        model_tag = ' <span style="color:var(--lime);font-size:12px">⚡模型一致</span>' if match_model else ''
+        rows += (f'<div style="margin:6px 0">'
+                 f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">'
+                 f'<span style="font-size:15px;font-weight:{fw};color:{fg}">#{i+1} <b>{sc}</b>{model_tag}</span>'
+                 f'<span style="font-size:13px;color:var(--sec)">{votes} 票 · {pct:.0f}%</span></div>'
+                 f'<div style="height:4px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden">'
+                 f'<div style="height:100%;width:{bar_w}%;background:{bar_bg};border-radius:2px;opacity:{bar_op}"></div></div></div>')
+    # WDL 小结
+    wdl_total = sum(wdl.values()) or 1
+    wdl_row = (f'<div style="display:flex;gap:8px;margin-top:10px;font-size:11px;color:var(--sec)">'
+               f'<span>主胜 {wdl["home"]/wdl_total*100:.0f}%</span>'
+               f'<span>平局 {wdl["draw"]/wdl_total*100:.0f}%</span>'
+               f'<span>客胜 {wdl["away"]/wdl_total*100:.0f}%</span>'
+               f'<span style="margin-left:auto">共 {cd["n"]} 条评论 · {total_votes} 票含比分</span></div>')
+    return f'<div class="glass">{sec_head("groups","万人竞猜")}{rows}{wdl_row}</div>'
+
 def score_top3_block(rich, my, grid):
     """比分推荐 TOP3：Poisson 模型概率最高的3个比分 + 真实赔率。"""
     top3 = sorted(grid.items(), key=lambda x: -x[1])[:3]
@@ -1218,6 +1272,7 @@ def build_detail(cfg, rows, rich):
         fb = form_block(cfg)
         fb_html = f'<div class="glass">{fb}</div>' if fb else ''
         inner = (f'{match_header(rows, cfg)}'
+                 f'{crowd_block(cfg["slug"], grid)}'
                  f'{score_top3_block(rich, cfg["my"], grid)}'
                  f'{wdl_rec_block(rows, cfg)}'
                  f'{goals_block(rich, cfg["my"], grid)}'
