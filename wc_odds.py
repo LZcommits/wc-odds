@@ -309,6 +309,11 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .pnl.pos{color:var(--lime)} .pnl.neg{color:var(--crim)}
 .pnl small{font-size:12px;font-weight:500;color:var(--sec);opacity:.8}
 .pnl-row{display:flex;flex-wrap:wrap;gap:4px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sec);margin-bottom:8px}
+.fxday{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--lime);opacity:.85;margin:16px 2px 8px;font-weight:700}
+.fxrow{display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(13,28,45,.4);border:1px solid var(--line);border-radius:8px;margin-bottom:6px}
+.fx-tm{flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--sec)}
+.fx-tt{flex:1;font-size:14px;color:var(--on)}
+.fx-vs{color:var(--sec);opacity:.5;font-size:12px;margin:0 4px}
 .track-grid{display:flex;gap:8px;margin:12px 0 10px}
 .tg{flex:1;text-align:center;background:rgba(0,0,0,.18);border-radius:8px;padding:10px 4px}
 .tg-v{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--lime)}
@@ -1089,9 +1094,30 @@ def build_past_detail(p):
     open(os.path.join(DOCS, f'past_{fid}.html'), 'w').write(
         f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title)}</head><body>{body}</body></html>')
 
+def schedule_block(items):
+    """全部小组赛赛程:从 fixtures 列所有未开赛(NS)比赛,按北京日期分组;手动精选场排除(已在上方精选区)。"""
+    fx = fetch_fixtures()
+    ns = sorted([f for f in fx if f['fixture']['status']['short'] == 'NS'], key=lambda f: f['fixture']['date'])
+    picked = set(AFID.values())
+    out = ''; cur = None; n = 0
+    for f in ns:
+        fid = f['fixture']['id']
+        if fid in picked: continue  # 精选场已在上方
+        try: bj = datetime.datetime.fromisoformat(f['fixture']['date']).astimezone(BJ)
+        except Exception: continue
+        wd = '一二三四五六日'[bj.weekday()]; day = f'{bj.month}/{bj.day} 周{wd}'
+        if day != cur: out += f'<div class="fxday">{day}</div>'; cur = day
+        h = f['teams']['home']['name']; a = f['teams']['away']['name']
+        teams = f'{flag_of(h)} {cn_of(h)} <span class="fx-vs">vs</span> {cn_of(a)} {flag_of(a)}'
+        out += (f'<div class="fxrow"><span class="fx-tm">{bj.hour:02d}:{bj.minute:02d}</span>'
+                f'<span class="fx-tt">{teams}</span></div>'); n += 1
+    return out, n
+
 def build_index(items):
-    mc = ''
+    mc = ''; nup = 0
     for cfg, rows, rich in items:
+        if cfg['ko'] <= now: continue  # 已开赛/结束 → 不在精选区,自动归入下方「战绩对账」
+        nup += 1
         fh = FLAG.get(cfg['home']); fa = FLAG.get(cfg['away'])
         hh = f'{fh} {cfg["cn_h"]}' if fh else cfg['cn_h']
         aa = f'{cfg["cn_a"]} {fa}' if fa else cfg['cn_a']
@@ -1120,12 +1146,15 @@ def build_index(items):
              f'<span>ROI {sign}{abs(roi)}%</span><span>胜负中 {nwin}/{ntot}</span></div>'
              f'<div class="track-note">按「假设 ¥100 方案」(主注50 + 2比分注30/20)用各场真实赔率回测 {ntot} 场。价值投注高方差,看长期累计、非单场。仅研究、非投注建议。</div></div>')
     pc = ''.join(past_card(p) for p in past)
+    sched, nsched = schedule_block(items)
+    up_sec = (f'{sec_h("即将开赛 · 精选分析", f"{nup} 场 · 实时追踪")}{mc}') if nup else ''
+    sched_sec = (f'{sec_h("全部小组赛 · 赛程", f"{nsched} 场未开赛")}{sched}') if nsched else ''
     body = (f'{APPBAR}<main>'
             f'<div class="sub" style="margin-top:4px">{now.isoformat(timespec="minutes")} UTC · 每 1h 自动更新</div>'
             f'<div style="height:12px"></div>{track}'
-            f'{sec_h("即将开赛", f"{len(items)} 场 · 实时追踪")}{mc}'
+            f'{up_sec}{sched_sec}'
             f'{sec_h("已结束 · 战绩对账", f"{ntot} 场已结算")}{pc}'
-            f'<div class="glass"><h2 class="sec">读法指南</h2><p class="note">绿色=正价值方向。「即将开赛」点卡片看实时期望值 / 比分概率 / 全盘口 / 对阵分析;「战绩对账」为赛前去水位赔率自动回测 vs 真实赛果。仅供研究,非投注建议。</p></div>'
+            f'<div class="glass"><h2 class="sec">读法指南</h2><p class="note">「精选分析」点卡片看竞猜方案 / 全盘口 / 对阵分析;「全部小组赛」为完整赛程(北京时间);「战绩对账」按每场 ¥100 真实赔率回测,点卡片看推荐 vs 实际。仅供研究,非投注建议。</p></div>'
             f'<div class="foot">API-Football Pro · GitHub Actions</div></main>')
     open(os.path.join(DOCS, 'index.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赔率追踪")}</head><body>{body}</body></html>')
 
