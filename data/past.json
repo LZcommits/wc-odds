@@ -253,5 +253,22 @@
 "dir": "砍屠杀 / 小球 / 弱队受让",
 "kind": "anti_blowout",
 "hit": true
+},
+"1489378": {
+"date": "2026-06-16T01:00:00+00:00",
+"h": "Iran",
+"a": "New Zealand",
+"gh": 2,
+"ga": 2,
+"devig": {
+"home": 0.5331,
+"draw": 0.2718,
+"away": 0.1951
+},
+"tier": "②中热门",
+"fav": "home",
+"dir": "平 / 弱队 / 小球",
+"kind": "anti_fav",
+"hit": true
 }
 }

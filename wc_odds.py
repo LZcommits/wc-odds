@@ -338,6 +338,16 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .rt-r{text-align:right;font-weight:800;font-size:15px;width:30px}
 .rt-r.ok{color:var(--lime)}
 .rt-r.no{color:var(--crim)}
+.bet{display:flex;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid rgba(255,255,255,.06)}
+.bet-tag{flex:0 0 auto;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--sec);border:1px solid var(--line);border-radius:4px;padding:2px 6px}
+.bet.main .bet-tag{background:var(--lime);color:var(--navy);border-color:var(--lime);font-weight:700}
+.bet-mid{flex:1;min-width:0}
+.bet-mid b{font-size:15px;color:var(--on);font-weight:700}
+.bet-od{display:block;font-size:11px;color:var(--sec);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.bet-amt{flex:0 0 auto;text-align:right;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:800;color:var(--lime)}
+.bet-amt small{display:block;font-size:10px;color:var(--sec);font-weight:400;margin-top:2px}
+.plan-sum{font-size:12px;color:var(--sec);line-height:1.65;margin-top:12px}
+.plan-sum b{color:var(--lime)}
 .pva-hits{display:flex;gap:6px;justify-content:center;margin-bottom:12px}
 .ph3{font-size:11px;padding:4px 9px;border-radius:999px;font-weight:700;background:rgba(255,255,255,.06);color:var(--sec)}
 .ph3.y{background:rgba(204,255,0,.15);color:var(--lime)}
@@ -915,12 +925,46 @@ def third_party_block(cfg, pred):
     return (f'{sec_head("hub","第三方参照 · API 官方预测")}{row}{adv_html}{cmp_html}'
             f'<div class="vs-note">API-Football 机器学习预测,与本页「市场去水位 / 价值模型」相互参照(部分维度国家队数据缺省已隐藏)</div>')
 
-def rec_block(wdl_txt, picks):
-    pk = ''.join(f'<span class="rec-sc">{s}</span>' for s in picks)
-    return (f'<div class="glass">{sec_head("emoji_events","本场竞猜推荐")}'
-            f'<div class="rec-row"><span class="rec-lbl">胜负倾向</span><b class="rec-wdl">{wdl_txt}</b></div>'
-            f'<div class="rec-row"><span class="rec-lbl">推荐比分</span><span class="rec-scs">{pk}</span></div>'
-            f'<div class="vs-note">顺价值方向产出 · 胜负为主、2 个比分供参考 · 仅研究非投注建议</div></div>')
+def bet_plan(rich, my, kind, fav, cnh, cna):
+    """模拟拿 100 元的价值投注:用我的概率 × 真实赔率,给出主注(胜负方向)+ 2 个比分注。"""
+    g = poisson_calc(my['home'], my['away'], None)[2]  # 我的判断对应的比分分布
+    bets = []
+    if kind == 'anti_blowout':  # 砍屠杀:核心价值在小球
+        prob = sum(p for s, p in g.items() if sum(map(int, s.split('-'))) <= 2)
+        odd = (rich.get('tot') or {}).get('under')
+        bets.append(['主注', '小球(总进球 ≤ 2)', prob, odd, 50])
+    else:                       # 逆向:押"平 或 非热门"双重机会
+        dc = rich.get('dc') or {}
+        if fav == 'home': key, lbl, prob = 'Draw/Away', f'平 或 {cna}', my['draw'] + my['away']
+        else: key, lbl, prob = 'Home/Draw', f'平 或 {cnh}', my['draw'] + my['home']
+        bets.append(['主注', f'{lbl}(双重机会)', prob, dc.get(key), 50])
+    picks, _ = value_picks(my, kind, fav)
+    so = (rich.get('score_odds') or {}).get('odds', {})
+    for i, sc in enumerate(picks):
+        key = sc.replace(':', '-')
+        bets.append(['比分', sc, g.get(key, 0), so.get(key), [30, 20][i] if i < 2 else 10])
+    out = []
+    for tag, lbl, prob, odd, stake in bets:
+        if not odd: odd = round(1/prob, 2) if prob > 0 else 0  # 赔率暂缺→用我的概率反推兜底
+        out.append({'tag': tag, 'lbl': lbl, 'prob': prob, 'odd': round(odd, 2), 'stake': stake, 'ret': round(stake*odd)})
+    return out
+def plan_block(rich, my, kind, fav, cnh, cna, dirn):
+    bets = bet_plan(rich, my, kind, fav, cnh, cna)
+    rows = ''
+    for b in bets:
+        cls = ' main' if b['tag'] == '主注' else ''
+        rows += (f'<div class="bet{cls}"><span class="bet-tag">{b["tag"]}</span>'
+                 f'<div class="bet-mid"><b>{b["lbl"]}</b><span class="bet-od">@{b["odd"]} · 我估 {b["prob"]*100:.0f}%</span></div>'
+                 f'<span class="bet-amt">¥{b["stake"]}<small>中→¥{b["ret"]}</small></span></div>')
+    maxret = max(b['ret'] for b in bets)
+    inner = (f'<div class="locked">{rows}'
+             f'<div class="plan-sum">本金 ¥100 → 押中主注稳一手;押中任一比分最高博到 <b>¥{maxret}</b>。逻辑:{dirn}。</div></div>'
+             f'<div class="lockmask"><span class="material-symbols-outlined lockicon">lock</span>'
+             f'<div class="lockttl">竞猜方案 · 付费内容</div>'
+             f'<div class="lockrow"><input class="lockinput" type="tel" inputmode="numeric" maxlength="6" placeholder="输入验证码"><button class="lockbtn">解锁</button></div>'
+             f'<div class="lockhint"></div></div>')
+    return (f'<div class="glass">{sec_head("payments","假设 100 元 · 我的竞猜方案")}'
+            f'<div class="lockbox" id="lock-scores">{inner}</div></div>')
 
 def build_detail(cfg, rows, rich):
     l = L(cfg); title = f'{cfg["cn_h"]} vs {cfg["cn_a"]}'; script = ''
@@ -940,16 +984,9 @@ def build_detail(cfg, rows, rich):
         fb_html = f'<div class="glass">{fb}</div>' if fb else ''
         _fav = max(cfg['my'], key=cfg['my'].get)  # 未来比赛用我的手工判断(my 概率 + 价值方向)
         _kind = 'anti_blowout' if '砍屠杀' in cfg['st'].get('val', '') else 'anti_fav'
-        _picks, _wdl = value_picks(cfg['my'], _kind, _fav)
-        rec_html = rec_block(wdl_text(_wdl, cfg['cn_h'], cfg['cn_a']), _picks)
+        plan_html = plan_block(rich, cfg['my'], _kind, _fav, cfg['cn_h'], cfg['cn_a'], cfg['st'].get('val', ''))
         inner = (f'{match_header(rows, cfg)}'
-                 f'{rec_html}'
-                 f'<div class="glass">{sec_head("grid_view","比分概率 Top 6")}'
-                 f'<div class="lockbox" id="lock-scores"><div class="locked">{scores_grid(lh, la, grid)}</div>'
-                 f'<div class="lockmask"><span class="material-symbols-outlined lockicon">lock</span>'
-                 f'<div class="lockttl">比分概率 · 付费内容</div>'
-                 f'<div class="lockrow"><input class="lockinput" type="tel" inputmode="numeric" maxlength="6" placeholder="输入验证码"><button class="lockbtn">解锁</button></div>'
-                 f'<div class="lockhint"></div></div></div></div>'
+                 f'{plan_html}'
                  f'<div class="glass"><div class="evhead"><span class="l"><span class="dot"></span>实时 +EV 分析</span></div>{ev_cards(rows, cfg)}</div>'
                  f'{tp_html}'
                  f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
