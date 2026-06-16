@@ -313,6 +313,19 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .pnl.pos{color:var(--lime)} .pnl.neg{color:var(--crim)}
 .pnl small{font-size:12px;font-weight:500;color:var(--sec);opacity:.8}
 .pnl-row{display:flex;flex-wrap:wrap;gap:4px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sec);margin-bottom:8px}
+.tkwrap{margin-bottom:8px}
+.tk{border:1px solid var(--line);border-left:3px solid var(--line);border-radius:10px;padding:13px 14px;margin-bottom:10px;background:rgba(13,28,45,.5)}
+.tk.green{border-left-color:#3ddc84} .tk.amber{border-left-color:#ffcc33} .tk.red{border-left-color:var(--crim)}
+.tk-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.tk-tag{font-size:14px;font-weight:800;color:var(--on)}
+.tk-stake{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sec)}
+.tk-stake b{color:var(--lime);font-size:14px}
+.tk-leg{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-top:1px solid rgba(255,255,255,.05);font-size:13px}
+.tk-vs{color:var(--on)}
+.tk-bet{flex:0 0 auto;font-family:'JetBrains Mono',monospace;color:var(--sec);white-space:nowrap}
+.tk-bet b{color:var(--lime)}
+.tk-foot{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--sec);opacity:.75;margin-top:9px}
+.tk-warn{font-size:11px;color:var(--sec);opacity:.6;line-height:1.5;margin-top:4px}
 .fxday{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--lime);opacity:.85;margin:16px 2px 8px;font-weight:700}
 .fxrow{display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(13,28,45,.4);border:1px solid var(--line);border-radius:8px;margin-bottom:6px}
 .fx-tm{flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--sec)}
@@ -1132,6 +1145,76 @@ def build_past_detail(p):
         f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title)}</head><body>{body}</body></html>')
 
 FID2SLUG = {v: k for k, v in AFID.items()}
+def fetch_upcoming(hours=72, limit=6):
+    """拉接下来 hours 小时内最近的 limit 场(未开赛),带赔率 + 自动价值方向,供「购彩参考」组票。"""
+    fx = sorted(fetch_fixtures(), key=lambda f: f['fixture']['date']); out = []
+    for f in fx:
+        if f['fixture']['status']['short'] != 'NS': continue
+        try: dt = datetime.datetime.fromisoformat(f['fixture']['date'])
+        except Exception: continue
+        hrs = (dt - now).total_seconds() / 3600
+        if hrs <= 0 or hrs > hours: continue
+        fid = f['fixture']['id']; bms = fetch_af_odds(fid)
+        mw = af_h2h(af_bet(af_book(bms, PIN), 1)) if bms else None
+        if not mw: mw = af_h2h(af_vals(bms, 1)) if bms else None
+        if not mw: continue
+        d = {k: round(v, 4) for k, v in devig(mw).items()}
+        tier, fav, dirn, kind = value_call(d)
+        h = f['teams']['home']['name']; a = f['teams']['away']['name']
+        out.append({'fid': fid, 'cnh': cn_of(h), 'cna': cn_of(a), 'fh': flag_of(h), 'fa': flag_of(a),
+                    'd': d, 'fav': fav, 'kind': kind,
+                    'dc': af_pair(af_vals(bms, 12), ('Home/Draw', 'Home/Away', 'Draw/Away')) or {},
+                    'tot': af_tot(af_bet(af_book(bms, PIN), 5)) or af_tot(af_vals(bms, 5)) or {},
+                    'score': (af_score(bms) or {}).get('odds', {})})
+        if len(out) >= limit: break
+    return out
+def _od(o, k, prob): v = o.get(k); return round(v, 2) if v else (round(1/prob, 2) if prob > 0 else 0.0)
+def dc_pick(m):
+    """按价值方向给出该场要买的双重机会(玩法标签, 赔率, 命中概率)。"""
+    af = m['fav']; opp = 'away' if af == 'home' else 'home'
+    if m['kind'] == 'anti_fav':   # 押"平 或 非热门不败"
+        key = 'Draw/Away' if af == 'home' else 'Home/Draw'
+        lbl = f'平或{m["cna"]}' if af == 'home' else f'{m["cnh"]}或平'; prob = m['d']['draw'] + m['d'][opp]
+    else:                          # 押"热门 不败"(让球思路,稳)
+        key = 'Home/Draw' if af == 'home' else 'Draw/Away'
+        lbl = f'{m["cnh"]}或平' if af == 'home' else f'平或{m["cna"]}'; prob = m['d']['draw'] + m['d'][af]
+    return lbl, _od(m['dc'], key, prob), prob
+def leg_pick(m):
+    """价值方向的可串玩法:逆向场=双重机会(平或非热门,有赔率);砍屠杀场=小球(符合价值且赔率合理)。"""
+    af = m['fav']; opp = 'away' if af == 'home' else 'home'
+    if m['kind'] == 'anti_blowout':
+        g = poisson_calc(m['d']['home'], m['d']['away'], None)[2]
+        prob = sum(p for s, p in g.items() if sum(map(int, s.split('-'))) <= 2)
+        return '小球 ≤2 球', _od(m['tot'], 'under', prob), prob
+    key = 'Draw/Away' if af == 'home' else 'Home/Draw'
+    lbl = f'平或{m["cna"]}' if af == 'home' else f'{m["cnh"]}或平'; prob = m['d']['draw'] + m['d'][opp]
+    return lbl, _od(m['dc'], key, prob), prob
+def build_tickets(up):
+    if not up: return ''
+    def card(cls, tag, stake, legs, ret, prob, note):
+        body = ''.join(f'<div class="tk-leg"><span class="tk-vs">{m["fh"]} {m["cnh"]} vs {m["cna"]} {m["fa"]}</span>'
+                       f'<span class="tk-bet">{bet} <b>@{od}</b></span></div>' for m, bet, od in legs)
+        ph = f'命中约 {prob*100:.0f}%' if prob >= 0.01 else f'命中约 {prob*100:.1f}%'
+        return (f'<div class="tk {cls}"><div class="tk-top"><span class="tk-tag">{tag}</span>'
+                f'<span class="tk-stake">参考 ¥{stake} · 全中赢 <b>¥{ret}</b></span></div>{body}'
+                f'<div class="tk-foot">{ph} · {note}</div></div>')
+    # 🟢 稳健:最悬殊场,热门不败双重机会
+    safe = max(up, key=lambda m: max(m['d'].values())); sl, so, sp = dc_pick(safe)
+    g_safe = card('green', '🟢 稳健 · 单关', 20, [(safe, sl, so)], round(20*so), sp, '热门不败,小赔率求稳')
+    # 🟡 平衡:3 串 1(价值方向双重机会)
+    three = up[:3]; legs = []; mult = 1.0; cp = 1.0
+    for m in three:
+        lb, od, pr = leg_pick(m); legs.append((m, lb, od)); mult *= od; cp *= pr
+    g_bal = card('amber', '🟡 平衡 · 3 串 1', 10, legs, round(10*mult), cp, '三场价值方向串关,博中等回报') if len(three) >= 2 else ''
+    # 🔴 博胆:2 场比分串
+    two = up[:2]; slegs = []; smult = 1.0; sprob = 1.0
+    for m in two:
+        picks, _ = value_picks(m['d'], m['kind'], m['fav']); sc = picks[0]
+        g = poisson_calc(m['d']['home'], m['d']['away'], None)[2]; pr = g.get(sc.replace(':', '-'), 0.05)
+        od = _od(m['score'], sc.replace(':', '-'), pr); slegs.append((m, f'比分 {sc}', od)); smult *= od; sprob *= pr
+    g_bold = card('red', '🔴 博胆 · 比分串', 5, slegs, round(5*smult), sprob, '押被低估的平局/砍屠杀,小钱搏大') if len(two) >= 2 else ''
+    warn = '<div class="tk-warn">⚠️ 仅供参考娱乐 · 理性购彩 · 量力而行 · 未成年人禁止购彩。竞彩返还率低,长期期望为负,切勿当作赚钱工具。</div>'
+    return f'<div class="tkwrap">{g_safe}{g_bal}{g_bold}{warn}</div>'
 def line_row(f, pmap, cur_fid, prob_map):
     """时间线单行:已结束=比分+盈亏(可点复盘);精选未来=⭐可点详情;其余=赛程行。"""
     fid = f['fixture']['id']; st = f['fixture']['status']['short']
@@ -1182,6 +1265,10 @@ def build_index(items):
              f'<div class="pnl {pcls}">{sign} ¥{abs(pl)}<small>净盈亏</small></div>'
              f'<div class="pnl-row"><span>本金 ¥{invest}</span><span>收回 ¥{won}</span>'
              f'<span>ROI {sign}{abs(roi)}%</span><span>胜负中 {nwin}/{ntot}</span></div></div>')
+    # ---------- 本期购彩参考(三档)----------
+    up = fetch_upcoming()
+    tickets = build_tickets(up)
+    ticket_sec = f'{sec_h("本期购彩参考", "近期 " + str(len(up)) + " 场 · 三档可选")}{tickets}' if tickets else ''
     # ---------- 统一时间线(全部小组赛按时间从上到下)----------
     prob_map = {}  # 精选场 fid → (cfg, 最新去水位),供大气卡底部展示概率条
     for cfg, rows, rich in items:
@@ -1205,7 +1292,7 @@ def build_index(items):
           'if(e&&!location.hash)setTimeout(function(){e.scrollIntoView({block:"center"});},80);})();</script>')
     body = (f'{APPBAR}<main>'
             f'<div class="sub" style="margin-top:4px">{now.isoformat(timespec="minutes")} UTC · 每 1h 自动更新</div>'
-            f'<div style="height:12px"></div>{track}{filt}{tl}'
+            f'<div style="height:12px"></div>{track}{ticket_sec}{filt}{tl}'
             f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{js}')
     open(os.path.join(DOCS, 'index.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赔率追踪")}</head><body>{body}</body></html>')
 
