@@ -326,6 +326,18 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .pva-vs{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--sec);opacity:.5;flex:0 0 auto}
 .pva-note{font-size:12px;color:var(--sec);line-height:1.6;border-top:1px solid rgba(255,255,255,.06);padding-top:10px}
 .pva-note b{color:var(--lime)}
+.rec-row{display:flex;align-items:center;gap:10px;margin:9px 0}
+.rec-lbl{font-size:12px;color:var(--sec);flex:0 0 64px}
+.rec-wdl{font-size:16px;font-weight:800;color:var(--lime)}
+.rec-scs{display:flex;gap:8px}
+.rec-sc{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--on);background:rgba(204,255,0,.1);border:1px solid rgba(204,255,0,.3);border-radius:7px;padding:4px 12px}
+.rectab{width:100%;border-collapse:collapse}
+.rectab td{padding:10px 6px;border-bottom:1px solid rgba(255,255,255,.06)}
+.rt-l{font-size:12px;color:var(--sec);width:72px}
+.rt-m{font-size:14px;color:var(--on)}
+.rt-r{text-align:right;font-weight:800;font-size:15px;width:30px}
+.rt-r.ok{color:var(--lime)}
+.rt-r.no{color:var(--crim)}
 .pva-hits{display:flex;gap:6px;justify-content:center;margin-bottom:12px}
 .ph3{font-size:11px;padding:4px 9px;border-radius:999px;font-weight:700;background:rgba(255,255,255,.06);color:var(--sec)}
 .ph3.y{background:rgba(204,255,0,.15);color:var(--lime)}
@@ -565,6 +577,24 @@ def call_hit(kind, fav, gh, ga):
     res = 'home' if gh > ga else ('away' if ga > gh else 'draw')
     if kind == 'anti_fav': return res != fav
     return abs(gh - ga) <= 1
+def _res(gh, ga): return 'home' if gh > ga else ('away' if ga > gh else 'draw')
+def value_picks(d, kind, fav):
+    """顺价值方向,从赛前去水位泊松网格里筛 2 个推荐比分 + 胜负倾向。"""
+    lh, la, grid = poisson_calc(d['home'], d['away'], None)
+    def r(s): i, j = map(int, s.split('-')); return 'home' if i > j else ('away' if j > i else 'draw')
+    if kind == 'anti_blowout':              # 押热门小胜(砍屠杀):候选=热门赢
+        cand = [s for s in grid if r(s) == fav]; wdl = ('win', fav)
+    else:                                   # 押平/非热门不败:候选=平 或 非热门赢
+        cand = [s for s in grid if r(s) != fav]; wdl = ('safe', fav)
+    cand.sort(key=lambda s: -grid[s])
+    picks = (cand or [max(grid, key=grid.get)])[:2]
+    return [s.replace('-', ':') for s in picks], wdl
+def wdl_text(wdl, cnh, cna):
+    mode, fav = wdl; favcn = cnh if fav == 'home' else cna; oppcn = cna if fav == 'home' else cnh
+    return f'{favcn} 胜(让球)' if mode == 'win' else f'平 或 {oppcn}(双重机会)'
+def wdl_hit(wdl, gh, ga):
+    mode, fav = wdl; res = _res(gh, ga)
+    return (res == fav) if mode == 'win' else (res != fav)
 def fetch_fixtures():
     if not AFKEY: return []
     d = af_get("https://v3.football.api-sports.io/fixtures?league=1&season=2026")
@@ -601,13 +631,11 @@ def build_past():
     out = []
     for fid, v in cache.items():
         v = dict(v); v['fid'] = fid
-        if v.get('devig'):  # 纯计算:泊松最可能比分 → 胜平负命中 / 比分精确命中(不耗请求)
-            d = v['devig']; lh, la, grid = poisson_calc(d['home'], d['away'], None)
-            ph, pa = map(int, sorted(grid.items(), key=lambda x: -x[1])[0][0].split('-'))
-            v['pred'] = f'{ph}-{pa}'
-            pr = 'home' if ph > pa else ('away' if pa > ph else 'draw')
-            ar = 'home' if v['gh'] > v['ga'] else ('away' if v['ga'] > v['gh'] else 'draw')
-            v['wdl_hit'] = (pr == ar); v['score_hit'] = (ph == v['gh'] and pa == v['ga'])
+        if v.get('devig'):  # 纯计算:顺价值方向产出 2 推荐比分 + 胜负倾向,按具体结果判命中
+            picks, wdl = value_picks(v['devig'], v['kind'], v['fav'])
+            v['picks'] = picks; v['wdl_txt'] = wdl_text(wdl, cn_of(v['h']), cn_of(v['a']))
+            v['wdl_hit'] = bool(wdl_hit(wdl, v['gh'], v['ga']))
+            v['score2_hit'] = (f"{v['gh']}:{v['ga']}" in picks)
         out.append(v)
     out.sort(key=lambda x: x['date'], reverse=True)
     return out
@@ -887,6 +915,13 @@ def third_party_block(cfg, pred):
     return (f'{sec_head("hub","第三方参照 · API 官方预测")}{row}{adv_html}{cmp_html}'
             f'<div class="vs-note">API-Football 机器学习预测,与本页「市场去水位 / 价值模型」相互参照(部分维度国家队数据缺省已隐藏)</div>')
 
+def rec_block(wdl_txt, picks):
+    pk = ''.join(f'<span class="rec-sc">{s}</span>' for s in picks)
+    return (f'<div class="glass">{sec_head("emoji_events","本场竞猜推荐")}'
+            f'<div class="rec-row"><span class="rec-lbl">胜负倾向</span><b class="rec-wdl">{wdl_txt}</b></div>'
+            f'<div class="rec-row"><span class="rec-lbl">推荐比分</span><span class="rec-scs">{pk}</span></div>'
+            f'<div class="vs-note">顺价值方向产出 · 胜负为主、2 个比分供参考 · 仅研究非投注建议</div></div>')
+
 def build_detail(cfg, rows, rich):
     l = L(cfg); title = f'{cfg["cn_h"]} vs {cfg["cn_a"]}'; script = ''
     if not rows:
@@ -903,7 +938,12 @@ def build_detail(cfg, rows, rich):
         tp_html = f'<div class="glass">{tp}</div>' if tp else ''
         fb = form_block(cfg)
         fb_html = f'<div class="glass">{fb}</div>' if fb else ''
+        _fav = max(cfg['my'], key=cfg['my'].get)  # 未来比赛用我的手工判断(my 概率 + 价值方向)
+        _kind = 'anti_blowout' if '砍屠杀' in cfg['st'].get('val', '') else 'anti_fav'
+        _picks, _wdl = value_picks(cfg['my'], _kind, _fav)
+        rec_html = rec_block(wdl_text(_wdl, cfg['cn_h'], cfg['cn_a']), _picks)
         inner = (f'{match_header(rows, cfg)}'
+                 f'{rec_html}'
                  f'<div class="glass">{sec_head("grid_view","比分概率 Top 6")}'
                  f'<div class="lockbox" id="lock-scores"><div class="locked">{scores_grid(lh, la, grid)}</div>'
                  f'<div class="lockmask"><span class="material-symbols-outlined lockicon">lock</span>'
@@ -936,11 +976,12 @@ def past_card(p):
     if not p.get('devig'):
         return (f'<div class="pcard"><div class="ptop">{teams}<span class="pres no">赛果</span></div>'
                 f'<div class="pmeta"><span class="pchip">{ds}</span><span class="pval">（无赛前赔率,仅记录比分）</span></div></div>')
-    ok = p.get('hit'); accent = '#CCFF00' if ok else 'rgba(255,255,255,.14)'
-    badge = '<span class="pres ok">✓ 命中</span>' if ok else '<span class="pres no">✗ 未中</span>'
+    ok = p.get('wdl_hit'); accent = '#CCFF00' if ok else 'rgba(255,255,255,.14)'
+    badge = '<span class="pres ok">✓ 胜负中</span>' if ok else '<span class="pres no">✗ 胜负失</span>'
+    sc_tag = '<span class="pchip" style="border-color:rgba(204,255,0,.4);color:var(--lime)">比分也中</span>' if p.get('score2_hit') else ''
     return (f'<a class="pcard" style="border-left-color:{accent}" href="past_{p["fid"]}.html"><div class="ptop">{teams}{badge}</div>'
-            f'<div class="pmeta"><span class="pchip">{ds}</span><span class="pchip">{p["tier"]}</span>'
-            f'<span class="pval">价值:<b>{p["dir"]}</b></span><span class="pmore">推演 ›</span></div></a>')
+            f'<div class="pmeta"><span class="pchip">{ds}</span>{sc_tag}'
+            f'<span class="pval">荐:<b>{p.get("wdl_txt","")}</b></span><span class="pmore">推演 ›</span></div></a>')
 
 def build_past_detail(p):
     if not p.get('devig'): return
@@ -950,24 +991,24 @@ def build_past_detail(p):
         bj = datetime.datetime.fromisoformat(p['date']).astimezone(BJ); ds = f'{bj.month}/{bj.day} {bj.hour:02d}:{bj.minute:02d}'
     except Exception: ds = p['date'][:10]
     lh, la, grid = poisson_calc(d['home'], d['away'], None)
-    pred = sorted(grid.items(), key=lambda x: -x[1])[0][0]; pred_sc = pred.replace('-', ' - ')
-    ok = p.get('hit')
-    badge = '<span class="pres ok">✓ 方向命中</span>' if ok else '<span class="pres no">✗ 方向未中</span>'
+    okw = p.get('wdl_hit'); sc_ok = p.get('score2_hit')
+    badge = '<span class="pres ok">✓ 胜负命中</span>' if okw else '<span class="pres no">✗ 胜负未中</span>'
     title = f'{cnh} vs {cna}'
     dv = lambda k: f'{d[k]*100:.0f}%'
+    picks = p.get('picks', []); pk = ' / '.join(s.replace(':', ' : ') for s in picks)
+    rescn = f'{cnh} 胜' if gh > ga else (f'{cna} 胜' if ga > gh else '平局')
     head_card = (f'<div class="glass" style="text-align:center">'
                  f'<div class="pd-flags">{fh} <span class="pd-sc">{gh} - {ga}</span> {fa}</div>'
                  f'<div class="pd-tn">{cnh} vs {cna}</div>'
                  f'<div style="margin:8px 0">{badge}</div>'
                  f'<div class="pd-meta">{ds}(北京) · 已结束 FT · {p["tier"]}</div></div>')
-    pva = (f'<div class="glass">{sec_head("compare_arrows","模型推测 vs 实际")}'
-           f'<div class="pva"><div class="pva-col"><div class="pva-lbl">模型最可能比分</div>'
-           f'<div class="pva-sc lime">{pred_sc}</div><div class="pva-sub">赛前去水位 · 泊松反推</div></div>'
-           f'<div class="pva-vs">VS</div>'
-           f'<div class="pva-col"><div class="pva-lbl">实际比分</div>'
-           f'<div class="pva-sc">{gh} - {ga}</div><div class="pva-sub">真实赛果</div></div></div>'
-           f'<div class="pva-note">价值方向:<b>{p["dir"]}</b> &nbsp;→&nbsp; {"✓ 命中" if ok else "✗ 未中"}'
-           f'(口径:{"①档悬殊看热门没被血洗、净胜≤1" if p["kind"]=="anti_blowout" else "②③档看热门没赢、出现平或冷门"})</div></div>')
+    pva = (f'<div class="glass">{sec_head("emoji_events","竞猜推荐 vs 实际")}'
+           f'<table class="rectab">'
+           f'<tr><td class="rt-l">胜负倾向</td><td class="rt-m">{p.get("wdl_txt","")}</td><td class="rt-r {"ok" if okw else "no"}">{"✓" if okw else "✗"}</td></tr>'
+           f'<tr><td class="rt-l">推荐比分</td><td class="rt-m">{pk}</td><td class="rt-r {"ok" if sc_ok else "no"}">{"✓" if sc_ok else "✗"}</td></tr>'
+           f'<tr><td class="rt-l">实际结果</td><td class="rt-m"><b>{rescn} · {gh} : {ga}</b></td><td class="rt-r"></td></tr>'
+           f'</table>'
+           f'<div class="vs-note">价值逻辑:{p["dir"]}(顺此产出推荐);胜负为主、2 个比分供参考。</div></div>')
     grid_card = f'<div class="glass">{sec_head("grid_view","模型推测比分分布 Top 6")}{scores_grid(lh, la, grid)}</div>'
     devig_card = (f'<div class="glass">{sec_head("balance","赛前市场预期(锐庄去水位)")}'
                   f'<div class="tp-pct"><span style="color:#CCFF00">{cnh} {dv("home")}</span>'
@@ -1005,13 +1046,13 @@ def build_index(items):
     past = build_past()
     for p in past: build_past_detail(p)  # 为每场已结束比赛生成"推测vs实际"复盘页
     scored = [p for p in past if p.get('devig')]
-    ntot = len(scored); nval = sum(1 for p in scored if p.get('hit'))
-    pct = round(nval/ntot*100) if ntot else 0
+    ntot = len(scored); nwin = sum(1 for p in scored if p.get('wdl_hit')); nsc = sum(1 for p in scored if p.get('score2_hit'))
+    pct = round(nwin/ntot*100) if ntot else 0; pcs = round(nsc/ntot*100) if ntot else 0
     track = (f'<div class="track"><div class="track-top">'
-             f'<div class="track-l"><span class="material-symbols-outlined">verified</span>模型战绩 · 价值方向命中</div>'
-             f'<div class="track-r">命中 <b>{nval}/{ntot}</b> · <b>{pct}%</b></div></div>'
+             f'<div class="track-l"><span class="material-symbols-outlined">verified</span>模型战绩 · 胜负命中</div>'
+             f'<div class="track-r">胜负 <b>{nwin}/{ntot}</b> · <b>{pct}%</b></div></div>'
              f'<div class="track-bar"><i style="width:{pct}%"></i></div>'
-             f'<div class="track-note">价值方向由各场赛前去水位赔率自动判定(不看赛果);价值≠会赢、长期高方差,逐场仅供参考。</div></div>')
+             f'<div class="track-note">每场给「胜负倾向 + 2 推荐比分」,按具体结果判命中。比分(2选)命中 {nsc}/{ntot} ≈ {pcs}%。仅研究、非投注建议。</div></div>')
     pc = ''.join(past_card(p) for p in past)
     body = (f'{APPBAR}<main>'
             f'<div class="sub" style="margin-top:4px">{now.isoformat(timespec="minutes")} UTC · 每 1h 自动更新</div>'
