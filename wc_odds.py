@@ -85,6 +85,10 @@ TEAM = {
  'Germany':('德国','🇩🇪'), 'Curaçao':('库拉索','🇨🇼'), 'Netherlands':('荷兰','🇳🇱'), 'Japan':('日本','🇯🇵'),
  'Ivory Coast':('科特迪瓦','🇨🇮'), 'Ecuador':('厄瓜多尔','🇪🇨'), 'Sweden':('瑞典','🇸🇪'), 'Tunisia':('突尼斯','🇹🇳'),
  'Spain':('西班牙','🇪🇸'), 'Cape Verde Islands':('佛得角','🇨🇻'),
+ 'Austria':('奥地利','🇦🇹'), 'Jordan':('约旦','🇯🇴'), 'Iraq':('伊拉克','🇮🇶'), 'Norway':('挪威','🇳🇴'),
+ 'Colombia':('哥伦比亚','🇨🇴'), 'Congo DR':('刚果(金)','🇨🇩'), 'Croatia':('克罗地亚','🇭🇷'),
+ 'England':('英格兰','🏴󠁧󠁢󠁥󠁮󠁧󠁿'), 'Ghana':('加纳','🇬🇭'), 'Iran':('伊朗','🇮🇷'),
+ 'New Zealand':('新西兰','🇳🇿'), 'Panama':('巴拿马','🇵🇦'), 'Portugal':('葡萄牙','🇵🇹'), 'Uzbekistan':('乌兹别克斯坦','🇺🇿'),
 }
 FLAG = {k: v[1] for k, v in TEAM.items()}  # 兼容旧引用
 def cn_of(en): return TEAM.get(en, (en, ''))[0]
