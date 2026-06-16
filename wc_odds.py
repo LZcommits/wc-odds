@@ -1186,38 +1186,34 @@ def crowd_block(slug, grid):
         if h > a: wdl['home'] += v
         elif h == a: wdl['draw'] += v
         else: wdl['away'] += v
-    rows = ''
-    top3 = cd['top'][:3]
     so_model = sorted(grid.items(), key=lambda x: -x[1])[:1]
     model_top = so_model[0][0] if so_model else ''
     slug_odds = CROWD_SCORE_ODDS.get(slug, {})
-    for i, (s, votes) in enumerate(top3):
+    max_votes = cd['top'][0][1]  # 票数最多者（用于进度条基准）
+    # 计算价差比，按价差降序排列（无赔率数据则跌落到末尾）
+    picks = []
+    for s, votes in cd['top']:
+        od = slug_odds.get(s)
+        ratio = (votes / scored_n) / (1 / od) if od else 0.0
+        picks.append((s, votes, ratio, od))
+    picks.sort(key=lambda x: -x[2])
+    rows = ''
+    for i, (s, votes, ratio, od) in enumerate(picks[:3]):
         sc = s.replace('-', ':')
         pct = votes / total_votes * 100
-        bar_w = int(pct / max(cd['top'][0][1] / total_votes * 100, 1) * 100)
+        bar_w = int(pct / max(max_votes / total_votes * 100, 1) * 100)
+        is_value = ratio >= 2.0
         match_model = s == model_top
-        fw = '800' if i == 0 else '500'
-        fg = 'var(--fg)' if i == 0 else 'var(--sec)'
-        bar_bg = 'var(--lime)' if i == 0 else 'var(--sec)'
-        bar_op = '1' if i == 0 else '0.5'
+        fg = 'var(--lime)' if is_value else 'var(--sec)'
+        bar_bg = 'var(--lime)' if is_value else 'rgba(255,255,255,.25)'
         model_tag = ' <span style="color:var(--lime);font-size:12px">⚡模型一致</span>' if match_model else ''
-        # 价差比：大众隐含概率 / 庄家隐含概率
-        od = slug_odds.get(s)
-        vr_tag = ''
-        if od:
-            ratio = (votes / scored_n) / (1 / od)
-            if ratio >= 2.0:
-                vr_tag = f' <span style="color:var(--lime);font-size:11px">价差{ratio:.1f}x @{od}</span>'
-            elif ratio >= 1.5:
-                vr_tag = f' <span style="color:#BA7517;font-size:11px">{ratio:.1f}x @{od}</span>'
-            else:
-                vr_tag = f' <span style="color:rgba(255,255,255,.3);font-size:11px">@{od}</span>'
+        ratio_str = f' · {ratio:.1f}x @{od}' if od else ''
         rows += (f'<div style="margin:6px 0">'
                  f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">'
-                 f'<span style="font-size:15px;font-weight:{fw};color:{fg}">#{i+1} <b>{sc}</b>{model_tag}</span>'
-                 f'<span style="font-size:13px;color:var(--sec)">{votes} 票 · {pct:.0f}%{vr_tag}</span></div>'
+                 f'<span style="font-size:15px;font-weight:700;color:{fg}">#{i+1} <b>{sc}</b>{model_tag}</span>'
+                 f'<span style="font-size:13px;color:{fg}">{votes} 票 · {pct:.0f}%{ratio_str}</span></div>'
                  f'<div style="height:4px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden">'
-                 f'<div style="height:100%;width:{bar_w}%;background:{bar_bg};border-radius:2px;opacity:{bar_op}"></div></div></div>')
+                 f'<div style="height:100%;width:{bar_w}%;background:{bar_bg};border-radius:2px"></div></div></div>')
     # WDL 小结
     wdl_total = sum(wdl.values()) or 1
     wdl_row = (f'<div style="display:flex;gap:8px;margin-top:10px;font-size:11px;color:var(--sec)">'
