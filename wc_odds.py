@@ -1132,7 +1132,7 @@ def build_past_detail(p):
         f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title)}</head><body>{body}</body></html>')
 
 FID2SLUG = {v: k for k, v in AFID.items()}
-def line_row(f, pmap, cur_fid):
+def line_row(f, pmap, cur_fid, prob_map):
     """时间线单行:已结束=比分+盈亏(可点复盘);精选未来=⭐可点详情;其余=赛程行。"""
     fid = f['fixture']['id']; st = f['fixture']['status']['short']
     h = f['teams']['home']['name']; a = f['teams']['away']['name']
@@ -1157,8 +1157,12 @@ def line_row(f, pmap, cur_fid):
     when = f'{tm} 北京 · 进行中' if live else f'{tm} 北京 · 距开赛 {hrs:.0f}h'
     slug = FID2SLUG.get(fid)
     tag = '<span class="fxbig-tag">⭐ 精选分析</span>' if slug else ''
-    if slug: bottom = '<div class="fxbig-cta">⭐ 查看竞猜方案<span class="material-symbols-outlined">arrow_forward</span></div>'
-    else: bottom = '<div class="fxbig-ph"><span class="material-symbols-outlined">hourglass_empty</span>竞猜分析筹备中,赛前补充</div>'
+    if slug and prob_map.get(fid):           # 精选场:展示去水位概率行 + 比例条
+        pcfg, pd = prob_map[fid]; bottom = f'{probrow(pd, pcfg)}{minibar(pd)}'
+    elif slug:                               # 精选场但暂无采样数据
+        bottom = '<div class="fxbig-cta">⭐ 查看竞猜方案<span class="material-symbols-outlined">arrow_forward</span></div>'
+    else:                                    # 无分析场:占位待补
+        bottom = '<div class="fxbig-ph"><span class="material-symbols-outlined">hourglass_empty</span>竞猜分析筹备中,赛前补充</div>'
     inner = (f'<div class="fxbig-top"><span class="fxbig-tm"><span class="material-symbols-outlined">schedule</span>{when}</span>{tag}</div>'
              f'<div class="fxbig-vs"><span class="fxbig-team">{th}</span><span class="fxbig-mid">VS</span><span class="fxbig-team">{ta}</span></div>'
              f'{bottom}')
@@ -1181,6 +1185,10 @@ def build_index(items):
              f'<span>ROI {sign}{abs(roi)}%</span><span>胜负中 {nwin}/{ntot}</span></div>'
              f'<div class="track-note">按「假设 ¥100 方案」用各场真实赔率回测。价值投注高方差,看长期累计。仅研究、非投注建议。</div></div>')
     # ---------- 统一时间线(全部小组赛按时间从上到下)----------
+    prob_map = {}  # 精选场 fid → (cfg, 最新去水位),供大气卡底部展示概率条
+    for cfg, rows, rich in items:
+        afid = AFID.get(cfg['slug'])
+        if afid and rows: prob_map[afid] = (cfg, rows[-1]['devig'])
     fx = sorted(fetch_fixtures(), key=lambda f: f['fixture']['date'])
     cur_fid = next((f['fixture']['id'] for f in fx if f['fixture']['status']['short'] not in ('FT', 'AET', 'PEN')), None)
     RMAP = {'Group Stage - 1': ('r1', '小组赛 · 第 1 轮'), 'Group Stage - 2': ('r2', '小组赛 · 第 2 轮'), 'Group Stage - 3': ('r3', '小组赛 · 第 3 轮')}
@@ -1193,7 +1201,7 @@ def build_index(items):
         except Exception: continue
         wd = '一二三四五六日'[bj.weekday()]; day = f'{bj.month}/{bj.day} 周{wd}'
         if day != cur_day: tl += f'<div class="tl-day">{day}</div>'; cur_day = day
-        tl += line_row(f, pmap, cur_fid)
+        tl += line_row(f, pmap, cur_fid, prob_map)
     filt = '<div class="filt"><a href="#r1">第 1 轮</a><a href="#r2">第 2 轮</a><a href="#r3">第 3 轮</a></div>'
     js = ('<script>(function(){var e=document.getElementById("cur");'
           'if(e&&!location.hash)setTimeout(function(){e.scrollIntoView({block:"center"});},80);})();</script>')
