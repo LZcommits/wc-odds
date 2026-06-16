@@ -314,6 +314,8 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .fx-tm{flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--sec)}
 .fx-tt{flex:1;font-size:14px;color:var(--on)}
 .fx-vs{color:var(--sec);opacity:.5;font-size:12px;margin:0 4px}
+.mtime{display:flex;align-items:center;gap:6px;margin-top:9px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sec)}
+.mtime .material-symbols-outlined{font-size:14px;opacity:.7}
 .track-grid{display:flex;gap:8px;margin:12px 0 10px}
 .tg{flex:1;text-align:center;background:rgba(0,0,0,.18);border-radius:8px;padding:10px 4px}
 .tg-v{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--lime)}
@@ -1126,12 +1128,16 @@ def build_index(items):
         accent = '#CCFF00' if '价值' in t else ('#FF0055' if ('冷门' in t or '警报' in t) else 'rgba(255,255,255,.12)')
         topbar = (f'<div class="mtop"><div class="mtitle">{title}</div>'
                   f'<span class="material-symbols-outlined chev">chevron_right</span></div>')
+        bj = cfg['ko'].astimezone(BJ); wd = '一二三四五六日'[bj.weekday()]
+        hrs = (cfg['ko'] - now).total_seconds() / 3600
+        mtime = (f'<div class="mtime"><span class="material-symbols-outlined">schedule</span>'
+                 f'{bj.month}/{bj.day} 周{wd} {bj.hour:02d}:{bj.minute:02d}(北京) · 距开赛 {hrs:.0f}h</div>')
         if not rows:
             mc += (f'<a class="mcard" style="border-left-color:{accent}" href="{cfg["slug"]}.html">'
-                   f'{topbar}{tier_chips(cfg, 0)}</a>'); continue
+                   f'{topbar}{mtime}</a>'); continue
         last = rows[-1]; d = last['devig']
         mc += (f'<a class="mcard" style="border-left-color:{accent}" href="{cfg["slug"]}.html">'
-               f'{topbar}{tier_chips(cfg, last["hrs_to_ko"])}{probrow(d, cfg)}{minibar(d)}</a>')
+               f'{topbar}{mtime}{probrow(d, cfg)}{minibar(d)}</a>')
     past = build_past()
     for p in past: build_past_detail(p)  # 为每场已结束比赛生成"推测vs实际"复盘页
     scored = [p for p in past if p.get('devig')]
