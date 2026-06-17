@@ -1501,14 +1501,16 @@ def wdl_rec_block(rows, cfg, slug=''):
         if ev > 1.03: tag, ev_c = '✅ 推荐', 'var(--lime)'
         elif ev > .99: tag, ev_c = '⚪ 临界', 'var(--sec)'
         else: tag, ev_c = '❌ 不推荐', '#FF0055'
+        mprob = cfg['my'][k]
         left = (f'<div style="{CELL}">'
                 f'<div style="font-size:13px;font-weight:700;color:var(--on);margin-bottom:3px">{name}</div>'
-                f'<div style="font-size:11px;color:var(--sec);font-family:JetBrains Mono,monospace">'
-                f'我估 {cfg["my"][k]:.0%} · @{p[k]}</div>'
-                f'<div style="display:flex;align-items:center;gap:5px;margin-top:4px">'
-                f'<span style="font-size:12px;font-weight:700;color:{ev_c};font-family:JetBrains Mono,monospace">EV {ev:.2f}</span>'
-                f'<span style="font-size:11px;color:{ev_c}">{tag}</span>'
-                f'</div></div>')
+                f'<div style="font-size:18px;font-weight:700;color:{ev_c};font-family:JetBrains Mono,monospace;line-height:1.2">'
+                f'{mprob:.0%}</div>'
+                f'<div style="font-size:11px;color:var(--sec);font-family:JetBrains Mono,monospace;margin-top:2px">'
+                f'@{p[k]} · EV {ev:.2f} {tag}</div>'
+                f'<div style="margin-top:5px;height:3px;border-radius:2px;background:rgba(255,255,255,.08)">'
+                f'<div style="height:100%;width:{mprob*100:.0f}%;background:{ev_c};border-radius:2px;transition:width .4s"></div></div>'
+                f'</div>')
         cpct = wdl_crowd.get(k, 0)
         bar_c = 'var(--lime)' if cpct >= 0.4 else 'var(--sec)'
         right = (f'<div style="{CELL};border-left:1px solid var(--line);padding-left:12px">'
