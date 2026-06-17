@@ -135,6 +135,72 @@ MATCHES = [
    'note':'①档(哥68%)。哥伦比亚攻击强悍,但乌兹别克首届世界杯防守求稳,总进球≤2有价值;价值在小球。'}},
 ]
 COL = {'home':'#CCFF00', 'draw':'#8e9379', 'away':'#FF0055'}  # 移盘曲线用色
+# 关键球员：俱乐部、身价、特点+近期状态。side='h'主队/'a'客队
+KEY_PLAYERS = {
+ 'spain_capeverde': [
+  {'n':'亚马尔','c':'巴塞罗那','v':'€1.8亿','side':'h','d':'右翼 · 17岁天才，速度+过人+弧线远射，欧冠赛季12球，西甲最具威胁边锋'},
+  {'n':'佩德里','c':'巴塞罗那','v':'€1亿','side':'h','d':'中场组织核心，控球传切+前插，传球成功率联赛前列，欧洲杯冠军班底'},
+  {'n':'萨拉比亚','c':'波尔图','v':'€800万','side':'a','d':'佛得角核心 · 右翼/右后，旅欧多年，组织反击关键人'},
+ ],
+ 'belgium_egypt': [
+  {'n':'德布劳内','c':'曼城','v':'€7000万','side':'h','d':'进攻中场，传球视野全欧顶级，英超赛季15助，老将仍是发动机'},
+  {'n':'卢卡库','c':'那不勒斯','v':'€3000万','side':'h','d':'中锋，意甲18球，支点+空中球优势，背身拿球破铁桶'},
+  {'n':'萨拉赫','c':'利物浦','v':'€4500万','side':'a','d':'右翼 · 英超22球，速度+内切左脚，比利时右路是最大克星'},
+  {'n':'马尔穆什','c':'曼城','v':'€6000万','side':'a','d':'右翼/中锋，德甲赛季25球引爆，速度+技术+射门均顶级，本届最大黑马之一'},
+ ],
+ 'saudi_uruguay': [
+  {'n':'Valverde','c':'皇马','v':'€1.3亿','side':'a','d':'中场 · 西甲赛季12球8助，体能+插上射门兼顾，中场二传手+终结者'},
+  {'n':'Darwin Núñez','c':'利物浦','v':'€7000万','side':'a','d':'中锋，速度+身体爆发，英超赛季15球，对阵低防线危险极高'},
+  {'n':'Al-Dawsari','c':'Al-Hilal','v':'€400万','side':'h','d':'左翼/右翼 · 2022年绝杀阿根廷的人，速度爆发+禁区内冷静，爆冷核心'},
+ ],
+ 'france_senegal': [
+  {'n':'姆巴佩','c':'皇马','v':'€1.8亿','side':'h','d':'左翼/中锋 · 西甲25球，加速全欧第一，距法国射手王纪录仅2球'},
+  {'n':'格列兹曼','c':'马竞','v':'€3500万','side':'h','d':'影锋 · 欧冠赛季12球，跑位脱身+小区域技术，隐形威胁'},
+  {'n':'Nicholas Jackson','c':'切尔西','v':'€5000万','side':'a','d':'中锋，英超赛季16球，高空球+速度反击，身体对抗强'},
+  {'n':'Idrissa Gueye','c':'埃弗顿','v':'€800万','side':'a','d':'防守中场 · 断球+覆盖能力强，塞内加尔中场防线核心'},
+ ],
+ 'argentina_algeria': [
+  {'n':'梅西','c':'国际迈阿密','v':'€1500万','side':'h','d':'10号，第200次国家队出场+第6届世界杯，MLS MVP，传球创造+远射+任意球仍是顶级'},
+  {'n':'劳塔罗','c':'国际米兰','v':'€1.1亿','side':'h','d':'中锋，意甲赛季25球+12助，与梅西配合默契，禁区终结机器'},
+  {'n':'马赫雷斯','c':'Al-Ahli(沙特)','v':'€2000万','side':'a','d':'右翼/10号，沙特联赛状态稳定15球，技术+过人仍是非洲顶级，阿尔及利亚旗帜'},
+  {'n':'Amoura','c':'VfB斯图加特','v':'€3000万','side':'a','d':'右翼，速度爆发+直线冲刺，德甲赛季13球，反击最大威胁'},
+ ],
+ 'iraq_norway': [
+  {'n':'哈兰德','c':'曼城','v':'€2亿','side':'a','d':'中锋，英超赛季22球欧洲金靴热门，高空球+禁区终结无解，小空间同样致命'},
+  {'n':'厄德高','c':'阿森纳','v':'€1.2亿','side':'a','d':'前腰/10号，英超14助攻，组织+直塞节奏把控，挪威大脑'},
+  {'n':'Sörloth','c':'马竞','v':'€3500万','side':'a','d':'第二锋线/影锋，西甲稳定发挥，身体+速度补位哈兰德左右'},
+ ],
+ 'austria_jordan': [
+  {'n':'Sabitzer','c':'多特蒙德','v':'€2500万','side':'h','d':'中场/10号，德甲赛季8球，奥地利攻防核心，体能好+跑动强'},
+  {'n':'Laimer','c':'拜仁','v':'€4000万','side':'h','d':'中场，德甲高强度覆盖，拦截+高位逼抢体系核心，赛季表现成熟'},
+  {'n':'Al-Naimat','c':'Al-Faisaly(约旦)','v':'€200万','side':'a','d':'中场核心，亚洲杯半决赛淘汰韩国核心，组织+传球节奏，约旦大脑'},
+  {'n':'Bani Yaseen','c':'海外联赛','v':'€150万','side':'a','d':'防守中场，亚洲杯亚军阵容核心，覆盖+断球强，铁桶防线关键'},
+ ],
+ 'portugal_congodr': [
+  {'n':'C罗','c':'Al-Nassr(沙特)','v':'€1000万','side':'h','d':'中锋，沙特联29球年度射手王，禁区内嗅觉仍在，葡萄牙队长+精神领袖'},
+  {'n':'B费','c':'曼联','v':'€8000万','side':'h','d':'前腰/进攻中场，英超赛季15球12助，传球+任意球+远射，葡萄牙真正大脑'},
+  {'n':'B席','c':'曼城','v':'€1亿','side':'h','d':'中场，西甲→英超过渡期，技术传切+节奏把控，配合佩佩/鲁本体系完善'},
+ ],
+ 'england_croatia': [
+  {'n':'贝林厄姆','c':'皇马','v':'€2亿','side':'h','d':'前腰，西甲赛季表现回升至18球，禁区插上+长途奔袭，有爆发力但不稳定'},
+  {'n':'凯恩','c':'拜仁','v':'€9000万','side':'h','d':'中锋，德甲27球联赛金靴，支点+射门+传球三位一体，英格兰最稳定得分点'},
+  {'n':'萨卡','c':'阿森纳','v':'€1.3亿','side':'h','d':'右翼/右中场，英超12球14助，内切左脚+直线突破，阿森纳双核之一'},
+  {'n':'莫德里奇','c':'皇马','v':'€1000万','side':'a','d':'中场/10号，老将末年仍是核心，节奏把控+传球视野，克罗地亚灵魂'},
+  {'n':'格瓦迪奥尔','c':'曼城','v':'€8000万','side':'a','d':'左后卫，英超防守最稳，身体+速度，上下游能力强，对位萨卡是全场焦点'},
+  {'n':'科瓦契奇','c':'曼城','v':'€4000万','side':'a','d':'中场，英超冠军阵容稳定轮转，覆盖+技术，中场争夺关键人'},
+ ],
+ 'ghana_panama': [
+  {'n':'Kudus','c':'西汉姆','v':'€5500万','side':'h','d':'攻击中场/右翼，英超11球8助，技术华丽+过人能力强，加纳最大进攻威胁'},
+  {'n':'Thomas Partey','c':'阿森纳','v':'€3500万','side':'h','d':'防守中场，英超赛季稳定，断球+覆盖+远射，中场防线核心'},
+  {'n':'Fajardo','c':'哥斯达黎加联赛','v':'€200万','side':'a','d':'中锋，CONCACAF赛事经验丰富，支点+反击，巴拿马唯一锋线依赖'},
+ ],
+ 'uzbekistan_colombia': [
+  {'n':'路易斯-迪亚斯','c':'利物浦','v':'€8000万','side':'a','d':'左翼，英超12球MVP级，速度爆发+内切右脚，本届最危险边锋之一'},
+  {'n':'科塔斯','c':'曼城','v':'€7000万','side':'a','d':'中场/影锋，英超冠军阵容核心，传跑技术精湛，组织+前插'},
+  {'n':'詹姆斯','c':'复出中','v':'€1200万','side':'a','d':'前腰，2014世界杯金靴，技术+视野仍在，复出后状态待确认但威胁不减'},
+ ],
+}
+
 # 抖音评论区万人竞猜数据 (2026-06-16 采集, ~150条/场)
 CROWD_DATA = {
  'spain_capeverde':    {'n':349, 'top':[('0-0',41),('1-1',4),('1-0',2),('3-0',2),('4-0',2)]},
@@ -443,6 +509,15 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .opta-bar{display:flex;gap:3px;height:8px;margin:12px 0 10px}
 .opta-bar i{display:block;border-radius:999px}
 .opta-val{font-style:italic;font-size:12.5px;color:var(--sec)}
+.kp-list{display:flex;flex-direction:column;gap:7px;margin:10px 0}
+.kp-card{border-radius:8px;padding:9px 12px;border-left:3px solid var(--line)}
+.kp-card.h{border-left-color:var(--lime)}
+.kp-card.a{border-left-color:var(--crim)}
+.kp-hd{display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap}
+.kp-name{font-size:13px;font-weight:700;color:var(--on)}
+.kp-club{font-size:10px;color:var(--sec);border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+.kp-val{font-size:10px;color:var(--lime);font-family:'JetBrains Mono',monospace}
+.kp-desc{font-size:11.5px;color:var(--sec);line-height:1.55}
 .sec-h{display:flex;align-items:baseline;gap:8px;margin:24px 2px 12px}
 .sec-h .t{font-size:15px;font-weight:800;color:var(--on);letter-spacing:-.01em}
 .sec-h .c{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--sec);opacity:.7}
@@ -1059,10 +1134,26 @@ def matchup_analysis(cfg):
         x = x.replace(' vs ', ' <b class="muvs">vs</b> ')
         lis += f'<li><span class="mudot"></span><span>{x}</span></li>'
     oh = s['oh']; oa = s['oa']; tot = (oh + oa) or 1
-    hw = oh / tot * 100  # 主队胜率在条形中所占宽度
+    hw = oh / tot * 100
     head = (f'<b style="color:var(--lime)">{oh}%</b> vs '
             f'<b style="color:var(--crim)">{oa}%</b>'
             f'<span class="opta-tag">({s["otag"]})</span>')
+    # 关键球员卡片
+    kp_html = ''
+    players = KEY_PLAYERS.get(cfg['slug'], [])
+    if players:
+        cards = ''
+        for p in players:
+            val_html = f'<span class="kp-val">{p["v"]}</span>' if p.get('v') else ''
+            cards += (f'<div class="kp-card {p["side"]}">'
+                      f'<div class="kp-hd"><span class="kp-name">{p["n"]}</span>'
+                      f'<span class="kp-club">{p["c"]}</span>{val_html}</div>'
+                      f'<div class="kp-desc">{p["d"]}</div></div>')
+        kp_html = (f'<div class="mua-div"></div>'
+                   f'<div class="muah" style="margin:10px 0 6px">'
+                   f'<span class="material-symbols-outlined">person</span>'
+                   f'<span class="muah-t">关键球员</span></div>'
+                   f'<div class="kp-list">{cards}</div>')
     return (
         f'<div class="mua-h2h"><div class="muah">'
         f'<span class="material-symbols-outlined">history</span><span class="muah-t">历史交锋</span></div>'
@@ -1072,7 +1163,9 @@ def matchup_analysis(cfg):
         f'<div class="mua-fc away"><h4>{ca} {s["fa"]}</h4><p>{s["xa"]}</p></div></div>'
         f'<div class="glass mua-key"><div class="muah">'
         f'<span class="material-symbols-outlined">gps_fixed</span><span class="muah-t">关键对位</span></div>'
-        f'<div class="mua-div"></div><ul class="mua-mu">{lis}</ul><div class="mua-div"></div>'
+        f'<div class="mua-div"></div><ul class="mua-mu">{lis}</ul>'
+        f'{kp_html}'
+        f'<div class="mua-div"></div>'
         f'<div class="opta-row"><span class="opta-pill">{s.get("osrc","OPTA")}</span>'
         f'<span class="opta-txt">{head}</span></div>'
         f'<div class="opta-bar"><i style="width:{hw:.1f}%;background:var(--lime)"></i>'
@@ -1084,17 +1177,21 @@ def reasoning_html(cfg):
     if not steps: return '<p class="note">暂无推理</p>'
     return ''.join(f'<div class="mtag"><b>{i+1}.</b> {s}</div>' for i, s in enumerate(steps))
 
-def fetch_last5(tid):  # 该队最近 5 场(API,含热身赛),返回 W/D/L 列表(旧→新)
+def fetch_qual_form(tid):
+    """世界杯预选赛全部场次 W/D/L，旧→新；过滤非预选赛场次。"""
     if not tid: return []
-    d = af_get(f"https://v3.football.api-sports.io/fixtures?team={tid}&last=5")
-    out = []
+    d = af_get(f"https://v3.football.api-sports.io/fixtures?team={tid}&last=60")
+    qual = []
     for f in (d.get('response', []) if d else []):
+        if f['fixture']['status']['short'] not in ('FT', 'AET', 'PEN'): continue
+        lg = f.get('league', {}).get('name', '')
+        if 'World Cup' not in lg or 'Qualif' not in lg: continue
         gh, ga = f['goals']['home'], f['goals']['away']
         if gh is None or ga is None: continue
         ih = f['teams']['home']['id'] == tid
         gf, gc = (gh, ga) if ih else (ga, gh)
-        out.append('W' if gf > gc else ('L' if gf < gc else 'D'))
-    return list(reversed(out))
+        qual.append('W' if gf > gc else ('L' if gf < gc else 'D'))
+    return list(reversed(qual))
 def form_dots(form):
     col = {'W':'#CCFF00','D':'#8e9379','L':'#FF0055'}
     if not form: return '<span class="form-dots"><span class="fdmin">暂无</span></span>'
@@ -1102,13 +1199,13 @@ def form_dots(form):
 def form_block(cfg):
     th = TID.get(cfg['home']); ta = TID.get(cfg['away'])
     if not th or not ta: return ''
-    fh = fetch_last5(th); fa = fetch_last5(ta)
+    fh = fetch_qual_form(th); fa = fetch_qual_form(ta)
     if not fh and not fa: return ''
-    return (f'{sec_head("trending_up","近 5 场状态")}'
+    return (f'{sec_head("trending_up","世界杯预选赛战绩")}'
             f'<div class="form-blk">'
             f'<div class="form-row"><span class="form-team">{cfg["cn_h"]}</span>{form_dots(fh)}</div>'
             f'<div class="form-row"><span class="form-team">{cfg["cn_a"]}</span>{form_dots(fa)}</div></div>'
-            f'<div class="vs-note">近 5 场含热身赛 · 左旧 → 右新 · W 胜 / D 平 / L 负</div>')
+            f'<div class="vs-note">2026 世界杯预选赛全部场次 · 左旧 → 右新 · W 胜 / D 平 / L 负</div>')
 
 def fetch_predictions(afid):
     if not afid: return None
@@ -1280,7 +1377,7 @@ def score_top3_block(rich, my, grid, slug=''):
         od_txt = f'@{od}' if od else ''
         model_rows += (f'<div class="bet{" main" if i==0 else ""}"><span class="bet-tag">TOP{i+1}</span>'
                        f'<div class="bet-mid"><b>{sc_disp}</b>'
-                       f'<span class="bet-od">我估 {prob*100:.1f}%{" · " + od_txt if od_txt else ""}</span></div></div>')
+                       f'<span class="bet-od">{prob*100:.1f}%{" · " + od_txt if od_txt else ""}</span></div></div>')
     # 抖音大众推荐列
     cd = CROWD_DATA.get(slug)
     crowd_col = ''
@@ -1298,14 +1395,14 @@ def score_top3_block(rich, my, grid, slug=''):
             sc = s.replace('-', ':')
             is_val = ratio >= 2.0
             fg = 'var(--lime)' if is_val else 'var(--on)'
-            ratio_str = f'{ratio:.1f}x @{od}' if od else '—'
+            desc = f'{votes}人押 · 赔率@{od} · 超押{ratio:.1f}倍' if od else f'{votes}人押'
             tag_style = ' style="background:var(--lime);color:var(--navy);border-color:var(--lime)"' if is_val else ''
             crowd_rows += (f'<div class="bet"><span class="bet-tag"{tag_style}>#{i+1}</span>'
                            f'<div class="bet-mid"><b style="color:{fg}">{sc}</b>'
-                           f'<span class="bet-od" style="color:{"var(--lime)" if is_val else "var(--sec)"}">{ratio_str}</span></div></div>')
-        sub_hd = '<div style="font-size:11px;color:var(--sec);margin-bottom:4px;font-weight:600;letter-spacing:.03em">大众推荐 · 抖音评论</div>'
+                           f'<span class="bet-od" style="color:{"var(--lime)" if is_val else "var(--sec)"}">{desc}</span></div></div>')
+        sub_hd = '<div style="font-size:11px;color:var(--sec);margin-bottom:4px;font-weight:600;letter-spacing:.03em">大众推荐</div>'
         crowd_col = f'<div style="flex:1;min-width:0;border-left:1px solid var(--line);padding-left:12px">{sub_hd}{crowd_rows}</div>'
-    model_hd = '<div style="font-size:11px;color:var(--sec);margin-bottom:4px;font-weight:600;letter-spacing:.03em">模型推荐 · Poisson</div>'
+    model_hd = '<div style="font-size:11px;color:var(--sec);margin-bottom:4px;font-weight:600;letter-spacing:.03em">模型推荐</div>'
     model_col = f'<div style="flex:1;min-width:0">{model_hd}{model_rows}</div>'
     if crowd_col:
         inner = f'<div style="display:flex;gap:0;align-items:flex-start">{model_col}{crowd_col}</div>'
@@ -1313,8 +1410,8 @@ def score_top3_block(rich, my, grid, slug=''):
         inner = model_rows
     return f'<div class="glass">{sec_head("scoreboard","比分推荐 TOP3")}{inner}</div>'
 
-def wdl_rec_block(rows, cfg):
-    """胜平负推荐：基于去水位赔率 × 我的概率，给出价值方向。"""
+def wdl_rec_block(rows, cfg, slug=''):
+    """胜平负推荐：基于去水位赔率 × 我的概率，给出价值方向 + 大众观点。"""
     p = rows[-1].get('pin_h2h')
     if not p: return ''
     l = L(cfg); out = ''
@@ -1328,7 +1425,21 @@ def wdl_rec_block(rows, cfg):
                 f'<div class="evstat">我估: {cfg["my"][k]:.0%}　赔率: {p[k]}</div></div>'
                 f'<div class="evright"><div class="evev">EV {ev:.2f}</div>'
                 f'<div class="evtag"><span class="material-symbols-outlined" style="font-size:15px">{ic}</span>{tag}</div></div></div>')
-    return f'<div class="glass">{sec_head("how_to_vote","胜平负推荐")}{out}</div>'
+    crowd_line = ''
+    cd = CROWD_DATA.get(slug)
+    if cd:
+        wdl = {'home': 0, 'draw': 0, 'away': 0}
+        for s, v in cd['top']:
+            h, a = map(int, s.split('-'))
+            if h > a: wdl['home'] += v
+            elif h == a: wdl['draw'] += v
+            else: wdl['away'] += v
+        wt = sum(wdl.values()) or 1
+        crowd_line = (f'<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--line);'
+                      f'font-size:11px;color:var(--sec)">'
+                      f'大众观点（抖音评论）：{l["home"]} {wdl["home"]/wt:.0%} · 平局 {wdl["draw"]/wt:.0%} · {l["away"]} {wdl["away"]/wt:.0%}'
+                      f'</div>')
+    return f'<div class="glass">{sec_head("how_to_vote","胜平负推荐")}{out}{crowd_line}</div>'
 
 def goals_block(rich, my, grid):
     """进球推荐：大小球 2.5 + BTTS + xG 预期。"""
@@ -1376,9 +1487,9 @@ def build_detail(cfg, rows, rich):
         fb = form_block(cfg)
         fb_html = f'<div class="glass">{fb}</div>' if fb else ''
         inner = (f'{match_header(rows, cfg)}'
-                 f'{crowd_block(cfg["slug"], grid)}'
+                 f''
                  f'{score_top3_block(rich, cfg["my"], grid, cfg["slug"])}'
-                 f'{wdl_rec_block(rows, cfg)}'
+                 f'{wdl_rec_block(rows, cfg, cfg["slug"])}'
                  f'{goals_block(rich, cfg["my"], grid)}'
                  f'{tp_html}'
                  f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
