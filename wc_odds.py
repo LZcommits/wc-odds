@@ -1370,19 +1370,12 @@ def score_top3_block(rich, my, grid, slug=''):
     """比分推荐 TOP3：Poisson 模型 + 抖音大众推荐双列对比。"""
     model_top3 = sorted(grid.items(), key=lambda x: -x[1])[:3]
     so = (rich.get('score_odds') or {}).get('odds', {})
-    model_rows = ''
-    for i, (s, prob) in enumerate(model_top3):
-        sc_disp = s.replace('-', ':')
-        od = so.get(s)
-        od_txt = f'@{od}' if od else ''
-        model_rows += (f'<div class="bet{" main" if i==0 else ""}"><span class="bet-tag">TOP{i+1}</span>'
-                       f'<div class="bet-mid"><b>{sc_disp}</b>'
-                       f'<span class="bet-od">{prob*100:.1f}%{" · " + od_txt if od_txt else ""}</span></div></div>')
-    # 抖音大众推荐列
     cd = CROWD_DATA.get(slug)
-    crowd_col = ''
+    # 计算大众推荐列表
+    crowd_picks = []
     if cd:
         scored_n = cd.get('scored', sum(v for _, v in cd['top']))
+        total_votes = sum(v for _, v in cd['top']) or 1
         slug_odds = CROWD_SCORE_ODDS.get(slug, {})
         picks = []
         for s, votes in cd['top']:
@@ -1390,24 +1383,61 @@ def score_top3_block(rich, my, grid, slug=''):
             ratio = (votes / scored_n) / (1 / od) if od else 0.0
             picks.append((s, votes, ratio, od))
         picks.sort(key=lambda x: -x[2])
-        crowd_rows = ''
-        for i, (s, votes, ratio, od) in enumerate(picks[:3]):
-            sc = s.replace('-', ':')
+        crowd_picks = picks[:3]
+    # 无大众数据，纯模型列
+    if not crowd_picks:
+        rows = ''
+        for i, (s, prob) in enumerate(model_top3):
+            sc_disp = s.replace('-', ':')
+            od = so.get(s)
+            od_txt = f'@{od}' if od else ''
+            rows += (f'<div class="bet{" main" if i==0 else ""}"><span class="bet-tag">TOP{i+1}</span>'
+                     f'<div class="bet-mid"><b>{sc_disp}</b>'
+                     f'<span class="bet-od">{prob*100:.1f}%{" · " + od_txt if od_txt else ""}</span></div></div>')
+        return f'<div class="glass">{sec_head("scoreboard","比分推荐 TOP3")}{rows}</div>'
+    # CSS grid 双列，行行对齐
+    CELL = 'display:flex;align-items:center;gap:8px;padding:10px 6px;border-bottom:1px solid rgba(255,255,255,.06)'
+    TAG  = 'flex:0 0 auto;font-size:10px;font-family:JetBrains Mono,monospace;border:1px solid var(--line);border-radius:4px;padding:2px 6px;color:var(--sec)'
+    TAG_H = 'flex:0 0 auto;font-size:10px;font-family:JetBrains Mono,monospace;background:var(--lime);color:var(--navy);border:1px solid var(--lime);border-radius:4px;padding:2px 6px;font-weight:700'
+    grid_rows = ''
+    for i, (ms, mprob) in enumerate(model_top3):
+        msc = ms.replace('-', ':')
+        mod_od = so.get(ms)
+        mod_txt = f'· @{mod_od}' if mod_od else ''
+        # 左列（模型）
+        left = (f'<div style="{CELL}">'
+                f'<span style="{TAG_H if i==0 else TAG}">TOP{i+1}</span>'
+                f'<div style="flex:1;min-width:0">'
+                f'<b style="font-size:15px;color:var(--on)">{msc}</b>'
+                f'<span style="display:block;font-size:11px;color:var(--sec);font-family:JetBrains Mono,monospace;margin-top:2px">'
+                f'{mprob*100:.1f}%{mod_txt}</span>'
+                f'</div></div>')
+        # 右列（大众）
+        if i < len(crowd_picks):
+            cs, votes, ratio, od = crowd_picks[i]
+            csc = cs.replace('-', ':')
             is_val = ratio >= 2.0
-            fg = 'var(--lime)' if is_val else 'var(--on)'
-            desc = f'{votes}人押 · 赔率@{od} · 超押{ratio:.1f}倍' if od else f'{votes}人押'
-            tag_style = ' style="background:var(--lime);color:var(--navy);border-color:var(--lime)"' if is_val else ''
-            crowd_rows += (f'<div class="bet"><span class="bet-tag"{tag_style}>#{i+1}</span>'
-                           f'<div class="bet-mid"><b style="color:{fg}">{sc}</b>'
-                           f'<span class="bet-od" style="color:{"var(--lime)" if is_val else "var(--sec)"}">{desc}</span></div></div>')
-        sub_hd = '<div style="font-size:11px;color:var(--sec);margin-bottom:4px;font-weight:600;letter-spacing:.03em">大众推荐</div>'
-        crowd_col = f'<div style="flex:1;min-width:0;border-left:1px solid var(--line);padding-left:12px">{sub_hd}{crowd_rows}</div>'
-    model_hd = '<div style="font-size:11px;color:var(--sec);margin-bottom:4px;font-weight:600;letter-spacing:.03em">模型推荐</div>'
-    model_col = f'<div style="flex:1;min-width:0">{model_hd}{model_rows}</div>'
-    if crowd_col:
-        inner = f'<div style="display:flex;gap:0;align-items:flex-start">{model_col}{crowd_col}</div>'
-    else:
-        inner = model_rows
+            fg  = 'var(--lime)' if is_val else 'var(--on)'
+            sec_c = 'var(--lime)' if is_val else 'var(--sec)'
+            tag_s = TAG_H if is_val else TAG
+            pct = votes / total_votes * 100
+            line2 = f'指数{ratio:.1f}' if od else '—'
+            line3 = f'{votes}票({pct:.0f}%) | {od}倍' if od else f'{votes}票({pct:.0f}%)'
+            right = (f'<div style="{CELL};border-left:1px solid var(--line);padding-left:12px">'
+                     f'<span style="{tag_s}">TOP{i+1}</span>'
+                     f'<div style="flex:1;min-width:0">'
+                     f'<b style="font-size:15px;color:{fg}">{csc}</b>'
+                     f'<span style="display:block;font-size:11px;color:{sec_c};font-family:JetBrains Mono,monospace;margin-top:2px">{line2}</span>'
+                     f'<span style="display:block;font-size:11px;color:var(--sec);font-family:JetBrains Mono,monospace">{line3}</span>'
+                     f'</div></div>')
+        else:
+            right = f'<div style="{CELL};border-left:1px solid var(--line);padding-left:12px"></div>'
+        grid_rows += left + right
+    hd = 'font-size:11px;color:var(--sec);padding:0 6px 4px;font-weight:600;letter-spacing:.03em'
+    inner = (f'<div style="display:grid;grid-template-columns:1fr 1fr">'
+             f'<div style="{hd}">模型推荐</div>'
+             f'<div style="{hd};border-left:1px solid var(--line);padding-left:12px">大众推荐</div>'
+             f'{grid_rows}</div>')
     return f'<div class="glass">{sec_head("scoreboard","比分推荐 TOP3")}{inner}</div>'
 
 def wdl_rec_block(rows, cfg, slug=''):

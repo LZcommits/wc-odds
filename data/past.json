@@ -430,5 +430,86 @@
 "1-1": 6.5,
 "0-0": 7.6
 }
+},
+"1489383": {
+"date": "2026-06-16T19:00:00+00:00",
+"h": "France",
+"a": "Senegal",
+"gh": 3,
+"ga": 1,
+"devig": {
+"home": 0.6589,
+"draw": 0.2067,
+"away": 0.1345
+},
+"tier": "①悬殊",
+"fav": "home",
+"dir": "砍屠杀 / 小球 / 弱队受让",
+"kind": "anti_blowout",
+"hit": false,
+"dc": {
+"Home/Draw": 1.08,
+"Home/Away": 1.18,
+"Draw/Away": 2.7
+},
+"tot_u": 2.13,
+"po": {
+"1-0": 7.0,
+"2-0": 6.75
+}
+},
+"1539016": {
+"date": "2026-06-16T22:00:00+00:00",
+"h": "Iraq",
+"a": "Norway",
+"gh": 1,
+"ga": 4,
+"devig": {
+"home": 0.0727,
+"draw": 0.1362,
+"away": 0.7911
+},
+"tier": "①悬殊",
+"fav": "away",
+"dir": "砍屠杀 / 小球 / 弱队受让",
+"kind": "anti_blowout",
+"hit": false,
+"dc": {
+"Home/Draw": 4.33,
+"Home/Away": 1.1,
+"Draw/Away": 1.03
+},
+"tot_u": 2.34,
+"po": {
+"0-2": 5.75,
+"0-1": 6.75
+}
+},
+"1489381": {
+"date": "2026-06-17T01:00:00+00:00",
+"h": "Argentina",
+"a": "Algeria",
+"gh": 3,
+"ga": 0,
+"devig": {
+"home": 0.6318,
+"draw": 0.2332,
+"away": 0.1351
+},
+"tier": "②中热门",
+"fav": "home",
+"dir": "平 / 弱队 / 小球",
+"kind": "anti_fav",
+"hit": false,
+"dc": {
+"Home/Draw": 1.11,
+"Home/Away": 1.18,
+"Draw/Away": 2.45
+},
+"tot_u": 1.86,
+"po": {
+"1-1": 8.0,
+"0-0": 11.5
+}
 }
 }
