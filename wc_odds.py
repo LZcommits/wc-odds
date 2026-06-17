@@ -259,6 +259,39 @@ TEAM = {
  'Colombia':('哥伦比亚','🇨🇴'), 'Congo DR':('刚果(金)','🇨🇩'), 'Croatia':('克罗地亚','🇭🇷'),
  'England':('英格兰','🏴󠁧󠁢󠁥󠁮󠁧󠁿'), 'Ghana':('加纳','🇬🇭'), 'Iran':('伊朗','🇮🇷'),
  'New Zealand':('新西兰','🇳🇿'), 'Panama':('巴拿马','🇵🇦'), 'Portugal':('葡萄牙','🇵🇹'), 'Uzbekistan':('乌兹别克斯坦','🇺🇿'),
+ # 预选赛对手补全
+ 'Albania':('阿尔巴尼亚','🇦🇱'), 'Andorra':('安道尔','🇦🇩'), 'andorra':('安道尔','🇦🇩'),
+ 'Angola':('安哥拉','🇦🇴'), 'Armenia':('亚美尼亚','🇦🇲'), 'Azerbaijan':('阿塞拜疆','🇦🇿'),
+ 'Bahrain':('巴林','🇧🇭'), 'Belarus':('白俄罗斯','🇧🇾'), 'Belize':('伯利兹','🇧🇿'),
+ 'Bolivia':('玻利维亚','🇧🇴'), 'Botswana':('博茨瓦纳','🇧🇼'), 'Bulgaria':('保加利亚','🇧🇬'),
+ 'Burkina Faso':('布基纳法索','🇧🇫'), 'Cameroon':('喀麦隆','🇨🇲'),
+ 'Central African Republic':('中非','🇨🇫'), 'Chad':('乍得','🇹🇩'), 'Chile':('智利','🇨🇱'),
+ 'China':('中国','🇨🇳'), 'Comoros':('科摩罗','🇰🇲'), 'Cyprus':('塞浦路斯','🇨🇾'),
+ 'Denmark':('丹麦','🇩🇰'), 'Djibouti':('吉布提','🇩🇯'), 'El Salvador':('萨尔瓦多','🇸🇻'),
+ 'Estonia':('爱沙尼亚','🇪🇪'), 'Eswatini':('斯威士兰','🇸🇿'), 'Ethiopia':('埃塞俄比亚','🇪🇹'),
+ 'FYR Macedonia':('北马其顿','🇲🇰'), 'Faroe Islands':('法罗群岛','🇫🇴'), 'Finland':('芬兰','🇫🇮'),
+ 'Georgia':('格鲁吉亚','🇬🇪'), 'Gibraltar':('直布罗陀','🇬🇮'), 'Greece':('希腊','🇬🇷'),
+ 'Guatemala':('危地马拉','🇬🇹'), 'Guinea':('几内亚','🇬🇳'), 'Guinea-Bissau':('几内亚比绍','🇬🇼'),
+ 'Guyana':('圭亚那','🇬🇾'), 'Hong Kong':('香港','🇭🇰'), 'Hungary':('匈牙利','🇭🇺'),
+ 'Iceland':('冰岛','🇮🇸'), 'Indonesia':('印度尼西亚','🇮🇩'), 'Israel':('以色列','🇮🇱'),
+ 'Italy':('意大利','🇮🇹'), 'Jamaica':('牙买加','🇯🇲'), 'Kazakhstan':('哈萨克斯坦','🇰🇿'),
+ 'Kuwait':('科威特','🇰🇼'), 'Kyrgyzstan':('吉尔吉斯斯坦','🇰🇬'), 'Latvia':('拉脱维亚','🇱🇻'),
+ 'Liberia':('利比里亚','🇱🇷'), 'Libya':('利比亚','🇱🇾'), 'Liechtenstein':('列支敦士登','🇱🇮'),
+ 'Luxembourg':('卢森堡','🇱🇺'), 'Madagascar':('马达加斯加','🇲🇬'), 'Mali':('马里','🇲🇱'),
+ 'Malta':('马耳他','🇲🇹'), 'Mauritania':('毛里塔尼亚','🇲🇷'), 'Mauritius':('毛里求斯','🇲🇺'),
+ 'Moldova':('摩尔多瓦','🇲🇩'), 'Montenegro':('黑山','🇲🇪'), 'Montserrat':('蒙特塞拉特','🇲🇸'),
+ 'Mozambique':('莫桑比克','🇲🇿'), 'Nicaragua':('尼加拉瓜','🇳🇮'), 'Nigeria':('尼日利亚','🇳🇬'),
+ 'North Korea':('朝鲜','🇰🇵'), 'Oman':('阿曼','🇴🇲'), 'Pakistan':('巴基斯坦','🇵🇰'),
+ 'Palestine':('巴勒斯坦','🇵🇸'), 'Peru':('秘鲁','🇵🇪'), 'Philippines':('菲律宾','🇵🇭'),
+ 'Poland':('波兰','🇵🇱'), 'Rep. Of Ireland':('爱尔兰','🇮🇪'), 'Romania':('罗马尼亚','🇷🇴'),
+ 'Russia':('俄罗斯','🇷🇺'), 'San Marino':('圣马力诺','🇸🇲'), 'Serbia':('塞尔维亚','🇷🇸'),
+ 'Sierra Leone':('塞拉利昂','🇸🇱'), 'Slovakia':('斯洛伐克','🇸🇰'), 'Slovenia':('斯洛文尼亚','🇸🇮'),
+ 'Somalia':('索马里','🇸🇴'), 'South Sudan':('南苏丹','🇸🇸'), 'Sudan':('苏丹','🇸🇩'),
+ 'Suriname':('苏里南','🇸🇷'), 'Syria':('叙利亚','🇸🇾'), 'Tajikistan':('塔吉克斯坦','🇹🇯'),
+ 'Togo':('多哥','🇹🇬'), 'Turkmenistan':('土库曼斯坦','🇹🇲'), 'Uganda':('乌干达','🇺🇬'),
+ 'Ukraine':('乌克兰','🇺🇦'), 'United Arab Emirates':('阿联酋','🇦🇪'), 'Venezuela':('委内瑞拉','🇻🇪'),
+ 'Vietnam':('越南','🇻🇳'), 'Wales':('威尔士','🏴󠁧󠁢󠁷󠁬󠁳󠁿'), 'Saudi Arabia':('沙特','🇸🇦'),
+ 'South Korea':('韩国','🇰🇷'), 'Bosnia & Herzegovina':('波黑','🇧🇦'),
 }
 FLAG = {k: v[1] for k, v in TEAM.items()}  # 兼容旧引用
 def cn_of(en): return TEAM.get(en, (en, ''))[0]
@@ -1216,7 +1249,7 @@ def form_block(cfg):
             ha = '主' if m['h'] else '客'
             rows += (f'<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)">'
                      f'<span style="font-size:10px;color:var(--sec);flex:0 0 14px;text-align:center">{ha}</span>'
-                     f'<span style="font-size:11px;color:var(--sec);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{m["opp"]}</span>'
+                     f'<span style="font-size:11px;color:var(--sec);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{cn_of(m["opp"])}</span>'
                      f'<span style="font-size:12px;font-weight:700;color:var(--on);flex:0 0 32px;text-align:right;font-family:JetBrains Mono,monospace">{m["gf"]}:{m["gc"]}</span>'
                      f'<span style="font-size:10px;font-weight:700;color:{c};flex:0 0 14px;text-align:right">{m["r"]}</span>'
                      f'</div>')
