@@ -1269,19 +1269,49 @@ def crowd_backtest_block():
     hd = sec_head('query_stats', f'众选回测 · {n} 场')
     return f'<div class="glass">{hd}{rows_html}{strats}{insight}{dnote}</div>'
 
-def score_top3_block(rich, my, grid):
-    """比分推荐 TOP3：Poisson 模型概率最高的3个比分 + 真实赔率。"""
-    top3 = sorted(grid.items(), key=lambda x: -x[1])[:3]
+def score_top3_block(rich, my, grid, slug=''):
+    """比分推荐 TOP3：Poisson 模型 + 抖音大众推荐双列对比。"""
+    model_top3 = sorted(grid.items(), key=lambda x: -x[1])[:3]
     so = (rich.get('score_odds') or {}).get('odds', {})
-    rows = ''
-    for i, (s, prob) in enumerate(top3):
+    model_rows = ''
+    for i, (s, prob) in enumerate(model_top3):
         sc_disp = s.replace('-', ':')
         od = so.get(s)
         od_txt = f'@{od}' if od else ''
-        rows += (f'<div class="bet{" main" if i==0 else ""}"><span class="bet-tag">TOP{i+1}</span>'
-                 f'<div class="bet-mid"><b>{sc_disp}</b>'
-                 f'<span class="bet-od">我估 {prob*100:.1f}%{" · " + od_txt if od_txt else ""}</span></div></div>')
-    return f'<div class="glass">{sec_head("scoreboard","比分推荐 TOP3")}{rows}</div>'
+        model_rows += (f'<div class="bet{" main" if i==0 else ""}"><span class="bet-tag">TOP{i+1}</span>'
+                       f'<div class="bet-mid"><b>{sc_disp}</b>'
+                       f'<span class="bet-od">我估 {prob*100:.1f}%{" · " + od_txt if od_txt else ""}</span></div></div>')
+    # 抖音大众推荐列
+    cd = CROWD_DATA.get(slug)
+    crowd_col = ''
+    if cd:
+        scored_n = cd.get('scored', sum(v for _, v in cd['top']))
+        slug_odds = CROWD_SCORE_ODDS.get(slug, {})
+        picks = []
+        for s, votes in cd['top']:
+            od = slug_odds.get(s)
+            ratio = (votes / scored_n) / (1 / od) if od else 0.0
+            picks.append((s, votes, ratio, od))
+        picks.sort(key=lambda x: -x[2])
+        crowd_rows = ''
+        for i, (s, votes, ratio, od) in enumerate(picks[:3]):
+            sc = s.replace('-', ':')
+            is_val = ratio >= 2.0
+            fg = 'var(--lime)' if is_val else 'var(--on)'
+            ratio_str = f'{ratio:.1f}x @{od}' if od else '—'
+            tag_style = ' style="background:var(--lime);color:var(--navy);border-color:var(--lime)"' if is_val else ''
+            crowd_rows += (f'<div class="bet"><span class="bet-tag"{tag_style}>#{i+1}</span>'
+                           f'<div class="bet-mid"><b style="color:{fg}">{sc}</b>'
+                           f'<span class="bet-od" style="color:{"var(--lime)" if is_val else "var(--sec)"}">{ratio_str}</span></div></div>')
+        sub_hd = '<div style="font-size:11px;color:var(--sec);margin-bottom:4px;font-weight:600;letter-spacing:.03em">大众推荐 · 抖音评论</div>'
+        crowd_col = f'<div style="flex:1;min-width:0;border-left:1px solid var(--line);padding-left:12px">{sub_hd}{crowd_rows}</div>'
+    model_hd = '<div style="font-size:11px;color:var(--sec);margin-bottom:4px;font-weight:600;letter-spacing:.03em">模型推荐 · Poisson</div>'
+    model_col = f'<div style="flex:1;min-width:0">{model_hd}{model_rows}</div>'
+    if crowd_col:
+        inner = f'<div style="display:flex;gap:0;align-items:flex-start">{model_col}{crowd_col}</div>'
+    else:
+        inner = model_rows
+    return f'<div class="glass">{sec_head("scoreboard","比分推荐 TOP3")}{inner}</div>'
 
 def wdl_rec_block(rows, cfg):
     """胜平负推荐：基于去水位赔率 × 我的概率，给出价值方向。"""
@@ -1347,7 +1377,7 @@ def build_detail(cfg, rows, rich):
         fb_html = f'<div class="glass">{fb}</div>' if fb else ''
         inner = (f'{match_header(rows, cfg)}'
                  f'{crowd_block(cfg["slug"], grid)}'
-                 f'{score_top3_block(rich, cfg["my"], grid)}'
+                 f'{score_top3_block(rich, cfg["my"], grid, cfg["slug"])}'
                  f'{wdl_rec_block(rows, cfg)}'
                  f'{goals_block(rich, cfg["my"], grid)}'
                  f'{tp_html}'
