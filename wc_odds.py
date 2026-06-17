@@ -1178,7 +1178,7 @@ def reasoning_html(cfg):
     return ''.join(f'<div class="mtag"><b>{i+1}.</b> {s}</div>' for i, s in enumerate(steps))
 
 def fetch_qual_form(tid):
-    """世界杯预选赛全部场次 W/D/L，旧→新；过滤非预选赛场次。"""
+    """世界杯预选赛全部场次详情，旧→新。每项: {'r','gf','gc','opp','h'}"""
     if not tid: return []
     d = af_get(f"https://v3.football.api-sports.io/fixtures?team={tid}&last=60")
     qual = []
@@ -1188,24 +1188,45 @@ def fetch_qual_form(tid):
         if 'World Cup' not in lg or 'Qualif' not in lg: continue
         gh, ga = f['goals']['home'], f['goals']['away']
         if gh is None or ga is None: continue
-        ih = f['teams']['home']['id'] == tid
-        gf, gc = (gh, ga) if ih else (ga, gh)
-        qual.append('W' if gf > gc else ('L' if gf < gc else 'D'))
+        is_home = f['teams']['home']['id'] == tid
+        gf, gc = (gh, ga) if is_home else (ga, gh)
+        opp = f['teams']['away' if is_home else 'home']['name']
+        result = 'W' if gf > gc else ('L' if gf < gc else 'D')
+        qual.append({'r': result, 'gf': gf, 'gc': gc, 'opp': opp, 'h': is_home})
     return list(reversed(qual))
-def form_dots(form):
-    col = {'W':'#CCFF00','D':'#8e9379','L':'#FF0055'}
-    if not form: return '<span class="form-dots"><span class="fdmin">暂无</span></span>'
-    return '<span class="form-dots">' + ''.join(f'<span class="fdot" style="background:{col.get(r,"#888")}">{r}</span>' for r in form) + '</span>'
 def form_block(cfg):
     th = TID.get(cfg['home']); ta = TID.get(cfg['away'])
     if not th or not ta: return ''
     fh = fetch_qual_form(th); fa = fetch_qual_form(ta)
     if not fh and not fa: return ''
+    rc = {'W': '#CCFF00', 'D': '#8e9379', 'L': '#FF0055'}
+    def team_section(matches, cn):
+        if not matches:
+            return f'<div style="font-size:12px;color:var(--sec);padding:6px 0">暂无预选赛记录</div>'
+        wins = sum(1 for m in matches if m['r'] == 'W')
+        draws = sum(1 for m in matches if m['r'] == 'D')
+        losses = sum(1 for m in matches if m['r'] == 'L')
+        hd = (f'<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px">'
+              f'<span style="font-size:13px;font-weight:700;color:var(--on)">{cn}</span>'
+              f'<span style="font-size:11px;color:var(--sec)">{len(matches)}场 '
+              f'<b style="color:#CCFF00">{wins}胜</b> {draws}平 {losses}负</span></div>')
+        rows = ''
+        for m in matches:
+            c = rc.get(m['r'], '#888')
+            ha = '主' if m['h'] else '客'
+            rows += (f'<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)">'
+                     f'<span style="font-size:10px;color:var(--sec);flex:0 0 14px;text-align:center">{ha}</span>'
+                     f'<span style="font-size:11px;color:var(--sec);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{m["opp"]}</span>'
+                     f'<span style="font-size:12px;font-weight:700;color:var(--on);flex:0 0 32px;text-align:right;font-family:JetBrains Mono,monospace">{m["gf"]}:{m["gc"]}</span>'
+                     f'<span style="font-size:10px;font-weight:700;color:{c};flex:0 0 14px;text-align:right">{m["r"]}</span>'
+                     f'</div>')
+        return hd + rows
     return (f'{sec_head("trending_up","世界杯预选赛战绩")}'
-            f'<div class="form-blk">'
-            f'<div class="form-row"><span class="form-team">{cfg["cn_h"]}</span>{form_dots(fh)}</div>'
-            f'<div class="form-row"><span class="form-team">{cfg["cn_a"]}</span>{form_dots(fa)}</div></div>'
-            f'<div class="vs-note">2026 世界杯预选赛全部场次 · 左旧 → 右新 · W 胜 / D 平 / L 负</div>')
+            f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 14px">'
+            f'<div>{team_section(fh, cfg["cn_h"])}</div>'
+            f'<div style="border-left:1px solid var(--line);padding-left:14px">{team_section(fa, cfg["cn_a"])}</div>'
+            f'</div>'
+            f'<div class="vs-note">2026 世界杯预选赛全部场次 · 主=主场 客=客场</div>')
 
 def fetch_predictions(afid):
     if not afid: return None
@@ -1441,22 +1462,13 @@ def score_top3_block(rich, my, grid, slug=''):
     return f'<div class="glass">{sec_head("scoreboard","比分推荐 TOP3")}{inner}</div>'
 
 def wdl_rec_block(rows, cfg, slug=''):
-    """胜平负推荐：基于去水位赔率 × 我的概率，给出价值方向 + 大众观点。"""
+    """胜平负推荐：模型 EV（左） + 大众占比（右）双列对比。"""
     p = rows[-1].get('pin_h2h')
     if not p: return ''
-    l = L(cfg); out = ''
-    for k in ('home', 'draw', 'away'):
-        ev = cfg['my'][k] * p[k]
-        if ev > 1.03: cls, tag, ic = 'val', '✅ 推荐', 'check_circle'
-        elif ev > .99: cls, tag, ic = 'mid', '⚪ 临界', 'remove'
-        else: cls, tag, ic = 'bad', '❌ 不推荐', 'block'
-        out += (f'<div class="evc {cls}"><div class="evbar"></div>'
-                f'<div class="evmain"><div class="evteam">{l[k]}</div>'
-                f'<div class="evstat">我估: {cfg["my"][k]:.0%}　赔率: {p[k]}</div></div>'
-                f'<div class="evright"><div class="evev">EV {ev:.2f}</div>'
-                f'<div class="evtag"><span class="material-symbols-outlined" style="font-size:15px">{ic}</span>{tag}</div></div></div>')
-    crowd_line = ''
+    l = L(cfg)
+    # 计算大众胜平负占比
     cd = CROWD_DATA.get(slug)
+    wdl_crowd = None
     if cd:
         wdl = {'home': 0, 'draw': 0, 'away': 0}
         for s, v in cd['top']:
@@ -1465,11 +1477,54 @@ def wdl_rec_block(rows, cfg, slug=''):
             elif h == a: wdl['draw'] += v
             else: wdl['away'] += v
         wt = sum(wdl.values()) or 1
-        crowd_line = (f'<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--line);'
-                      f'font-size:11px;color:var(--sec)">'
-                      f'大众观点（抖音评论）：{l["home"]} {wdl["home"]/wt:.0%} · 平局 {wdl["draw"]/wt:.0%} · {l["away"]} {wdl["away"]/wt:.0%}'
-                      f'</div>')
-    return f'<div class="glass">{sec_head("how_to_vote","胜平负推荐")}{out}{crowd_line}</div>'
+        wdl_crowd = {k: wdl[k] / wt for k in wdl}
+    # 无大众数据，原版单列
+    if not wdl_crowd:
+        out = ''
+        for k in ('home', 'draw', 'away'):
+            ev = cfg['my'][k] * p[k]
+            if ev > 1.03: cls, tag, ic = 'val', '✅ 推荐', 'check_circle'
+            elif ev > .99: cls, tag, ic = 'mid', '⚪ 临界', 'remove'
+            else: cls, tag, ic = 'bad', '❌ 不推荐', 'block'
+            out += (f'<div class="evc {cls}"><div class="evbar"></div>'
+                    f'<div class="evmain"><div class="evteam">{l[k]}</div>'
+                    f'<div class="evstat">我估: {cfg["my"][k]:.0%}　赔率: {p[k]}</div></div>'
+                    f'<div class="evright"><div class="evev">EV {ev:.2f}</div>'
+                    f'<div class="evtag"><span class="material-symbols-outlined" style="font-size:15px">{ic}</span>{tag}</div></div></div>')
+        return f'<div class="glass">{sec_head("how_to_vote","胜平负推荐")}{out}</div>'
+    # 双列 grid
+    CELL = 'padding:10px 6px;border-bottom:1px solid rgba(255,255,255,.06)'
+    grid_rows = ''
+    KEYS = [('home', l['home']), ('draw', '平局'), ('away', l['away'])]
+    for k, name in KEYS:
+        ev = cfg['my'][k] * p[k]
+        if ev > 1.03: tag, ev_c = '✅ 推荐', 'var(--lime)'
+        elif ev > .99: tag, ev_c = '⚪ 临界', 'var(--sec)'
+        else: tag, ev_c = '❌ 不推荐', '#FF0055'
+        left = (f'<div style="{CELL}">'
+                f'<div style="font-size:13px;font-weight:700;color:var(--on);margin-bottom:3px">{name}</div>'
+                f'<div style="font-size:11px;color:var(--sec);font-family:JetBrains Mono,monospace">'
+                f'我估 {cfg["my"][k]:.0%} · @{p[k]}</div>'
+                f'<div style="display:flex;align-items:center;gap:5px;margin-top:4px">'
+                f'<span style="font-size:12px;font-weight:700;color:{ev_c};font-family:JetBrains Mono,monospace">EV {ev:.2f}</span>'
+                f'<span style="font-size:11px;color:{ev_c}">{tag}</span>'
+                f'</div></div>')
+        cpct = wdl_crowd.get(k, 0)
+        bar_c = 'var(--lime)' if cpct >= 0.4 else 'var(--sec)'
+        right = (f'<div style="{CELL};border-left:1px solid var(--line);padding-left:12px">'
+                 f'<div style="font-size:13px;font-weight:700;color:var(--on);margin-bottom:3px">{name}</div>'
+                 f'<div style="font-size:18px;font-weight:700;color:{bar_c};font-family:JetBrains Mono,monospace;line-height:1.2">'
+                 f'{cpct:.0%}</div>'
+                 f'<div style="margin-top:5px;height:3px;border-radius:2px;background:rgba(255,255,255,.08)">'
+                 f'<div style="height:100%;width:{cpct*100:.0f}%;background:{bar_c};border-radius:2px;transition:width .4s"></div></div>'
+                 f'</div>')
+        grid_rows += left + right
+    hd = 'font-size:11px;color:var(--sec);padding:0 6px 4px;font-weight:600;letter-spacing:.03em'
+    inner = (f'<div style="display:grid;grid-template-columns:1fr 1fr">'
+             f'<div style="{hd}">模型推荐</div>'
+             f'<div style="{hd};border-left:1px solid var(--line);padding-left:12px">大众推荐</div>'
+             f'{grid_rows}</div>')
+    return f'<div class="glass">{sec_head("how_to_vote","胜平负推荐")}{inner}</div>'
 
 def goals_block(rich, my, grid):
     """进球推荐：大小球 2.5 + BTTS + xG 预期。"""
