@@ -227,12 +227,24 @@ CROWD_SCORE_ODDS = {
 # 万人竞猜回测：6场已结束小组赛，赔率来源 Pinnacle/Bet365
 # 西班牙/伊朗已做赛前时间戳过滤；荷兰/巴西 ⚠️ 含赛后评论风险
 BACKTEST = [
- {'cn':'墨西哥 vs 南非',   'p1':('2-0',5.40), 'p2':('2-1',8.50),  'actual':'2-0'},
- {'cn':'韩国 vs 捷克',     'p1':('2-1',11.0), 'p2':('1-0',7.50),  'actual':'2-1'},
- {'cn':'巴西 vs 摩洛哥',   'p1':('1-1',6.75), 'p2':('0-0',10.0),  'actual':'1-1', 'warn':1},
- {'cn':'荷兰 vs 日本',     'p1':('2-2',12.5), 'p2':('2-0',9.00),  'actual':'2-2', 'warn':1},
- {'cn':'西班牙 vs 佛得角', 'p1':('4-1',17.0), 'p2':('0-0',29.0),  'actual':'0-0', 'vr':3.2},
- {'cn':'伊朗 vs 新西兰',   'p1':('2-0',7.50), 'p2':('2-1',9.50),  'actual':'2-2'},
+ {'cn':'墨西哥 vs 南非', 'actual':'2-0',
+  'model': [('2-0',5.40), ('1-0',7.50), ('2-1',8.50)],
+  'crowd': [('2-0',5.40), ('2-1',8.50), ('1-1',11.0)]},
+ {'cn':'韩国 vs 捷克', 'actual':'2-1',
+  'model': [('2-1',11.0), ('1-0',8.50), ('2-0',9.00)],
+  'crowd': [('2-1',11.0), ('1-0',7.50), ('1-1',13.0)]},
+ {'cn':'巴西 vs 摩洛哥', 'actual':'1-1', 'warn':1,
+  'model': [('2-0',5.50), ('1-0',7.00), ('3-0',9.50)],
+  'crowd': [('1-1',6.75), ('0-0',10.0), ('2-0',5.50)]},
+ {'cn':'荷兰 vs 日本', 'actual':'2-2', 'warn':1,
+  'model': [('2-0',9.00), ('2-1',10.0), ('1-0',8.00)],
+  'crowd': [('2-2',12.5), ('2-0',9.00), ('1-1',11.5)]},
+ {'cn':'西班牙 vs 佛得角', 'actual':'0-0', 'vr':3.2,
+  'model': [('3-0',9.50), ('2-0',7.00), ('4-0',11.0)],
+  'crowd': [('4-1',17.0), ('0-0',29.0), ('2-1',12.0)]},
+ {'cn':'伊朗 vs 新西兰', 'actual':'2-2',
+  'model': [('2-0',7.50), ('1-0',6.00), ('2-1',9.50)],
+  'crowd': [('2-0',7.50), ('2-1',9.50), ('1-0',8.00)]},
 ]
 AFID = {'belgium_egypt':1489377, 'saudi_uruguay':1489379, 'france_senegal':1489383,
         'argentina_algeria':1489381, 'spain_capeverde':1489380,
@@ -1377,48 +1389,73 @@ def crowd_block(slug, grid):
     return f'<div class="glass">{sec_head("groups","万人竞猜")}{rows}{wdl_row}</div>'
 
 def crowd_backtest_block():
-    inv = len(BACKTEST) * 100
-    ret1 = ret2 = h1 = h2 = 0
-    rows_html = ''
-    for b in BACKTEST:
-        actual = b['actual']
-        s1, o1 = b['p1']; s2, o2 = b['p2']
-        hit1 = s1 == actual; hit2 = s2 == actual
-        if hit1: h1 += 1; ret1 += o1 * 100
-        if hit2: h2 += 1; ret2 += o2 * 100
-        t1 = '<span style="color:var(--lime)">命中</span>' if hit1 else '<span style="color:var(--sec)">✗</span>'
-        t2 = '<span style="color:var(--lime)">命中</span>' if hit2 else '<span style="color:var(--sec)">✗</span>'
-        vr = f'<span style="color:var(--lime);font-size:10px"> {b["vr"]}x↑</span>' if b.get('vr') else ''
-        wn = '<span style="font-size:10px;color:#BA7517"> ⚠</span>' if b.get('warn') else ''
-        rows_html += (
-            f'<div style="padding:8px 0;border-bottom:.5px solid rgba(255,255,255,.07);font-size:12px">'
-            f'<div style="display:flex;justify-content:space-between;color:var(--sec);font-size:11px;margin-bottom:4px">'
-            f'<span>{b["cn"]}{wn}</span>'
-            f'<span>实际 <b style="color:var(--fg)">{actual.replace("-",":")}</b></span></div>'
-            f'<div style="display:flex;gap:14px">'
-            f'<span>众#1 <b>{s1.replace("-",":")}</b> @{o1} {t1}</span>'
-            f'<span>众#2 <b>{s2.replace("-",":")}</b> @{o2} {t2}{vr}</span>'
-            f'</div></div>')
-    roi1 = round((ret1 - inv) / inv * 100)
-    roi2 = round((ret2 - inv) / inv * 100)
     n = len(BACKTEST)
-    def sc(label, roi, hits, note=''):
-        col = 'var(--lime)' if roi >= 0 else '#FF0055'
-        sg = '+' if roi >= 0 else ''
+    def wdl_of(s):
+        h, a = map(int, s.split('-'))
+        return '主胜' if h > a else ('平局' if h == a else '客胜')
+    def hit_tag(hit):
+        if hit: return '<span style="font-size:10px;font-weight:700;color:var(--lime)">✓命中</span>'
+        return '<span style="font-size:10px;color:var(--sec)">✗</span>'
+    GD = 'display:grid;grid-template-columns:44px 1fr 1fr'
+    CELL = 'padding:7px 4px;border-bottom:1px solid rgba(255,255,255,.05)'
+    CELLR = f'{CELL};border-left:1px solid var(--line);padding-left:10px'
+    LBLC = 'font-size:10px;color:var(--sec);font-weight:600;padding:7px 4px;border-bottom:1px solid rgba(255,255,255,.05)'
+    msc_tot = mwdl_tot = csc_tot = cwdl_tot = 0
+    cards = ''
+    for b in BACKTEST:
+        actual = b['actual']; awdl = wdl_of(actual)
+        mpicks = b.get('model', []); cpicks = b.get('crowd', [])
+        wn = '<span style="font-size:10px;color:#BA7517"> ⚠</span>' if b.get('warn') else ''
+        vr = f'<span style="font-size:10px;color:var(--lime)"> {b["vr"]}x↑</span>' if b.get('vr') else ''
+        msc_hit = bool(mpicks and mpicks[0][0] == actual)
+        csc_hit = bool(cpicks and cpicks[0][0] == actual)
+        mwdl_hit = bool(mpicks and wdl_of(mpicks[0][0]) == awdl)
+        cwdl_hit = bool(cpicks and wdl_of(cpicks[0][0]) == awdl)
+        if msc_hit: msc_tot += 1
+        if mwdl_hit: mwdl_tot += 1
+        if csc_hit: csc_tot += 1
+        if cwdl_hit: cwdl_tot += 1
+        hdr = (f'<div style="display:flex;justify-content:space-between;align-items:center;'
+               f'padding:6px 0;border-bottom:1px solid rgba(255,255,255,.12)">'
+               f'<span style="font-size:13px;font-weight:700;color:var(--on)">{b["cn"]}{wn}</span>'
+               f'<span style="font-size:11px;color:var(--sec)">实际 '
+               f'<b style="color:var(--on)">{actual.replace("-",":")}</b>·{awdl}{vr}</span></div>')
+        col_hd = (f'<div style="{GD}">'
+                  f'<div style="{LBLC}"></div>'
+                  f'<div style="{LBLC}">竞猜推荐</div>'
+                  f'<div style="{LBLC};border-left:1px solid var(--line);padding-left:10px">大众推荐</div>'
+                  f'</div>')
+        def sc_cell(picks, i, right=False):
+            cs = CELLR if right else CELL
+            if i >= len(picks): return f'<div style="{cs}"><span style="color:rgba(255,255,255,.2)">—</span></div>'
+            s, od = picks[i]; hit = s == actual; c = 'var(--lime)' if hit else 'var(--on)'
+            return (f'<div style="{cs}"><b style="font-size:13px;color:{c}">{s.replace("-",":")}</b>'
+                    f'<span style="display:block;font-size:10px;color:var(--sec)">@{od} {hit_tag(hit) if hit else hit_tag(False)}</span></div>')
+        def wdl_cell(picks, right=False):
+            cs = CELLR if right else CELL
+            if not picks: return f'<div style="{cs}"><span style="color:rgba(255,255,255,.2)">—</span></div>'
+            pw = wdl_of(picks[0][0]); hit = pw == awdl; c = 'var(--lime)' if hit else 'var(--on)'
+            return (f'<div style="{cs}"><b style="font-size:13px;color:{c}">{pw}</b>'
+                    f'<span style="display:block;font-size:10px;color:var(--sec)">{hit_tag(hit)}</span></div>')
+        grid = f'<div style="{GD}">'
+        for i, lbl in enumerate(['TOP1', 'TOP2', 'TOP3']):
+            grid += f'<div style="{LBLC}">{lbl}</div>' + sc_cell(mpicks, i) + sc_cell(cpicks, i, True)
+        grid += f'<div style="{LBLC}">胜平负</div>' + wdl_cell(mpicks) + wdl_cell(cpicks, True)
+        grid += '</div>'
+        cards += f'<div style="margin-bottom:20px">{hdr}{col_hd}{grid}</div>'
+    def stat_box(label, sc_h, wdl_h):
         return (f'<div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px;text-align:center">'
-                f'<div style="font-size:10px;color:var(--sec);margin-bottom:3px">{label}</div>'
-                f'<div style="font-size:20px;font-weight:700;color:{col}">{sg}{roi}%</div>'
-                f'<div style="font-size:10px;color:var(--sec);margin-top:2px">{hits}/{n} 命中{note}</div></div>')
-    strats = (f'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px">'
-              f'{sc("买众#1",roi1,h1)}{sc("买众#2",roi2,h2," · @29大冷")}{sc("买最少票",-100,0)}</div>')
-    insight = (f'<div style="margin-top:10px;padding:8px 10px;border-left:2px solid rgba(204,255,0,.35);'
-               f'background:rgba(204,255,0,.04);font-size:11px;color:var(--sec);line-height:1.6">'
-               f'价值信号：大众票占比 ÷ 庄家隐含概率 ≥ 2 才有正期望。'
-               f'西班牙 0:0 大众 10.8% / 庄家 3.4% = 3.2x，唯一明确价差盘，@29 命中。</div>')
+                f'<div style="font-size:10px;color:var(--sec);margin-bottom:6px;font-weight:600">{label}</div>'
+                f'<div style="font-size:13px;margin-bottom:2px">比分命中 <b style="color:var(--lime)">{sc_h}</b>/{n}</div>'
+                f'<div style="font-size:13px">胜平负命中 <b style="color:var(--lime)">{wdl_h}</b>/{n}</div>'
+                f'</div>')
+    summary = (f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;padding-top:12px;border-top:1px solid var(--line)">'
+               f'{stat_box("竞猜推荐", msc_tot, mwdl_tot)}'
+               f'{stat_box("大众推荐", csc_tot, cwdl_tot)}'
+               f'</div>')
     dnote = (f'<div style="font-size:10px;color:#BA7517;margin-top:8px;line-height:1.5">'
-             f'⚠ 荷兰/巴西评论可能含赛后数据；西班牙/伊朗已做赛前时间戳过滤。{n} 场样本极小，勿过度推断。</div>')
-    hd = sec_head('query_stats', f'众选回测 · {n} 场')
-    return f'<div class="glass">{hd}{rows_html}{strats}{insight}{dnote}</div>'
+             f'⚠ 荷兰/巴西评论可能含赛后数据；西班牙0:0大众3.2x价差@29命中。{n}场样本极小，勿过度推断。</div>')
+    return f'<div class="glass">{sec_head("emoji_events",f"竞猜推荐 vs 实际 · {n} 场")}{cards}{summary}{dnote}</div>'
 
 def score_top3_block(rich, my, grid, slug=''):
     """比分推荐 TOP3：Poisson 模型 + 抖音大众推荐双列对比。"""
