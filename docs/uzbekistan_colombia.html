@@ -325,6 +325,18 @@ a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
 .rec-card-head{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line);background:rgba(204,255,0,.05)}
 .rec-card-head .material-symbols-outlined{color:var(--lime);font-size:17px}
 .rec-card-head .rch-title{font-size:13px;font-weight:800;color:var(--on);letter-spacing:-.01em}
+.parlay-rec{margin-bottom:14px}
+.pr-leg{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.pr-leg:last-of-type{border-bottom:none}
+.pr-match{font-size:11px;color:var(--sec);flex:0 0 auto;max-width:100px;line-height:1.3}
+.pr-pick{flex:1;font-size:14px;font-weight:700;color:var(--on)}
+.pr-odds{font-family:'JetBrains Mono',monospace;color:var(--lime);font-size:13px}
+.pr-ev{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--sec);white-space:nowrap}
+.pr-summary{display:flex;gap:12px;justify-content:space-around;padding:10px 0 4px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--sec)}
+.pr-summary b{color:var(--lime)}
+.pr-add-btn{width:100%;margin-top:10px;padding:12px;background:var(--lime);color:var(--navy);font-weight:800;font-size:13px;border:none;border-radius:8px;cursor:pointer}
+.pr-add-btn:active{opacity:.8}
+.pr-empty{text-align:center;color:var(--sec);font-size:13px;padding:16px 0;opacity:.6}
 .rec-row{display:grid;grid-template-columns:72px 1fr auto auto;align-items:center;border-bottom:1px solid rgba(255,255,255,.05);min-height:56px}
 .rec-row:last-child{border-bottom:none}
 .rec-type{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--sec);letter-spacing:.03em;border-right:1px solid rgba(255,255,255,.06);padding:12px 6px;align-self:stretch;text-align:center;line-height:1.4}
@@ -420,6 +432,13 @@ window.parlayAdd=function(item,btn){
     if(btn){btn.textContent='已选 ✓';btn.classList.add('in-parlay');}
   }
   save(d);syncFab();openModal();
+};
+window.parlayAddAll=function(items){
+  var d=load();
+  items.forEach(function(item){
+    if(d.findIndex(function(x){return x.id===item.id})<0) d.push(item);
+  });
+  save(d);syncFab();syncBtns();openModal();
 };
 window.parlayRemove=function(id){
   save(load().filter(function(x){return x.id!==id}));

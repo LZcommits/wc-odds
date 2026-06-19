@@ -926,6 +926,18 @@ a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
 .rec-card-head{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line);background:rgba(204,255,0,.05)}
 .rec-card-head .material-symbols-outlined{color:var(--lime);font-size:17px}
 .rec-card-head .rch-title{font-size:13px;font-weight:800;color:var(--on);letter-spacing:-.01em}
+.parlay-rec{margin-bottom:14px}
+.pr-leg{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.pr-leg:last-of-type{border-bottom:none}
+.pr-match{font-size:11px;color:var(--sec);flex:0 0 auto;max-width:100px;line-height:1.3}
+.pr-pick{flex:1;font-size:14px;font-weight:700;color:var(--on)}
+.pr-odds{font-family:'JetBrains Mono',monospace;color:var(--lime);font-size:13px}
+.pr-ev{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--sec);white-space:nowrap}
+.pr-summary{display:flex;gap:12px;justify-content:space-around;padding:10px 0 4px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--sec)}
+.pr-summary b{color:var(--lime)}
+.pr-add-btn{width:100%;margin-top:10px;padding:12px;background:var(--lime);color:var(--navy);font-weight:800;font-size:13px;border:none;border-radius:8px;cursor:pointer}
+.pr-add-btn:active{opacity:.8}
+.pr-empty{text-align:center;color:var(--sec);font-size:13px;padding:16px 0;opacity:.6}
 .rec-row{display:grid;grid-template-columns:72px 1fr auto auto;align-items:center;border-bottom:1px solid rgba(255,255,255,.05);min-height:56px}
 .rec-row:last-child{border-bottom:none}
 .rec-type{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--sec);letter-spacing:.03em;border-right:1px solid rgba(255,255,255,.06);padding:12px 6px;align-self:stretch;text-align:center;line-height:1.4}
@@ -2099,6 +2111,13 @@ window.parlayAdd=function(item,btn){
   }
   save(d);syncFab();openModal();
 };
+window.parlayAddAll=function(items){
+  var d=load();
+  items.forEach(function(item){
+    if(d.findIndex(function(x){return x.id===item.id})<0) d.push(item);
+  });
+  save(d);syncFab();syncBtns();openModal();
+};
 window.parlayRemove=function(id){
   save(load().filter(function(x){return x.id!==id}));
   syncFab();syncBtns();renderModal();
@@ -2548,6 +2567,91 @@ def crowd_stats_block(st):
             f'<div class="stats-grid" style="grid-template-columns:1fr 1fr">{cells}</div></div>')
 
 
+def build_recommended_parlay(items):
+    """扫描48h内未开始场次，取S级WDL腿(@1.5~3.5)，组最优2-3腿串。"""
+    from itertools import combinations as _comb
+    import html as _html
+
+    candidates = []
+    for cfg, rows, rich in items:
+        if not rows: continue
+        hrs = (cfg['ko'] - now).total_seconds() / 3600
+        if hrs <= 0 or hrs > 48: continue
+        last = rows[-1]; d = last['devig']
+        t25 = last.get('pin_tot25') or {}
+        up = None
+        if t25.get('over') and t25.get('under'):
+            dv = devig({'over': t25['over'], 'under': t25['under']})
+            up = dv.get('under')
+        lh, la, grid = poisson_calc(d['home'], d['away'], up)
+        grades = grade_bets(cfg, rows, rich, grid)
+        wdl = grades.get('wdl')
+        if not wdl: continue
+        if wdl.get('grade') != 'S': continue
+        od = wdl['odds']
+        if od < 1.5 or od > 6.0: continue
+        candidates.append({
+            'slug': cfg['slug'],
+            'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}',
+            'pick': wdl['pick'],
+            'odds': od,
+            'prob': wdl['my_pct'] / 100,
+            'ev': wdl['ev'],
+        })
+
+    hdr = sec_head('local_fire_department', '今日推荐串关')
+
+    if len(candidates) < 2:
+        return (f'<div class="glass parlay-rec">{hdr}'
+                f'<div class="pr-empty">今日S级串腿不足，暂无推荐</div></div>')
+
+    best = None; best_ev = 0.0
+    for r in (3, 2):  # 优先3腿
+        for combo in _comb(candidates, r):
+            ev = 1.0
+            for c in combo: ev *= c['ev']
+            if ev >= 1.05 and ev > best_ev:
+                prob = 1.0
+                for c in combo: prob *= c['prob']
+                odds = 1.0
+                for c in combo: odds *= c['odds']
+                best_ev = ev
+                best = {'legs': combo, 'ev': ev, 'prob': prob, 'odds': odds}
+
+    if not best:
+        return (f'<div class="glass parlay-rec">{hdr}'
+                f'<div class="pr-empty">今日暂无合并EV≥1.05的串关组合</div></div>')
+
+    legs_html = ''
+    raw_items = []
+    for leg in best['legs']:
+        raw_items.append(json.dumps({
+            'id': f'{leg["slug"]}_wdl', 'match': leg['match'],
+            'bet_label': leg['pick'], 'odds': leg['odds'],
+            'prob': round(leg['prob'], 4), 'grade': 'S'
+        }, ensure_ascii=False))
+        legs_html += (
+            f'<div class="pr-leg">'
+            f'<div class="pr-match">{leg["match"]}</div>'
+            f'<div class="pr-pick">{leg["pick"]} '
+            f'<span class="pr-odds">@{leg["odds"]:.2f}</span></div>'
+            f'<div class="pr-ev">EV {leg["ev"]:.2f}</div>'
+            f'</div>'
+        )
+
+    arr_esc = _html.escape('[' + ','.join(raw_items) + ']', quote=True)
+    add_btn = f'<button class="pr-add-btn" onclick="parlayAddAll({arr_esc})">一键加入串关篮</button>'
+
+    return (f'<div class="glass parlay-rec">{hdr}'
+            f'{legs_html}'
+            f'<div class="pr-summary">'
+            f'<span>合并赔率 <b>@{best["odds"]:.2f}</b></span>'
+            f'<span>命中率 <b>≈{best["prob"]*100:.1f}%</b></span>'
+            f'<span>合并EV <b>{best["ev"]:.2f}</b></span>'
+            f'</div>'
+            f'{add_btn}</div>')
+
+
 def build_index(items):
     past = build_past()
     items_map = {cfg['slug']: (cfg, rows, rich) for cfg, rows, rich in items}
@@ -2611,7 +2715,8 @@ def build_index(items):
     scroll_to_cur = ('<script>document.addEventListener("DOMContentLoaded",function(){'
                      'var el=document.getElementById("cur");'
                      'if(el)el.scrollIntoView({block:"center"});});</script>')
-    list_body = (f'<main>{back_home}<div style="height:4px"></div>{filt}{tl}'
+    rec_parlay = build_recommended_parlay(items)
+    list_body = (f'<main>{back_home}<div style="height:4px"></div>{rec_parlay}{filt}{tl}'
                  f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{PARLAY_JS}{scroll_to_cur}')
     open(os.path.join(DOCS, 'list.html'), 'w').write(
         f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赛程",raw_title=True)}</head><body>{list_body}</body></html>')
