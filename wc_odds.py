@@ -2538,13 +2538,13 @@ def ai_stats_block(st):
             f'<div class="stats-grid">{cells}</div></div>')
 
 def crowd_stats_block(st):
-    """大众推演战绩卡（胜平负/比分）。"""
+    """深度推演战绩卡（胜平负/比分）。"""
     if not st or not st.get('crowd_n'): return ''
     cn = st['crowd_n']
     cells = (_cell(_pct(st['crowd_wdl_hits'],cn), '胜平负命中', f'{st["crowd_wdl_hits"]}/{cn}场')
            + _cell(_pct(st['crowd_sc_hits'],cn),  '比分命中',   f'{st["crowd_sc_hits"]}/{cn}场'))
     return (f'<div class="glass" style="margin-bottom:14px">'
-            f'{sec_head("groups","大众推演战绩")}'
+            f'{sec_head("groups","深度推演战绩")}'
             f'<div class="stats-grid" style="grid-template-columns:1fr 1fr">{cells}</div></div>')
 
 
