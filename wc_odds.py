@@ -922,55 +922,65 @@ a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
 .cmp-bar i{display:block;height:100%;background:var(--lime);border-radius:3px}
 .cmp-c{flex:0 0 56px;color:var(--sec);opacity:.7;font-size:11px}
 /* ── 推荐卡片 ── */
-.rec-card{background:rgba(13,28,45,.85);border:1px solid rgba(204,255,0,.22);border-radius:10px;padding:0;margin-bottom:16px;overflow:hidden}
-.rec-card-head{display:flex;align-items:center;gap:6px;padding:10px 14px 8px;border-bottom:1px solid var(--line);background:rgba(204,255,0,.04)}
-.rec-card-head .material-symbols-outlined{color:var(--lime);font-size:16px}
-.rec-card-head span.rt{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--lime)}
-.rec-row{display:flex;align-items:stretch;border-bottom:1px solid rgba(255,255,255,.06)}
+.rec-card{background:rgba(13,28,45,.9);border:1px solid rgba(204,255,0,.25);border-radius:10px;padding:0;margin-bottom:16px;overflow:hidden}
+.rec-card-head{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line);background:rgba(204,255,0,.05)}
+.rec-card-head .material-symbols-outlined{color:var(--lime);font-size:17px}
+.rec-card-head .rch-title{font-size:13px;font-weight:800;color:var(--on);letter-spacing:-.01em}
+.rec-row{display:grid;grid-template-columns:52px 1fr auto auto;align-items:center;border-bottom:1px solid rgba(255,255,255,.05);min-height:56px}
 .rec-row:last-child{border-bottom:none}
-.rec-type{flex:0 0 54px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--sec);letter-spacing:.04em;border-right:1px solid rgba(255,255,255,.06);padding:10px 0}
-.rec-body{flex:1;padding:10px 12px;min-width:0}
-.rec-pick{font-size:15px;font-weight:700;color:var(--on);margin-bottom:2px}
-.rec-meta{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--sec);line-height:1.5}
-.rec-grade{flex:0 0 36px;display:flex;align-items:center;justify-content:center;padding:10px 6px}
-.grade-s{color:var(--lime);font-size:15px}
-.grade-o{color:#f0a500;font-size:13px}
-.grade-x{color:var(--sec);opacity:.4;font-size:12px}
-.rec-add{margin-left:auto;flex:0 0 auto;align-self:center;padding:4px 10px;border-radius:5px;border:1px solid rgba(204,255,0,.35);background:rgba(204,255,0,.08);color:var(--lime);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
-.rec-add:active{background:rgba(204,255,0,.22)}
-.rec-add.added{background:rgba(204,255,0,.22);border-color:var(--lime)}
-/* ── 串关篮子 ── */
-#parlay-fab{position:fixed;bottom:24px;right:16px;z-index:200;background:var(--lime);color:var(--navy);border-radius:28px;padding:10px 16px;font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px;cursor:pointer;box-shadow:0 4px 20px rgba(204,255,0,.35);transition:transform .15s}
-#parlay-fab:active{transform:scale(.95)}
-#parlay-fab .cnt{background:var(--navy);color:var(--lime);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
+.rec-type{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--sec);letter-spacing:.03em;border-right:1px solid rgba(255,255,255,.06);padding:12px 4px;align-self:stretch}
+.rec-body{padding:10px 10px;min-width:0}
+.rec-pick{font-size:14px;font-weight:700;color:var(--on);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-meta{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--sec);line-height:1.5}
+.rec-badge{padding:0 8px;display:flex;align-items:center;justify-content:center;min-width:52px}
+.badge-s{font-size:10px;font-weight:800;color:var(--lime);background:rgba(204,255,0,.12);border:1px solid rgba(204,255,0,.35);border-radius:4px;padding:2px 6px;white-space:nowrap}
+.badge-o{font-size:10px;font-weight:700;color:#f0c040;background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.3);border-radius:4px;padding:2px 6px;white-space:nowrap}
+.badge-x{font-size:10px;color:var(--sec);opacity:.35}
+.rec-act{padding:0 10px 0 4px;display:flex;align-items:center}
+.rec-btn{background:rgba(204,255,0,.1);border:1px solid rgba(204,255,0,.3);color:var(--lime);font-size:11px;font-weight:700;border-radius:5px;padding:5px 10px;cursor:pointer;white-space:nowrap;transition:background .15s;font-family:'JetBrains Mono',monospace}
+.rec-btn:active{background:rgba(204,255,0,.25)}
+.rec-btn.in-parlay{background:rgba(204,255,0,.22);border-color:var(--lime)}
+.rec-hit{font-size:20px;font-weight:900;line-height:1}
+.rec-hit.ok{color:var(--lime)}
+.rec-hit.no{color:var(--crim);opacity:.7}
+/* ── 串关弹窗 ── */
+#parlay-fab{position:fixed;bottom:20px;right:14px;z-index:200;background:var(--lime);color:var(--navy);border-radius:24px;padding:9px 14px;font-weight:800;font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;box-shadow:0 4px 18px rgba(204,255,0,.4);transition:transform .15s;border:none}
+#parlay-fab:active{transform:scale(.94)}
 #parlay-fab.hidden{display:none}
-#parlay-drawer{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;z-index:300;background:var(--low);border-top:2px solid var(--lime);border-radius:16px 16px 0 0;padding:16px 16px 32px;display:none;max-height:85vh;overflow-y:auto}
-#parlay-drawer.open{display:block}
-.pd-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.pd-title{font-weight:800;font-size:16px;color:var(--lime)}
-.pd-close{color:var(--sec);cursor:pointer;font-size:22px;line-height:1}
-.pd-leg{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
-.pd-leg-del{color:var(--sec);cursor:pointer;opacity:.6;font-size:18px;flex-shrink:0}
-.pd-leg-info{flex:1;min-width:0}
-.pd-leg-match{font-size:11px;color:var(--sec);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pd-leg-bet{font-weight:700;color:var(--on)}
-.pd-leg-od{font-family:'JetBrains Mono',monospace;color:var(--lime);font-weight:700;flex-shrink:0}
-.pd-stats{background:rgba(204,255,0,.06);border:1px solid rgba(204,255,0,.2);border-radius:8px;padding:12px;margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:12px}
-.pd-stat-row{display:flex;justify-content:space-between;padding:3px 0;color:var(--sec)}
-.pd-stat-row b{color:var(--on)}
-.pd-stat-row.ev-good b{color:var(--lime)}
-.pd-stat-row.ev-bad b{color:var(--crim)}
-.pd-btns{display:flex;gap:8px;margin-top:12px}
-.pd-btn{flex:1;padding:10px;border-radius:8px;font-weight:700;font-size:13px;text-align:center;cursor:pointer;border:none}
-.pd-btn.primary{background:var(--lime);color:var(--navy)}
-.pd-btn.secondary{background:rgba(255,255,255,.08);color:var(--on)}
-.pd-empty{text-align:center;color:var(--sec);font-size:13px;padding:20px 0;opacity:.6}
+#parlay-fab .p-cnt{background:var(--navy);color:var(--lime);border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900}
+#parlay-overlay{position:fixed;inset:0;z-index:400;background:rgba(2,6,23,.7);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center}
+#parlay-overlay.open{display:flex}
+#parlay-modal{width:100%;max-width:520px;background:var(--low);border-top:2px solid var(--lime);border-radius:18px 18px 0 0;padding:18px 16px 36px;max-height:88vh;overflow-y:auto;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.pm-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.pm-title{font-size:16px;font-weight:800;color:var(--lime);display:flex;align-items:center;gap:6px}
+.pm-close{color:var(--sec);cursor:pointer;font-size:24px;line-height:1;background:none;border:none}
+.pm-leg{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.pm-del{color:var(--sec);cursor:pointer;opacity:.55;font-size:18px;flex-shrink:0;background:none;border:none;line-height:1}
+.pm-info{flex:1;min-width:0}
+.pm-match{font-size:11px;color:var(--sec);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pm-bet{font-size:13px;font-weight:700;color:var(--on)}
+.pm-od{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--lime);font-weight:700;flex-shrink:0}
+.pm-stats{background:rgba(204,255,0,.06);border:1px solid rgba(204,255,0,.18);border-radius:8px;padding:12px;margin-top:12px}
+.pm-stat{display:flex;justify-content:space-between;font-size:12px;font-family:'JetBrains Mono',monospace;padding:3px 0;color:var(--sec)}
+.pm-stat b{color:var(--on)}
+.pm-stat.ev-ok b{color:var(--lime)}
+.pm-stat.ev-no b{color:var(--crim)}
+.pm-verdict{margin-top:10px;padding:10px 12px;border-radius:7px;font-size:13px;font-weight:700;text-align:center}
+.pm-verdict.v-ok{background:rgba(204,255,0,.1);color:var(--lime);border:1px solid rgba(204,255,0,.25)}
+.pm-verdict.v-no{background:rgba(255,0,85,.08);color:var(--crim);border:1px solid rgba(255,0,85,.2)}
+.pm-verdict.v-mid{background:rgba(255,255,255,.05);color:var(--sec);border:1px solid var(--line)}
+.pm-actions{display:flex;gap:8px;margin-top:12px}
+.pm-btn{flex:1;padding:11px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;border:none;text-align:center}
+.pm-btn.primary{background:var(--lime);color:var(--navy)}
+.pm-btn.ghost{background:rgba(255,255,255,.07);color:var(--sec)}
+.pm-empty{text-align:center;color:var(--sec);font-size:13px;padding:24px 0;opacity:.55}
 /* ── 首页战绩统计 ── */
-.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px}
 .stat-cell{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;padding:10px 8px;text-align:center}
-.stat-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--lime)}
+.stat-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--lime)}
 .stat-lbl{font-size:10px;color:var(--sec);margin-top:3px;letter-spacing:.03em}
-.stat-sub{font-size:10px;color:var(--sec);opacity:.6;text-align:center;margin-top:4px;font-family:'JetBrains Mono',monospace}"""
+.stat-sub{font-size:10px;color:var(--sec);opacity:.55;text-align:center;margin-top:2px;font-family:'JetBrains Mono',monospace}"""
 
 # ---------- API-Football 赔率源(单次 /odds 调用拿全 14 家书商×所有盘口)----------
 PIN = 4  # Pinnacle(锐庄)bookmaker id
@@ -1857,172 +1867,146 @@ def wdl_rec_block(rows, cfg, slug=''):
     return f'<div class="glass">{sec_head("how_to_vote","胜平负推荐")}{inner}</div>'
 
 def grade_bets(cfg, rows, rich, grid):
-    """对每场比赛的三类押注进行评级，返回可直接渲染的结构。"""
-    slug = cfg['slug']
-    my = cfg['my']
-    result = {'wdl': None, 'score': None, 'goals': None}
+    """对每场比赛评级，返回 wdl/score1/score2/goals 四项。"""
+    slug = cfg['slug']; my = cfg['my']
+    mn = f'{cfg["cn_h"]} vs {cfg["cn_a"]}'
+    result = {'wdl': None, 'score1': None, 'score2': None, 'goals': None}
 
-    # ── 1. 胜平负评级 ─────────────────────────────────────────────
+    # ── 1. 胜平负 ─────────────────────────────────────────────────
     if rows:
         p = rows[-1].get('pin_h2h')
         if p:
-            # 计算各方向EV = 我的概率 × 市场赔率
             evs = {k: my[k] * p[k] for k in ('home','draw','away')}
             best_k = max(evs, key=evs.get)
-            best_ev = evs[best_k]
-            fav_k = min(p, key=p.get)
-            fav_od = p[fav_k]
+            fav_k = min(p, key=p.get); fav_od = p[fav_k]
             label = {'home': cfg['cn_h'], 'draw': '平局', 'away': cfg['cn_a']}
-
-            # 超热门规则：热门@<1.5 改押平局
             if fav_od < 1.5 and best_k == fav_k:
-                best_k = 'draw'; best_ev = evs['draw']
-
-            od = p[best_k]; ev = best_ev
-            pick_label = f'{label[best_k]} @{od}'
-            meta = f'EV {ev:.2f} · 我估 {my[best_k]*100:.0f}% · 市场 {100/od:.0f}%'
-            if ev >= 1.08 and my[best_k] >= 0.12:
-                grade = 'S'
-            elif ev >= 1.02 and my[best_k] >= 0.07:
-                grade = 'O'
-            else:
-                grade = 'X'
-            # 大漂移降级
+                best_k = 'draw'
+            od = p[best_k]; ev = evs[best_k]
+            mkt_pct = round(100/od); my_pct = round(my[best_k]*100)
+            drift_warn = ''
             if len(rows) >= 5:
                 f1 = rows[0].get('pin_h2h'); f2 = rows[-1].get('pin_h2h')
                 if f1 and f2:
-                    max_drift = max(abs(f1[k]-f2[k]) for k in ('home','draw','away'))
-                    if max_drift > 0.3:
-                        if grade == 'S': grade = 'O'
-                        meta += f' · ⚠️漂移{max_drift:.2f}'
-            result['wdl'] = {'grade': grade, 'pick': pick_label, 'meta': meta,
-                             'odds': od, 'prob': my[best_k], 'bet_type': 'wdl',
-                             'bet_label': pick_label, 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+                    md = max(abs(f1[k]-f2[k]) for k in ('home','draw','away'))
+                    if md > 0.3: drift_warn = f' · ⚠漂移{md:.2f}'
+            if ev >= 1.08 and my[best_k] >= 0.12: grade = 'S'
+            elif ev >= 1.02 and my[best_k] >= 0.07: grade = 'O'
+            else: grade = 'X'
+            if drift_warn and grade == 'S': grade = 'O'
+            result['wdl'] = {
+                'grade': grade, 'pick': label[best_k], 'outcome': best_k,
+                'odds': od, 'mkt_pct': mkt_pct, 'my_pct': my_pct,
+                'meta': f'赔率 @{od} · 市场预估{mkt_pct}% · 模型预估{my_pct}%{drift_warn}',
+                'bet_label': label[best_k], 'match': mn, 'ev': round(ev, 2),
+            }
 
-    # ── 2. 比分评级 ─────────────────────────────────────────────────
+    # ── 2. 比分 TOP2 ─────────────────────────────────────────────
     so = (rich.get('score_odds') or {}).get('odds', {})
-    model_top = sorted(grid.items(), key=lambda x: -x[1])[:3]
-    # 找模型TOP3里赔率在@6~8的
-    sweet_picks = []
+    model_top = sorted(grid.items(), key=lambda x: -x[1])
+    candidates = []
     for sc, prob in model_top:
         od = so.get(sc)
-        if od and 6.0 <= od < 8.0:
-            sweet_picks.append((sc, prob, od))
-    # 也纳入大众数据
-    cd = CROWD_DATA.get(slug)
-    if cd and not sweet_picks:
-        slug_odds = CROWD_SCORE_ODDS.get(slug, {})
-        for s, votes in cd['top'][:3]:
-            od = slug_odds.get(s)
-            if od and 6.0 <= od < 8.0:
-                sc = s.replace('-','-'); sweet_picks.append((sc, grid.get(sc, 0.05), od))
+        if not od: continue
+        ev = prob * od
+        if 6.0 <= od < 8.0 and prob >= 0.05: grade = 'S'
+        elif od <= 9.0 and prob >= 0.04: grade = 'O'
+        else: grade = 'X'
+        mkt_pct = round(100/od); my_pct = round(prob*100, 1)
+        candidates.append({
+            'grade': grade, 'score': sc, 'pick': sc.replace('-',':'),
+            'odds': od, 'mkt_pct': mkt_pct, 'my_pct': my_pct, 'ev': round(ev, 2),
+            'meta': f'赔率 @{od} · 市场预估{mkt_pct}% · 模型预估{my_pct}%',
+            'bet_label': f'比分 {sc.replace("-",":")}', 'match': mn,
+        })
+    # 优先选 S/O，最多取2个
+    ranked = sorted(candidates, key=lambda x: ('X','O','S').index(x['grade']) * -1 if x['grade'] in ('S','O','X') else -1)
+    top2 = ranked[:2]
+    while len(top2) < 2:
+        top2.append({'grade': 'X', 'pick': '—', 'score': '', 'odds': 0, 'mkt_pct': 0, 'my_pct': 0,
+                     'meta': '暂无赔率数据', 'bet_label': '', 'match': mn, 'ev': 0})
+    result['score1'] = top2[0]; result['score2'] = top2[1]
 
-    if sweet_picks:
-        sc, prob, od = sweet_picks[0]
-        sc_disp = sc.replace('-',':')
-        grade = 'S' if prob >= 0.08 else 'O'
-        result['score'] = {'grade': grade, 'pick': f'{sc_disp} @{od}',
-                           'meta': f'模型估 {prob*100:.1f}% · @6~8甜区 · EV≈{prob*od:.2f}',
-                           'odds': od, 'prob': prob, 'bet_type': 'score',
-                           'bet_label': f'比分 {sc_disp}', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
-    elif model_top:
-        sc, prob = model_top[0]; od = so.get(sc)
-        if od and od <= 9.0:
-            sc_disp = sc.replace('-',':')
-            result['score'] = {'grade': 'O', 'pick': f'{sc_disp} @{od}',
-                               'meta': f'模型TOP1 {prob*100:.1f}% · 赔率{od}偏高',
-                               'odds': od, 'prob': prob, 'bet_type': 'score',
-                               'bet_label': f'比分 {sc_disp}', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
-        else:
-            result['score'] = {'grade': 'X', 'pick': '赔率均>@8', 'meta': '所有比分赔率超过甜区上限',
-                               'odds': 0, 'prob': 0, 'bet_type': 'score',
-                               'bet_label': '', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
-    else:
-        result['score'] = {'grade': 'X', 'pick': '暂无数据', 'meta': '等待比分赔率采样',
-                           'odds': 0, 'prob': 0, 'bet_type': 'score',
-                           'bet_label': '', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
-
-    # ── 3. 大小球评级 ────────────────────────────────────────────────
+    # ── 3. 大小球 ────────────────────────────────────────────────
     if rows:
         t25 = rows[-1].get('pin_tot25') or {}
         u_od = t25.get('under'); o_od = t25.get('over')
         if u_od and o_od:
-            ov_prob = sum(p for s, p in grid.items() if sum(map(int, s.split('-'))) > 2)
+            ov_prob = sum(pv for s, pv in grid.items() if sum(map(int, s.split('-'))) > 2)
             un_prob = 1 - ov_prob
             ev_over = ov_prob * o_od; ev_under = un_prob * u_od
             if u_od > 2.1:
-                # 大球价值区
-                grade = 'S' if ev_over >= 1.08 else 'O'
-                result['goals'] = {'grade': grade, 'pick': f'大球(≥3) @{o_od}',
-                                   'meta': f'EV {ev_over:.2f} · U2.5@{u_od}偏高→大球价值区',
-                                   'odds': o_od, 'prob': ov_prob, 'bet_type': 'goals',
-                                   'bet_label': f'大球 ≥3', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+                od, prob, ev, pick, pick_dir = o_od, ov_prob, ev_over, '大球 ≥3', 'over'
+                grade = 'S' if ev >= 1.08 else 'O'
             elif u_od < 1.65:
-                grade = 'S' if ev_under >= 1.05 else 'O'
-                result['goals'] = {'grade': grade, 'pick': f'小球(≤2) @{u_od}',
-                                   'meta': f'EV {ev_under:.2f} · 极端小球场',
-                                   'odds': u_od, 'prob': un_prob, 'bet_type': 'goals',
-                                   'bet_label': f'小球 ≤2', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+                od, prob, ev, pick, pick_dir = u_od, un_prob, ev_under, '小球 ≤2', 'under'
+                grade = 'S' if ev >= 1.05 else 'O'
             elif ev_over > ev_under and ev_over >= 1.04:
-                result['goals'] = {'grade': 'O', 'pick': f'大球(≥3) @{o_od}',
-                                   'meta': f'EV {ev_over:.2f} · 轻微大球优势',
-                                   'odds': o_od, 'prob': ov_prob, 'bet_type': 'goals',
-                                   'bet_label': f'大球 ≥3', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+                od, prob, ev, pick, pick_dir = o_od, ov_prob, ev_over, '大球 ≥3', 'over'
+                grade = 'O'
             elif ev_under >= 1.04:
-                result['goals'] = {'grade': 'O', 'pick': f'小球(≤2) @{u_od}',
-                                   'meta': f'EV {ev_under:.2f} · 轻微小球优势',
-                                   'odds': u_od, 'prob': un_prob, 'bet_type': 'goals',
-                                   'bet_label': f'小球 ≤2', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+                od, prob, ev, pick, pick_dir = u_od, un_prob, ev_under, '小球 ≤2', 'under'
+                grade = 'O'
             else:
-                result['goals'] = {'grade': 'X', 'pick': f'市场高效', 'meta': f'EV大球{ev_over:.2f}/小球{ev_under:.2f} · 无明显优势',
-                                   'odds': 0, 'prob': 0, 'bet_type': 'goals',
-                                   'bet_label': '', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+                od, prob, ev, pick, pick_dir = 0, 0, 0, '市场高效', ''
+                grade = 'X'
+            mkt_pct = round(100/od) if od else 0; my_pct = round(prob*100) if prob else 0
+            result['goals'] = {
+                'grade': grade, 'pick': pick, 'pick_dir': pick_dir,
+                'odds': od, 'mkt_pct': mkt_pct, 'my_pct': my_pct, 'ev': round(ev, 2),
+                'meta': f'赔率 @{od} · 市场预估{mkt_pct}% · 模型预估{my_pct}%' if od else '等待赔率采样',
+                'bet_label': pick, 'match': mn,
+            }
         else:
-            result['goals'] = {'grade': 'X', 'pick': '暂无数据', 'meta': '等待大小球赔率采样',
-                               'odds': 0, 'prob': 0, 'bet_type': 'goals',
-                               'bet_label': '', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+            result['goals'] = {'grade': 'X', 'pick': '暂无数据', 'pick_dir': '',
+                               'odds': 0, 'mkt_pct': 0, 'my_pct': 0, 'ev': 0,
+                               'meta': '等待大小球赔率采样', 'bet_label': '', 'match': mn}
     return result
 
 
-def rec_card_block(grades, slug):
-    """渲染推荐卡片：三行（胜平负/比分/大小球），每行带评级+串关按钮。"""
-    GRADE_ICON = {'S': '<span class="grade-s">⭐⭐</span>', 'O': '<span class="grade-o">⭐</span>', 'X': '<span class="grade-x">—</span>'}
-    GRADE_LBL = {'S': '强推', 'O': '可选', 'X': '跳过'}
-    TYPE_LABEL = {'wdl': '胜平负', 'score': '比  分', 'goals': '大小球'}
-
+def rec_card_block(grades, slug, is_past=False, past_hits=None):
+    """渲染本场推荐卡：胜平负/比分1/比分2/进球数 四行。
+    is_past=True 时串关按钮改为 ✓/✗ 命中图标。"""
+    if past_hits is None: past_hits = {}
+    BADGE = {'S': '<span class="badge-s">强推荐</span>',
+             'O': '<span class="badge-o">推荐</span>',
+             'X': '<span class="badge-x">不推荐</span>'}
     rows_html = ''
-    for key, type_cn in [('wdl','胜平负'), ('score','比  分'), ('goals','大小球')]:
-        g = grades.get(key)
-        if not g: continue
-        grade = g['grade']
-        icon = GRADE_ICON[grade]
-        add_btn = ''
-        if grade in ('S', 'O') and g.get('odds', 0) > 0:
-            item_json = json.dumps({
-                'id': f'{slug}_{key}',
-                'match': g['match'],
-                'bet_label': g['bet_label'],
-                'odds': g['odds'],
-                'prob': round(g['prob'], 3),
-                'grade': grade,
-            }, ensure_ascii=False)
-            add_btn = (f'<button class="rec-add" id="btn_{slug}_{key}" '
-                       f'onclick="parlayAdd({item_json},this)" '
-                       f'aria-label="加入串关">+串关</button>')
+    for key, type_cn in [('wdl','胜平负'), ('score1','比分 1'), ('score2','比分 2'), ('goals','进球数')]:
+        g = grades.get(key) or {}
+        grade = g.get('grade', 'X')
+        pick = g.get('pick', '—')
+        meta = g.get('meta', '')
+        odds = g.get('odds', 0)
+        badge = BADGE[grade]
+        if is_past:
+            hit = past_hits.get(key)
+            if hit is True:   act = '<span class="rec-hit ok">✓</span>'
+            elif hit is False: act = '<span class="rec-hit no">✗</span>'
+            else:             act = '<span class="rec-hit" style="opacity:.25">—</span>'
+        else:
+            if odds > 0:
+                item = json.dumps({'id': f'{slug}_{key}', 'match': g.get('match',''),
+                                   'bet_label': g.get('bet_label',''), 'odds': odds,
+                                   'prob': g.get('my_pct', 5) / 100, 'grade': grade},
+                                  ensure_ascii=False)
+                act = (f'<button class="rec-btn" id="pbtn_{slug}_{key}" '
+                       f'onclick="parlayAdd({item},this)">串关</button>')
+            else:
+                act = '<span style="opacity:.2;font-size:12px;color:var(--sec)">—</span>'
         rows_html += (f'<div class="rec-row">'
                       f'<div class="rec-type">{type_cn}</div>'
                       f'<div class="rec-body">'
-                      f'<div class="rec-pick">{GRADE_LBL[grade]}  {g["pick"]}</div>'
-                      f'<div class="rec-meta">{g["meta"]}</div>'
+                      f'<div class="rec-pick">{pick}</div>'
+                      f'<div class="rec-meta">{meta}</div>'
                       f'</div>'
-                      f'<div class="rec-grade">{icon}</div>'
-                      f'{add_btn}'
+                      f'<div class="rec-badge">{badge}</div>'
+                      f'<div class="rec-act">{act}</div>'
                       f'</div>')
-
     return (f'<div class="rec-card">'
             f'<div class="rec-card-head">'
-            f'<span class="material-symbols-outlined">bolt</span>'
-            f'<span class="rt">本场推荐</span>'
+            f'<span class="material-symbols-outlined" style="color:var(--lime);font-size:17px">bolt</span>'
+            f'<span class="rch-title">本场推荐</span>'
             f'</div>'
             f'{rows_html}'
             f'</div>')
@@ -2034,73 +2018,111 @@ PARLAY_JS = r"""
 var KEY='parlay_v1';
 function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
 function save(d){localStorage.setItem(KEY,JSON.stringify(d))}
+
 function syncFab(){
-  var d=load();
-  var fab=document.getElementById('parlay-fab');
+  var d=load(),fab=document.getElementById('parlay-fab');
   if(!fab)return;
   if(d.length===0){fab.classList.add('hidden');}
-  else{fab.classList.remove('hidden');fab.querySelector('.cnt').textContent=d.length;}
+  else{fab.classList.remove('hidden');fab.querySelector('.p-cnt').textContent=d.length;}
 }
 function syncBtns(){
-  var d=load();
-  var ids=d.map(function(x){return x.id});
-  document.querySelectorAll('.rec-add').forEach(function(b){
-    var key=b.getAttribute('onclick').match(/"id":"([^"]+)"/);
-    if(key&&ids.indexOf(key[1])>=0){b.textContent='已选✓';b.classList.add('added');}
-    else{b.textContent='+串关';b.classList.remove('added');}
+  var ids=load().map(function(x){return x.id});
+  document.querySelectorAll('.rec-btn[id^="pbtn_"]').forEach(function(b){
+    var m=b.id.replace('pbtn_','');
+    if(ids.indexOf(m)>=0){b.textContent='已选 ✓';b.classList.add('in-parlay');}
+    else{b.textContent='串关';b.classList.remove('in-parlay');}
   });
 }
+function openModal(){
+  var ov=document.getElementById('parlay-overlay');
+  if(ov){ov.classList.add('open');renderModal();}
+}
+function closeModal(){
+  var ov=document.getElementById('parlay-overlay');
+  if(ov)ov.classList.remove('open');
+}
+
 window.parlayAdd=function(item,btn){
   var d=load();
   var idx=d.findIndex(function(x){return x.id===item.id});
-  if(idx>=0){d.splice(idx,1);btn.textContent='+串关';btn.classList.remove('added');}
-  else{d.push(item);btn.textContent='已选✓';btn.classList.add('added');}
-  save(d);syncFab();renderDrawer();
+  if(idx>=0){
+    d.splice(idx,1);
+    if(btn){btn.textContent='串关';btn.classList.remove('in-parlay');}
+  } else {
+    d.push(item);
+    if(btn){btn.textContent='已选 ✓';btn.classList.add('in-parlay');}
+  }
+  save(d);syncFab();openModal();
 };
 window.parlayRemove=function(id){
-  var d=load().filter(function(x){return x.id!==id});
-  save(d);syncFab();renderDrawer();syncBtns();
+  save(load().filter(function(x){return x.id!==id}));
+  syncFab();syncBtns();renderModal();
 };
-window.parlayClear=function(){save([]);syncFab();renderDrawer();syncBtns();};
-function renderDrawer(){
-  var dr=document.getElementById('parlay-drawer');if(!dr)return;
+window.parlayClear=function(){
+  save([]);syncFab();syncBtns();renderModal();
+};
+
+function renderModal(){
+  var modal=document.getElementById('parlay-modal');
+  if(!modal)return;
   var d=load();
+  var closeBtn='<button class="pm-close" onclick="closeModal()">✕</button>';
   if(d.length===0){
-    dr.innerHTML='<div class="pd-head"><span class="pd-title">串关篮子</span><span class="pd-close" onclick="document.getElementById(\'parlay-drawer\').classList.remove(\'open\')">✕</span></div><div class="pd-empty">还没有选择任何押注<br>在比赛详情页点「+串关」</div>';
+    modal.innerHTML='<div class="pm-head"><span class="pm-title">串关分析</span>'+closeBtn+'</div>'
+      +'<div class="pm-empty">还没有选注<br><small>在推荐卡片点「串关」加入</small></div>';
     return;
   }
-  var legs='';
-  var combOdds=1.0; var combProb=1.0;
+  var legs=''; var combOdds=1.0; var combProb=1.0;
   d.forEach(function(x){
     combOdds*=x.odds; combProb*=x.prob;
-    legs+='<div class="pd-leg"><span class="pd-leg-del" onclick="parlayRemove(\''+x.id+'\')">✕</span><div class="pd-leg-info"><div class="pd-leg-match">'+x.match+'</div><div class="pd-leg-bet">'+x.bet_label+'</div></div><span class="pd-leg-od">@'+x.odds.toFixed(2)+'</span></div>';
+    var gradeTag=x.grade==='S'?'<span class="badge-s" style="font-size:9px">强推荐</span>':
+                 x.grade==='O'?'<span class="badge-o" style="font-size:9px">推荐</span>':'';
+    legs+='<div class="pm-leg">'
+      +'<button class="pm-del" onclick="parlayRemove(\''+x.id+'\')">✕</button>'
+      +'<div class="pm-info"><div class="pm-match">'+x.match+'</div>'
+      +'<div class="pm-bet">'+x.bet_label+' '+gradeTag+'</div></div>'
+      +'<span class="pm-od">@'+x.odds.toFixed(2)+'</span>'
+      +'</div>';
   });
   var ev=combProb*combOdds;
-  var evCls=ev>=1.1?'ev-good':(ev<0.9?'ev-bad':'');
-  var pct=(combProb*100);var pctStr=pct<1?pct.toFixed(1)+'%':pct.toFixed(0)+'%';
-  var stats='<div class="pd-stats">'
-    +'<div class="pd-stat-row"><span>'+d.length+'腿串关</span><b>合并赔率 @'+combOdds.toFixed(1)+'</b></div>'
-    +'<div class="pd-stat-row"><span>命中概率</span><b>≈'+pctStr+'</b></div>'
-    +'<div class="pd-stat-row '+evCls+'"><span>期望值 EV</span><b>'+ev.toFixed(2)+(ev>=1.0?' ✅':' ❌')+'</b></div>'
+  var pct=combProb*100; var pctStr=pct<1?pct.toFixed(2)+'%':pct.toFixed(1)+'%';
+  var evOk=ev>=1.05; var evBad=ev<0.90;
+  var evCls=evOk?'ev-ok':evBad?'ev-no':'';
+  var verdict=evOk?'<div class="pm-verdict v-ok">期望值正向，值得考虑 ✓</div>'
+              :evBad?'<div class="pm-verdict v-no">期望值偏低，建议减腿 ✗</div>'
+              :'<div class="pm-verdict v-mid">期望值接近平衡，谨慎参考</div>';
+  var stats='<div class="pm-stats">'
+    +'<div class="pm-stat"><span>'+d.length+'腿串关</span><b>合并赔率 @'+combOdds.toFixed(2)+'</b></div>'
+    +'<div class="pm-stat"><span>命中概率</span><b>≈'+pctStr+'</b></div>'
+    +'<div class="pm-stat '+evCls+'"><span>期望值 EV</span><b>'+ev.toFixed(2)+(ev>=1.0?' ✓':' ✗')+'</b></div>'
+    +'</div>'+verdict;
+  var txt=d.map(function(x){return x.match+' · '+x.bet_label+' @'+x.odds.toFixed(2)}).join('\n')
+    +'\n--- 合并赔率 @'+combOdds.toFixed(2)+' | 命中率≈'+pctStr+' | EV '+ev.toFixed(2);
+  var safeTxt=txt.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n');
+  var actions='<div class="pm-actions">'
+    +'<button class="pm-btn primary" onclick="(navigator.clipboard?navigator.clipboard.writeText(\''+safeTxt+'\').then(function(){alert(\'已复制')}):alert(\'浏览器不支持\'))">复制分析</button>'
+    +'<button class="pm-btn ghost" onclick="parlayClear()">清空全部</button>'
     +'</div>';
-  var copyText=d.map(function(x){return x.match+' · '+x.bet_label+' @'+x.odds.toFixed(2)}).join('\n');
-  copyText+= '\n合并赔率: @'+combOdds.toFixed(1)+' | 命中率≈'+pctStr+' | EV '+ev.toFixed(2);
-  var btns='<div class="pd-btns">'
-    +'<button class="pd-btn primary" onclick="navigator.clipboard&&navigator.clipboard.writeText(\''+copyText.replace(/'/g,"\\'").replace(/\n/g,'\\n')+'\').then(function(){alert(\'已复制到剪贴板\')})">复制分析</button>'
-    +'<button class="pd-btn secondary" onclick="parlayClear()">清空</button>'
-    +'</div>';
-  dr.innerHTML='<div class="pd-head"><span class="pd-title">串关篮子 ('+d.length+'腿)</span><span class="pd-close" onclick="document.getElementById(\'parlay-drawer\').classList.remove(\'open\')">✕</span></div>'+legs+stats+btns;
+  modal.innerHTML='<div class="pm-head"><span class="pm-title">串关分析 ('+d.length+'腿)</span>'+closeBtn+'</div>'
+    +legs+stats+actions;
 }
+
 document.addEventListener('DOMContentLoaded',function(){
-  // 注入FAB
-  var fab=document.createElement('div');fab.id='parlay-fab';fab.innerHTML='<span class="material-symbols-outlined" style="font-size:18px">casino</span>串关篮子 <span class="cnt">0</span>';
-  fab.classList.add('hidden');
-  fab.onclick=function(){var dr=document.getElementById('parlay-drawer');dr.classList.toggle('open');renderDrawer();};
+  // 注入 FAB
+  var fab=document.createElement('button');
+  fab.id='parlay-fab';fab.className='hidden';
+  fab.innerHTML='<span class="material-symbols-outlined" style="font-size:16px">casino</span>串关篮子 <span class="p-cnt">0</span>';
+  fab.onclick=openModal;
   document.body.appendChild(fab);
-  // 注入抽屉
-  var dr=document.createElement('div');dr.id='parlay-drawer';
-  document.body.appendChild(dr);
-  syncFab();syncBtns();renderDrawer();
+  // 注入弹窗遮罩
+  var ov=document.createElement('div');ov.id='parlay-overlay';
+  ov.onclick=function(e){if(e.target===ov)closeModal();};
+  var modal=document.createElement('div');modal.id='parlay-modal';
+  ov.appendChild(modal);document.body.appendChild(ov);
+  // 初始化
+  syncFab();syncBtns();
+  // 关闭弹窗快捷键
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
 });
 })();
 </script>
@@ -2194,27 +2216,77 @@ def build_past_detail(p):
     fid = p['fid']; cnh = cn_of(p['h']); cna = cn_of(p['a']); fh = flag_of(p['h']); fa = flag_of(p['a'])
     gh, ga = p['gh'], p['ga']; d = p['devig']
     try:
-        bj = datetime.datetime.fromisoformat(p['date']).astimezone(BJ); ds = f'{bj.month}/{bj.day} {bj.hour:02d}:{bj.minute:02d}'
+        bj = datetime.datetime.fromisoformat(p['date']).astimezone(BJ)
+        ds = f'{bj.month}/{bj.day} {bj.hour:02d}:{bj.minute:02d}'
     except Exception: ds = p['date'][:10]
     lh, la, grid = poisson_calc(d['home'], d['away'], None)
-    okw = p.get('wdl_hit'); sc_ok = p.get('score2_hit')
+    actual_sc = f'{gh}-{ga}'
+    actual_wdl = 'home' if gh > ga else ('away' if ga > gh else 'draw')
+    actual_tot = gh + ga
+
+    # ── 重建赛前推荐结构(仅展示用,无串关按钮) ──────────────────────
+    picks = p.get('picks', [])
+    kind = p.get('kind', ''); fav = p.get('fav', 'home')
+    wdl_mode, wdl_fav = value_picks(d, kind, fav)[1]  # (mode, fav)
+    # WDL 方向还原
+    label = {'home': cnh, 'draw': '平局', 'away': cna}
+    wdl_outcome = wdl_fav if wdl_mode == 'win' else ('draw' if actual_wdl != wdl_fav else 'away')
+    # 用去水位概率推近似赔率（1/prob 是公允赔率）
+    def approx_od(prob): return round(1/prob, 2) if prob and prob > 0.01 else 0
+    wdl_od = approx_od(d.get(wdl_fav if wdl_mode=='win' else 'draw', 0))
+    wdl_pk = p.get('wdl_txt', '—')
+    wdl_pct = round(d.get(wdl_fav if wdl_mode=='win' else 'draw', 0)*100)
+
+    sc1 = picks[0] if picks else ''; sc2 = picks[1] if len(picks) > 1 else ''
+    sc1_od = approx_od(grid.get(sc1.replace(':','-'), 0) or 0.05)
+    sc2_od = approx_od(grid.get(sc2.replace(':','-'), 0) or 0.03)
+    sc1_pct = round(grid.get(sc1.replace(':','-'), 0)*100, 1)
+    sc2_pct = round(grid.get(sc2.replace(':','-'), 0)*100, 1)
+
+    tot_u = p.get('tot_u', 0)
+    goals_dir = 'over' if (tot_u and tot_u > 2.1) else 'under'
+    goals_pick = '大球 ≥3' if goals_dir == 'over' else '小球 ≤2'
+    ov_prob = sum(pv for s, pv in grid.items() if sum(map(int, s.split('-'))) > 2)
+    goals_od = approx_od(ov_prob if goals_dir=='over' else 1-ov_prob)
+    goals_pct = round((ov_prob if goals_dir=='over' else 1-ov_prob)*100)
+
+    def meta_str(od, mkt, my): return f'赔率 @{od} · 市场预估{mkt}% · 模型预估{my}%' if od else '无赔率记录'
+    grades_past = {
+        'wdl':   {'grade': 'O', 'pick': wdl_pk, 'outcome': wdl_fav,
+                  'odds': wdl_od, 'mkt_pct': wdl_pct, 'my_pct': wdl_pct,
+                  'meta': meta_str(wdl_od, wdl_pct, wdl_pct), 'bet_label': wdl_pk, 'match': f'{cnh} vs {cna}'},
+        'score1':{'grade': 'O', 'pick': sc1.replace('-',':') if sc1 else '—', 'score': sc1.replace(':','-'),
+                  'odds': sc1_od, 'mkt_pct': round(sc1_pct), 'my_pct': sc1_pct,
+                  'meta': meta_str(sc1_od, round(sc1_pct), sc1_pct), 'bet_label': f'比分 {sc1}', 'match': f'{cnh} vs {cna}'},
+        'score2':{'grade': 'O', 'pick': sc2.replace('-',':') if sc2 else '—', 'score': sc2.replace(':','-'),
+                  'odds': sc2_od, 'mkt_pct': round(sc2_pct), 'my_pct': sc2_pct,
+                  'meta': meta_str(sc2_od, round(sc2_pct), sc2_pct), 'bet_label': f'比分 {sc2}', 'match': f'{cnh} vs {cna}'},
+        'goals': {'grade': 'O', 'pick': goals_pick, 'pick_dir': goals_dir,
+                  'odds': goals_od, 'mkt_pct': goals_pct, 'my_pct': goals_pct,
+                  'meta': meta_str(goals_od, goals_pct, goals_pct), 'bet_label': goals_pick, 'match': f'{cnh} vs {cna}'},
+    }
+    # goals 命中
+    goals_hit = None
+    if tot_u:
+        goals_hit = (goals_dir == 'over' and actual_tot > 2) or (goals_dir == 'under' and actual_tot <= 2)
+    past_hits = {
+        'wdl':    p.get('wdl_hit'),
+        'score1': (actual_sc == sc1.replace(':','-')) if sc1 else None,
+        'score2': (actual_sc == sc2.replace(':','-')) if sc2 else None,
+        'goals':  goals_hit,
+    }
+    rec_html = rec_card_block(grades_past, f'p{fid}', is_past=True, past_hits=past_hits)
+
+    okw = p.get('wdl_hit')
     badge = '<span class="pres ok">✓ 胜负命中</span>' if okw else '<span class="pres no">✗ 胜负未中</span>'
     title = f'{cnh} vs {cna}'
     dv = lambda k: f'{d[k]*100:.0f}%'
-    picks = p.get('picks', []); pk = ' / '.join(s.replace(':', ' : ') for s in picks)
     rescn = f'{cnh} 胜' if gh > ga else (f'{cna} 胜' if ga > gh else '平局')
     head_card = (f'<div class="glass" style="text-align:center">'
                  f'<div class="pd-flags">{fh} <span class="pd-sc">{gh} - {ga}</span> {fa}</div>'
                  f'<div class="pd-tn">{cnh} vs {cna}</div>'
                  f'<div style="margin:8px 0">{badge}</div>'
-                 f'<div class="pd-meta">{ds}(北京) · 已结束 FT · {p["tier"]}</div></div>')
-    pva = (f'<div class="glass">{sec_head("emoji_events","竞猜推荐 vs 实际")}'
-           f'<table class="rectab">'
-           f'<tr><td class="rt-l">胜负倾向</td><td class="rt-m">{p.get("wdl_txt","")}</td><td class="rt-r {"ok" if okw else "no"}">{"✓" if okw else "✗"}</td></tr>'
-           f'<tr><td class="rt-l">推荐比分</td><td class="rt-m">{pk}</td><td class="rt-r {"ok" if sc_ok else "no"}">{"✓" if sc_ok else "✗"}</td></tr>'
-           f'<tr><td class="rt-l">实际结果</td><td class="rt-m"><b>{rescn} · {gh} : {ga}</b></td><td class="rt-r"></td></tr>'
-           f'</table>'
-           f'<div class="vs-note">价值逻辑:{p["dir"]}(顺此产出推荐);胜负为主、2 个比分供参考。</div></div>')
+                 f'<div class="pd-meta">{ds}(北京) · 已结束 FT · {p.get("tier","")}</div></div>')
     grid_card = f'<div class="glass">{sec_head("grid_view","模型推测比分分布 Top 6")}{scores_grid(lh, la, grid)}</div>'
     devig_card = (f'<div class="glass">{sec_head("balance","赛前市场预期(锐庄去水位)")}'
                   f'<div class="tp-pct"><span style="color:#CCFF00">{cnh} {dv("home")}</span>'
@@ -2223,12 +2295,12 @@ def build_past_detail(p):
                   f'<div class="tp-bar"><i style="flex:{max(d["home"]*100,3):.0f};background:#CCFF00"></i>'
                   f'<i style="flex:{max(d["draw"]*100,3):.0f};background:#3f465c"></i>'
                   f'<i style="flex:{max(d["away"]*100,3):.0f};background:#FF0055"></i></div>'
-                  f'<div class="vs-note">这是赛前市场对该场的真实定价(去水位);模型据此反推价值方向,再与实际赛果对账。</div></div>')
+                  f'<div class="vs-note">实际结果：<b>{rescn} · {gh}:{ga}</b>（{ds} 北京）</div></div>')
     body = (f'<main>'
             f'<a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
             f'<div style="height:12px"></div>'
-            f'{head_card}{pva}{grid_card}{devig_card}'
-            f'<div class="foot">价值≠会赢、看长期;赛前去水位自动判定方向,逐场仅供参考</div></main>')
+            f'{head_card}{rec_html}{grid_card}{devig_card}'
+            f'<div class="foot">仅供研究 · 非投注建议</div></main>')
     open(os.path.join(DOCS, f'past_{fid}.html'), 'w').write(
         f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title)}</head><body>{body}</body></html>')
 
@@ -2341,37 +2413,38 @@ def line_row(f, pmap, cur_fid, prob_map):
     return f'<div class="fxbig{cc}"{ida}>{inner}</div>'
 
 def build_stats_block(past):
-    """首页战绩统计卡片：胜平负/比分/大小球 各自命中率 + 综合ROI。"""
+    """首页战绩统计：胜平负 / 比分(2选中1) / 大小球 三格命中率。"""
     scored = [p for p in past if p.get('devig')]
     if not scored: return ''
     n = len(scored)
-    # 胜平负
+
+    # 胜平负命中
     wdl_hits = sum(1 for p in scored if p.get('wdl_hit'))
-    wdl_rate = wdl_hits / n if n else 0
-    # 比分（score2_hit = 推荐比分命中）
+
+    # 比分：2个推荐中任意一个命中即算（score2_hit 已含此逻辑）
     sc_hits = sum(1 for p in scored if p.get('score2_hit'))
-    sc_rate = sc_hits / n if n else 0
-    # 大小球：通过 tot_u(U2.5赔率) + 实际进球判断
-    tot_correct = 0; tot_n = 0
+
+    # 大小球：按 U2.5 赔率方向 vs 实际结果
+    tot_hits = 0; tot_n = 0
     for p in scored:
         u_od = p.get('tot_u'); gh = p.get('gh', 0); ga = p.get('ga', 0)
         if not u_od: continue
         tot_n += 1
-        actual_under = (gh + ga) <= 2
         press_over = u_od > 2.1
-        press_under = not press_over
-        if (press_over and not actual_under) or (press_under and actual_under):
-            tot_correct += 1
-    tot_rate = tot_correct / tot_n if tot_n else 0
-    # 综合ROI
-    invest = n * 100; won = sum(p.get('won', 0) for p in scored)
-    pl = won - invest; roi = pl / invest * 100 if invest else 0
-    roi_sign = '+' if roi >= 0 else ''; roi_col = 'var(--lime)' if roi >= 0 else '#FF0055'
+        actual_over = (gh + ga) > 2
+        if press_over == actual_over: tot_hits += 1
+
+    wdl_pct = f'{wdl_hits/n*100:.0f}%'
+    sc_pct  = f'{sc_hits/n*100:.0f}%'
+    tot_pct = f'{tot_hits/tot_n*100:.0f}%' if tot_n else '—'
 
     cells = (
-        f'<div class="stat-cell"><div class="stat-val">{wdl_rate*100:.0f}%</div><div class="stat-lbl">胜平负命中</div><div class="stat-sub">{wdl_hits}/{n}场</div></div>'
-        f'<div class="stat-cell"><div class="stat-val">{sc_rate*100:.0f}%</div><div class="stat-lbl">比分命中</div><div class="stat-sub">{sc_hits}/{n}场</div></div>'
-        f'<div class="stat-cell"><div class="stat-val">{tot_rate*100:.0f}%</div><div class="stat-lbl">大小球命中</div><div class="stat-sub">{tot_correct}/{tot_n}场</div></div>'
+        f'<div class="stat-cell"><div class="stat-val">{wdl_pct}</div>'
+        f'<div class="stat-lbl">胜平负命中</div><div class="stat-sub">{wdl_hits}/{n}场</div></div>'
+        f'<div class="stat-cell"><div class="stat-val">{sc_pct}</div>'
+        f'<div class="stat-lbl">比分命中</div><div class="stat-sub">{sc_hits}/{n}场</div></div>'
+        f'<div class="stat-cell"><div class="stat-val">{tot_pct}</div>'
+        f'<div class="stat-lbl">大小球命中</div><div class="stat-sub">{tot_hits}/{tot_n}场</div></div>'
     )
     return (f'<div class="glass" style="margin-bottom:14px">'
             f'{sec_head("emoji_events","AI推演战绩")}'

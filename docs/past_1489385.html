@@ -321,52 +321,62 @@ a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
 .cmp-bar i{display:block;height:100%;background:var(--lime);border-radius:3px}
 .cmp-c{flex:0 0 56px;color:var(--sec);opacity:.7;font-size:11px}
 /* ── 推荐卡片 ── */
-.rec-card{background:rgba(13,28,45,.85);border:1px solid rgba(204,255,0,.22);border-radius:10px;padding:0;margin-bottom:16px;overflow:hidden}
-.rec-card-head{display:flex;align-items:center;gap:6px;padding:10px 14px 8px;border-bottom:1px solid var(--line);background:rgba(204,255,0,.04)}
-.rec-card-head .material-symbols-outlined{color:var(--lime);font-size:16px}
-.rec-card-head span.rt{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--lime)}
-.rec-row{display:flex;align-items:stretch;border-bottom:1px solid rgba(255,255,255,.06)}
+.rec-card{background:rgba(13,28,45,.9);border:1px solid rgba(204,255,0,.25);border-radius:10px;padding:0;margin-bottom:16px;overflow:hidden}
+.rec-card-head{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line);background:rgba(204,255,0,.05)}
+.rec-card-head .material-symbols-outlined{color:var(--lime);font-size:17px}
+.rec-card-head .rch-title{font-size:13px;font-weight:800;color:var(--on);letter-spacing:-.01em}
+.rec-row{display:grid;grid-template-columns:52px 1fr auto auto;align-items:center;border-bottom:1px solid rgba(255,255,255,.05);min-height:56px}
 .rec-row:last-child{border-bottom:none}
-.rec-type{flex:0 0 54px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--sec);letter-spacing:.04em;border-right:1px solid rgba(255,255,255,.06);padding:10px 0}
-.rec-body{flex:1;padding:10px 12px;min-width:0}
-.rec-pick{font-size:15px;font-weight:700;color:var(--on);margin-bottom:2px}
-.rec-meta{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--sec);line-height:1.5}
-.rec-grade{flex:0 0 36px;display:flex;align-items:center;justify-content:center;padding:10px 6px}
-.grade-s{color:var(--lime);font-size:15px}
-.grade-o{color:#f0a500;font-size:13px}
-.grade-x{color:var(--sec);opacity:.4;font-size:12px}
-.rec-add{margin-left:auto;flex:0 0 auto;align-self:center;padding:4px 10px;border-radius:5px;border:1px solid rgba(204,255,0,.35);background:rgba(204,255,0,.08);color:var(--lime);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
-.rec-add:active{background:rgba(204,255,0,.22)}
-.rec-add.added{background:rgba(204,255,0,.22);border-color:var(--lime)}
-/* ── 串关篮子 ── */
-#parlay-fab{position:fixed;bottom:24px;right:16px;z-index:200;background:var(--lime);color:var(--navy);border-radius:28px;padding:10px 16px;font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px;cursor:pointer;box-shadow:0 4px 20px rgba(204,255,0,.35);transition:transform .15s}
-#parlay-fab:active{transform:scale(.95)}
-#parlay-fab .cnt{background:var(--navy);color:var(--lime);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
+.rec-type{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--sec);letter-spacing:.03em;border-right:1px solid rgba(255,255,255,.06);padding:12px 4px;align-self:stretch}
+.rec-body{padding:10px 10px;min-width:0}
+.rec-pick{font-size:14px;font-weight:700;color:var(--on);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-meta{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--sec);line-height:1.5}
+.rec-badge{padding:0 8px;display:flex;align-items:center;justify-content:center;min-width:52px}
+.badge-s{font-size:10px;font-weight:800;color:var(--lime);background:rgba(204,255,0,.12);border:1px solid rgba(204,255,0,.35);border-radius:4px;padding:2px 6px;white-space:nowrap}
+.badge-o{font-size:10px;font-weight:700;color:#f0c040;background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.3);border-radius:4px;padding:2px 6px;white-space:nowrap}
+.badge-x{font-size:10px;color:var(--sec);opacity:.35}
+.rec-act{padding:0 10px 0 4px;display:flex;align-items:center}
+.rec-btn{background:rgba(204,255,0,.1);border:1px solid rgba(204,255,0,.3);color:var(--lime);font-size:11px;font-weight:700;border-radius:5px;padding:5px 10px;cursor:pointer;white-space:nowrap;transition:background .15s;font-family:'JetBrains Mono',monospace}
+.rec-btn:active{background:rgba(204,255,0,.25)}
+.rec-btn.in-parlay{background:rgba(204,255,0,.22);border-color:var(--lime)}
+.rec-hit{font-size:20px;font-weight:900;line-height:1}
+.rec-hit.ok{color:var(--lime)}
+.rec-hit.no{color:var(--crim);opacity:.7}
+/* ── 串关弹窗 ── */
+#parlay-fab{position:fixed;bottom:20px;right:14px;z-index:200;background:var(--lime);color:var(--navy);border-radius:24px;padding:9px 14px;font-weight:800;font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;box-shadow:0 4px 18px rgba(204,255,0,.4);transition:transform .15s;border:none}
+#parlay-fab:active{transform:scale(.94)}
 #parlay-fab.hidden{display:none}
-#parlay-drawer{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;z-index:300;background:var(--low);border-top:2px solid var(--lime);border-radius:16px 16px 0 0;padding:16px 16px 32px;display:none;max-height:85vh;overflow-y:auto}
-#parlay-drawer.open{display:block}
-.pd-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.pd-title{font-weight:800;font-size:16px;color:var(--lime)}
-.pd-close{color:var(--sec);cursor:pointer;font-size:22px;line-height:1}
-.pd-leg{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
-.pd-leg-del{color:var(--sec);cursor:pointer;opacity:.6;font-size:18px;flex-shrink:0}
-.pd-leg-info{flex:1;min-width:0}
-.pd-leg-match{font-size:11px;color:var(--sec);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pd-leg-bet{font-weight:700;color:var(--on)}
-.pd-leg-od{font-family:'JetBrains Mono',monospace;color:var(--lime);font-weight:700;flex-shrink:0}
-.pd-stats{background:rgba(204,255,0,.06);border:1px solid rgba(204,255,0,.2);border-radius:8px;padding:12px;margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:12px}
-.pd-stat-row{display:flex;justify-content:space-between;padding:3px 0;color:var(--sec)}
-.pd-stat-row b{color:var(--on)}
-.pd-stat-row.ev-good b{color:var(--lime)}
-.pd-stat-row.ev-bad b{color:var(--crim)}
-.pd-btns{display:flex;gap:8px;margin-top:12px}
-.pd-btn{flex:1;padding:10px;border-radius:8px;font-weight:700;font-size:13px;text-align:center;cursor:pointer;border:none}
-.pd-btn.primary{background:var(--lime);color:var(--navy)}
-.pd-btn.secondary{background:rgba(255,255,255,.08);color:var(--on)}
-.pd-empty{text-align:center;color:var(--sec);font-size:13px;padding:20px 0;opacity:.6}
+#parlay-fab .p-cnt{background:var(--navy);color:var(--lime);border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900}
+#parlay-overlay{position:fixed;inset:0;z-index:400;background:rgba(2,6,23,.7);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center}
+#parlay-overlay.open{display:flex}
+#parlay-modal{width:100%;max-width:520px;background:var(--low);border-top:2px solid var(--lime);border-radius:18px 18px 0 0;padding:18px 16px 36px;max-height:88vh;overflow-y:auto;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.pm-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.pm-title{font-size:16px;font-weight:800;color:var(--lime);display:flex;align-items:center;gap:6px}
+.pm-close{color:var(--sec);cursor:pointer;font-size:24px;line-height:1;background:none;border:none}
+.pm-leg{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.pm-del{color:var(--sec);cursor:pointer;opacity:.55;font-size:18px;flex-shrink:0;background:none;border:none;line-height:1}
+.pm-info{flex:1;min-width:0}
+.pm-match{font-size:11px;color:var(--sec);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pm-bet{font-size:13px;font-weight:700;color:var(--on)}
+.pm-od{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--lime);font-weight:700;flex-shrink:0}
+.pm-stats{background:rgba(204,255,0,.06);border:1px solid rgba(204,255,0,.18);border-radius:8px;padding:12px;margin-top:12px}
+.pm-stat{display:flex;justify-content:space-between;font-size:12px;font-family:'JetBrains Mono',monospace;padding:3px 0;color:var(--sec)}
+.pm-stat b{color:var(--on)}
+.pm-stat.ev-ok b{color:var(--lime)}
+.pm-stat.ev-no b{color:var(--crim)}
+.pm-verdict{margin-top:10px;padding:10px 12px;border-radius:7px;font-size:13px;font-weight:700;text-align:center}
+.pm-verdict.v-ok{background:rgba(204,255,0,.1);color:var(--lime);border:1px solid rgba(204,255,0,.25)}
+.pm-verdict.v-no{background:rgba(255,0,85,.08);color:var(--crim);border:1px solid rgba(255,0,85,.2)}
+.pm-verdict.v-mid{background:rgba(255,255,255,.05);color:var(--sec);border:1px solid var(--line)}
+.pm-actions{display:flex;gap:8px;margin-top:12px}
+.pm-btn{flex:1;padding:11px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;border:none;text-align:center}
+.pm-btn.primary{background:var(--lime);color:var(--navy)}
+.pm-btn.ghost{background:rgba(255,255,255,.07);color:var(--sec)}
+.pm-empty{text-align:center;color:var(--sec);font-size:13px;padding:24px 0;opacity:.55}
 /* ── 首页战绩统计 ── */
-.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px}
 .stat-cell{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;padding:10px 8px;text-align:center}
-.stat-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--lime)}
+.stat-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--lime)}
 .stat-lbl{font-size:10px;color:var(--sec);margin-top:3px;letter-spacing:.03em}
-.stat-sub{font-size:10px;color:var(--sec);opacity:.6;text-align:center;margin-top:4px;font-family:'JetBrains Mono',monospace}</style></head><body><main><a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a><div style="height:12px"></div><div class="glass" style="text-align:center"><div class="pd-flags">🇬🇭 <span class="pd-sc">1 - 0</span> 🇵🇦</div><div class="pd-tn">加纳 vs 巴拿马</div><div style="margin:8px 0"><span class="pres no">✗ 胜负未中</span></div><div class="pd-meta">6/18 07:00(北京) · 已结束 FT · ③势均</div></div><div class="glass"><div class="sech"><span class="sech-ic"><span class="material-symbols-outlined">emoji_events</span></span><span class="sech-t">竞猜推荐 vs 实际</span></div><table class="rectab"><tr><td class="rt-l">胜负倾向</td><td class="rt-m">平 或 巴拿马(双重机会)</td><td class="rt-r no">✗</td></tr><tr><td class="rt-l">推荐比分</td><td class="rt-m">1 : 1 / 0 : 1</td><td class="rt-r no">✗</td></tr><tr><td class="rt-l">实际结果</td><td class="rt-m"><b>加纳 胜 · 1 : 0</b></td><td class="rt-r"></td></tr></table><div class="vs-note">价值逻辑:平 / 弱队 / 小球(顺此产出推荐);胜负为主、2 个比分供参考。</div></div><div class="glass"><div class="sech"><span class="sech-ic"><span class="material-symbols-outlined">grid_view</span></span><span class="sech-t">模型推测比分分布 Top 6</span></div><div class="scg"><div class="scg-cell hot"><div class="scg-s">1 - 1</div><div class="scg-p">12.4%</div></div><div class="scg-cell"><div class="scg-s">1 - 0</div><div class="scg-p">10.6%</div></div><div class="scg-cell"><div class="scg-s">2 - 1</div><div class="scg-p">8.9%</div></div><div class="scg-cell"><div class="scg-s">0 - 1</div><div class="scg-p">8.7%</div></div><div class="scg-cell"><div class="scg-s">2 - 0</div><div class="scg-p">7.6%</div></div><div class="scg-cell"><div class="scg-s">0 - 0</div><div class="scg-p">7.4%</div></div></div><div class="xg"><span class="xg-badge">xG</span><span class="xg-l">预期进球</span><span class="xg-v">主 <b style="color:#CCFF00">1.43</b> / 客 <b style="color:#FF0055">1.17</b></span></div></div><div class="glass"><div class="sech"><span class="sech-ic"><span class="material-symbols-outlined">balance</span></span><span class="sech-t">赛前市场预期(锐庄去水位)</span></div><div class="tp-pct"><span style="color:#CCFF00">加纳 41%</span><span style="color:#8e9379">平 30%</span><span style="color:#FF0055">巴拿马 29%</span></div><div class="tp-bar"><i style="flex:41;background:#CCFF00"></i><i style="flex:30;background:#3f465c"></i><i style="flex:29;background:#FF0055"></i></div><div class="vs-note">这是赛前市场对该场的真实定价(去水位);模型据此反推价值方向,再与实际赛果对账。</div></div><div class="foot">价值≠会赢、看长期;赛前去水位自动判定方向,逐场仅供参考</div></main></body></html>
+.stat-sub{font-size:10px;color:var(--sec);opacity:.55;text-align:center;margin-top:2px;font-family:'JetBrains Mono',monospace}</style></head><body><main><a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a><div style="height:12px"></div><div class="glass" style="text-align:center"><div class="pd-flags">🇬🇭 <span class="pd-sc">1 - 0</span> 🇵🇦</div><div class="pd-tn">加纳 vs 巴拿马</div><div style="margin:8px 0"><span class="pres no">✗ 胜负未中</span></div><div class="pd-meta">6/18 07:00(北京) · 已结束 FT · ③势均</div></div><div class="rec-card"><div class="rec-card-head"><span class="material-symbols-outlined" style="color:var(--lime);font-size:17px">bolt</span><span class="rch-title">本场推荐</span></div><div class="rec-row"><div class="rec-type">胜平负</div><div class="rec-body"><div class="rec-pick">平 或 巴拿马(双重机会)</div><div class="rec-meta">赔率 @3.28 · 市场预估30% · 模型预估30%</div></div><div class="rec-badge"><span class="badge-o">推荐</span></div><div class="rec-act"><span class="rec-hit no">✗</span></div></div><div class="rec-row"><div class="rec-type">比分 1</div><div class="rec-body"><div class="rec-pick">1:1</div><div class="rec-meta">赔率 @8.05 · 市场预估12% · 模型预估12.4%</div></div><div class="rec-badge"><span class="badge-o">推荐</span></div><div class="rec-act"><span class="rec-hit no">✗</span></div></div><div class="rec-row"><div class="rec-type">比分 2</div><div class="rec-body"><div class="rec-pick">0:1</div><div class="rec-meta">赔率 @11.53 · 市场预估9% · 模型预估8.7%</div></div><div class="rec-badge"><span class="badge-o">推荐</span></div><div class="rec-act"><span class="rec-hit no">✗</span></div></div><div class="rec-row"><div class="rec-type">进球数</div><div class="rec-body"><div class="rec-pick">小球 ≤2</div><div class="rec-meta">赔率 @1.91 · 市场预估52% · 模型预估52%</div></div><div class="rec-badge"><span class="badge-o">推荐</span></div><div class="rec-act"><span class="rec-hit ok">✓</span></div></div></div><div class="glass"><div class="sech"><span class="sech-ic"><span class="material-symbols-outlined">grid_view</span></span><span class="sech-t">模型推测比分分布 Top 6</span></div><div class="scg"><div class="scg-cell hot"><div class="scg-s">1 - 1</div><div class="scg-p">12.4%</div></div><div class="scg-cell"><div class="scg-s">1 - 0</div><div class="scg-p">10.6%</div></div><div class="scg-cell"><div class="scg-s">2 - 1</div><div class="scg-p">8.9%</div></div><div class="scg-cell"><div class="scg-s">0 - 1</div><div class="scg-p">8.7%</div></div><div class="scg-cell"><div class="scg-s">2 - 0</div><div class="scg-p">7.6%</div></div><div class="scg-cell"><div class="scg-s">0 - 0</div><div class="scg-p">7.4%</div></div></div><div class="xg"><span class="xg-badge">xG</span><span class="xg-l">预期进球</span><span class="xg-v">主 <b style="color:#CCFF00">1.43</b> / 客 <b style="color:#FF0055">1.17</b></span></div></div><div class="glass"><div class="sech"><span class="sech-ic"><span class="material-symbols-outlined">balance</span></span><span class="sech-t">赛前市场预期(锐庄去水位)</span></div><div class="tp-pct"><span style="color:#CCFF00">加纳 41%</span><span style="color:#8e9379">平 30%</span><span style="color:#FF0055">巴拿马 29%</span></div><div class="tp-bar"><i style="flex:41;background:#CCFF00"></i><i style="flex:30;background:#3f465c"></i><i style="flex:29;background:#FF0055"></i></div><div class="vs-note">实际结果：<b>加纳 胜 · 1:0</b>（6/18 07:00 北京）</div></div><div class="foot">仅供研究 · 非投注建议</div></main></body></html>
