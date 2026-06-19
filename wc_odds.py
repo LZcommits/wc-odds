@@ -1578,7 +1578,7 @@ def third_party_block(cfg, pred):
                  f'<span class="cmp-r">{aa:.0f}</span><span class="cmp-c">{label}</span></div>')
     adv_html = f'<div class="tp-adv"><span class="material-symbols-outlined">tips_and_updates</span>算法建议:{adv}</div>' if adv else ''
     cmp_html = f'<div class="cmp-blk">{rows}</div>' if rows else ''
-    return (f'{sec_head("hub","第三方参照 · API 官方预测")}{row}{adv_html}{cmp_html}'
+    return (f'{sec_head("hub","预测参照")}{row}{adv_html}{cmp_html}'
             f'<div class="vs-note">API-Football 机器学习预测,与本页「市场去水位 / 价值模型」相互参照(部分维度国家队数据缺省已隐藏)</div>')
 
 def bet_plan(rich, my, kind, fav, cnh, cna):
@@ -2174,11 +2174,9 @@ def build_detail(cfg, rows, rich):
         inner = (f'{match_header(rows, cfg)}'
                  f'{rec_html}'
                  f'{tp_html}'
+                 f'{sec_head("analytics","对阵分析")}{matchup_analysis(cfg)}'
                  f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
-                 f'<div class="glass">{sec_head("view_list","比分赔率")}{score_odds_html(rich, grid)}</div>'
-                 f'<div class="glass">{sec_head("dashboard","全盘口快照")}{markets_html(cfg, rows, rich)}</div>'
-                 f'{fb_html}'
-                 f'{sec_head("analytics","对阵分析")}{matchup_analysis(cfg)}')
+                 f'{fb_html}')
     body = (f'<main>'
             f'<a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
             f'<div style="height:12px"></div>{inner}'
