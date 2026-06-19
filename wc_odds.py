@@ -1172,18 +1172,21 @@ def process(cfg):
         soft = {k: round(sum(x[k] for x in allh)/len(allh), 3) for k in ('home','draw','away')} if allh else None
         src = ph or soft
         tot = af_tot(af_bet(pinb, 5)) or af_tot(af_vals(bms, 5))  # 锐庄大小球,缺则软庄
+        scr = af_score(bms)  # 精确比分(取条目最多的书商)
         if src:
             dv = {k: round(v, 4) for k, v in devig(src).items()}
             rec = {'ts': now.isoformat(timespec='minutes'), 'hrs_to_ko': hrs, 'pin_h2h': ph,
-                   'soft_h2h': soft, 'pin_tot25': tot, 'devig': dv, 'n_books': len(allh)}
+                   'soft_h2h': soft, 'pin_tot25': tot, 'devig': dv, 'n_books': len(allh),
+                   'pin_scores': scr}  # 精确比分赔率(哪家开盘就取哪家)
             with open(os.path.join(DATA_DIR, cfg['slug']+'.jsonl'), 'a') as f:
                 f.write(json.dumps(rec, ensure_ascii=False)+'\n')
-            print('sampled', cfg['slug'], hrs, 'h', '| books', len(allh))
+            print('sampled', cfg['slug'], hrs, 'h', '| books', len(allh),
+                  '| scores', len(scr['odds']) if scr else 0)
         rich['spread'] = af_spread(bms)
         rich['tot'] = tot
         rich['btts'] = af_pair(af_vals(bms, 8), ('Yes', 'No'))
         rich['dc'] = af_pair(af_vals(bms, 12), ('Home/Draw', 'Home/Away', 'Draw/Away'))
-        rich['score_odds'] = af_score(bms)
+        rich['score_odds'] = scr
         rich['pred'] = fetch_predictions(AFID.get(cfg['slug']))
     return rich
 
@@ -1886,7 +1889,7 @@ def wdl_rec_block(rows, cfg, slug=''):
              f'{grid_rows}</div>')
     return f'<div class="glass">{sec_head("how_to_vote","胜平负推荐")}{inner}</div>'
 
-def _crowd_picks(slug, grid, mn, cnh, cna):
+def _crowd_picks(slug, grid, mn, cnh, cna, rows=None):
     """返回大众胜平负 + 大众比分推荐列表（供 grade_bets 和 build_past_detail 共用）。"""
     cd = CROWD_DATA.get(slug)
     if not cd: return None, []
@@ -1909,7 +1912,14 @@ def _crowd_picks(slug, grid, mn, cnh, cna):
         'bet_label': label[cwd], 'match': mn,
     }
     # 大众比分推荐（有赔率：价差比≥1.5；无赔率：票选≥5%，最多3个）
-    slug_odds = CROWD_SCORE_ODDS.get(slug, {})
+    # 优先读 JSONL 实时赔率（每小时自动采样），回退到静态字典
+    live_scr = {}
+    if rows:
+        for row in reversed(rows):
+            sc = row.get('pin_scores') or {}
+            if sc.get('odds'):
+                live_scr = sc['odds']; break
+    slug_odds = live_scr or CROWD_SCORE_ODDS.get(slug, {})
     has_any_odds = any(slug_odds.get(s) for s, _ in cd['top'])
     cands = []
     for s, votes in cd['top']:
@@ -1973,7 +1983,7 @@ def grade_bets(cfg, rows, rich, grid):
             }
 
     # ── 2. 大众推测胜平负 + 大众比分 ─────────────────────────────
-    crowd_wdl, crowd_scores = _crowd_picks(slug, grid, mn, cfg['cn_h'], cfg['cn_a'])
+    crowd_wdl, crowd_scores = _crowd_picks(slug, grid, mn, cfg['cn_h'], cfg['cn_a'], rows=rows)
     if crowd_wdl: result['crowd_wdl'] = crowd_wdl
     for i, cp in enumerate(crowd_scores): result[f'crowd_score{i+1}'] = cp
 
