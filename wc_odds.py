@@ -1229,13 +1229,13 @@ def build_past():
         if gh is None or ga is None: continue
         h, a = f['teams']['home']['name'], f['teams']['away']['name']
         rec = cache.get(fid)
-        if rec and rec.get('gh') == gh and rec.get('ga') == ga and rec.get('devig') and rec.get('dc') is not None:
-            continue  # 已缓存且比分一致、含下注赔率,跳过请求
+        if rec and rec.get('gh') == gh and rec.get('ga') == ga and rec.get('devig') and rec.get('dc') is not None and 'score_odds' in rec:
+            continue  # 已缓存且含完整比分赔率,跳过请求
         bms = fetch_af_odds(int(fid))
         mw = af_h2h(af_bet(af_book(bms, PIN), 1)) if bms else None
         if not mw: mw = af_h2h(af_vals(bms, 1)) if bms else None
         if not mw:  # 无赛前赔率,仅记赛果
-            cache[fid] = {'date': f['fixture']['date'], 'h': h, 'a': a, 'gh': gh, 'ga': ga, 'devig': None}
+            cache[fid] = {'date': f['fixture']['date'], 'h': h, 'a': a, 'gh': gh, 'ga': ga, 'devig': None, 'score_odds': {}}
             continue
         d = {k: round(v, 4) for k, v in devig(mw).items()}
         tier, fav, dirn, kind = value_call(d)
@@ -1247,7 +1247,7 @@ def build_past():
         cache[fid] = {'date': f['fixture']['date'], 'h': h, 'a': a, 'gh': gh, 'ga': ga,
                       'devig': d, 'tier': tier, 'fav': fav, 'dir': dirn, 'kind': kind,
                       'hit': bool(call_hit(kind, fav, gh, ga)),
-                      'dc': dcd, 'tot_u': totd.get('under'), 'po': po}
+                      'dc': dcd, 'tot_u': totd.get('under'), 'po': po, 'score_odds': scd}
     with open(PAST_CACHE, 'w') as fp: json.dump(cache, fp, ensure_ascii=False, indent=0)
     out = []
     for fid, v in cache.items():
@@ -1863,7 +1863,7 @@ def wdl_rec_block(rows, cfg, slug=''):
              f'{grid_rows}</div>')
     return f'<div class="glass">{sec_head("how_to_vote","胜平负推荐")}{inner}</div>'
 
-def _crowd_picks(slug, grid, mn, cnh, cna, rows=None):
+def _crowd_picks(slug, grid, mn, cnh, cna, rows=None, score_odds=None):
     """返回大众胜平负 + 大众比分推荐列表（供 grade_bets 和 build_past_detail 共用）。"""
     cd = CROWD_DATA.get(slug)
     if not cd: return None, []
@@ -1886,9 +1886,9 @@ def _crowd_picks(slug, grid, mn, cnh, cna, rows=None):
         'bet_label': label[cwd], 'match': mn,
     }
     # 大众比分推荐（有赔率：价差比≥1.5；无赔率：票选≥5%，最多3个）
-    # 优先读 JSONL 实时赔率（每小时自动采样），回退到静态字典
-    live_scr = {}
-    if rows:
+    # 优先级：外部传入 score_odds > JSONL 实时采样 > 静态字典
+    live_scr = score_odds or {}
+    if not live_scr and rows:
         for row in reversed(rows):
             sc = row.get('pin_scores') or {}
             if sc.get('odds'):
@@ -2231,7 +2231,8 @@ def build_past_detail(p, items_map=None):
         goals_hit = (goals_dir == 'over' and actual_tot > 2) or (goals_dir == 'under' and actual_tot <= 2)
     # 大众推荐
     slug = FID2SLUG.get(int(fid), '')
-    crowd_wdl_g, crowd_sc_list = _crowd_picks(slug, grid, f'{cnh} vs {cna}', cnh, cna)
+    score_odds = p.get('score_odds') or {}
+    crowd_wdl_g, crowd_sc_list = _crowd_picks(slug, grid, f'{cnh} vs {cna}', cnh, cna, score_odds=score_odds)
     if crowd_wdl_g: grades_past['crowd_wdl'] = crowd_wdl_g
     for i, cp in enumerate(crowd_sc_list): grades_past[f'crowd_score{i+1}'] = cp
     past_hits = {
@@ -2288,7 +2289,7 @@ def build_past_detail(p, items_map=None):
     body = (f'<main>'
             f'<a class="back" href="list.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
             f'<div style="height:12px"></div>{inner}'
-            f'<div class="foot">仅供研究 · 非投注建议</div></main>')
+            f'<div class="foot">{ds}（北京）</div></main>{DEEP_INFO_MODAL}')
     open(os.path.join(DOCS, f'past_{fid}.html'), 'w').write(
         f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title,raw_title=True)}</head><body>{body}</body></html>')
 
