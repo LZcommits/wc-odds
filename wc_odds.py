@@ -920,7 +920,57 @@ a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
 .cmp-r{text-align:left;color:var(--crim)}
 .cmp-bar{flex:1;height:6px;background:rgba(255,0,85,.35);border-radius:3px;overflow:hidden}
 .cmp-bar i{display:block;height:100%;background:var(--lime);border-radius:3px}
-.cmp-c{flex:0 0 56px;color:var(--sec);opacity:.7;font-size:11px}"""
+.cmp-c{flex:0 0 56px;color:var(--sec);opacity:.7;font-size:11px}
+/* ── 推荐卡片 ── */
+.rec-card{background:rgba(13,28,45,.85);border:1px solid rgba(204,255,0,.22);border-radius:10px;padding:0;margin-bottom:16px;overflow:hidden}
+.rec-card-head{display:flex;align-items:center;gap:6px;padding:10px 14px 8px;border-bottom:1px solid var(--line);background:rgba(204,255,0,.04)}
+.rec-card-head .material-symbols-outlined{color:var(--lime);font-size:16px}
+.rec-card-head span.rt{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--lime)}
+.rec-row{display:flex;align-items:stretch;border-bottom:1px solid rgba(255,255,255,.06)}
+.rec-row:last-child{border-bottom:none}
+.rec-type{flex:0 0 54px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--sec);letter-spacing:.04em;border-right:1px solid rgba(255,255,255,.06);padding:10px 0}
+.rec-body{flex:1;padding:10px 12px;min-width:0}
+.rec-pick{font-size:15px;font-weight:700;color:var(--on);margin-bottom:2px}
+.rec-meta{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--sec);line-height:1.5}
+.rec-grade{flex:0 0 36px;display:flex;align-items:center;justify-content:center;padding:10px 6px}
+.grade-s{color:var(--lime);font-size:15px}
+.grade-o{color:#f0a500;font-size:13px}
+.grade-x{color:var(--sec);opacity:.4;font-size:12px}
+.rec-add{margin-left:auto;flex:0 0 auto;align-self:center;padding:4px 10px;border-radius:5px;border:1px solid rgba(204,255,0,.35);background:rgba(204,255,0,.08);color:var(--lime);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
+.rec-add:active{background:rgba(204,255,0,.22)}
+.rec-add.added{background:rgba(204,255,0,.22);border-color:var(--lime)}
+/* ── 串关篮子 ── */
+#parlay-fab{position:fixed;bottom:24px;right:16px;z-index:200;background:var(--lime);color:var(--navy);border-radius:28px;padding:10px 16px;font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px;cursor:pointer;box-shadow:0 4px 20px rgba(204,255,0,.35);transition:transform .15s}
+#parlay-fab:active{transform:scale(.95)}
+#parlay-fab .cnt{background:var(--navy);color:var(--lime);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
+#parlay-fab.hidden{display:none}
+#parlay-drawer{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;z-index:300;background:var(--low);border-top:2px solid var(--lime);border-radius:16px 16px 0 0;padding:16px 16px 32px;display:none;max-height:85vh;overflow-y:auto}
+#parlay-drawer.open{display:block}
+.pd-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.pd-title{font-weight:800;font-size:16px;color:var(--lime)}
+.pd-close{color:var(--sec);cursor:pointer;font-size:22px;line-height:1}
+.pd-leg{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.pd-leg-del{color:var(--sec);cursor:pointer;opacity:.6;font-size:18px;flex-shrink:0}
+.pd-leg-info{flex:1;min-width:0}
+.pd-leg-match{font-size:11px;color:var(--sec);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pd-leg-bet{font-weight:700;color:var(--on)}
+.pd-leg-od{font-family:'JetBrains Mono',monospace;color:var(--lime);font-weight:700;flex-shrink:0}
+.pd-stats{background:rgba(204,255,0,.06);border:1px solid rgba(204,255,0,.2);border-radius:8px;padding:12px;margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:12px}
+.pd-stat-row{display:flex;justify-content:space-between;padding:3px 0;color:var(--sec)}
+.pd-stat-row b{color:var(--on)}
+.pd-stat-row.ev-good b{color:var(--lime)}
+.pd-stat-row.ev-bad b{color:var(--crim)}
+.pd-btns{display:flex;gap:8px;margin-top:12px}
+.pd-btn{flex:1;padding:10px;border-radius:8px;font-weight:700;font-size:13px;text-align:center;cursor:pointer;border:none}
+.pd-btn.primary{background:var(--lime);color:var(--navy)}
+.pd-btn.secondary{background:rgba(255,255,255,.08);color:var(--on)}
+.pd-empty{text-align:center;color:var(--sec);font-size:13px;padding:20px 0;opacity:.6}
+/* ── 首页战绩统计 ── */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.stat-cell{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;padding:10px 8px;text-align:center}
+.stat-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--lime)}
+.stat-lbl{font-size:10px;color:var(--sec);margin-top:3px;letter-spacing:.03em}
+.stat-sub{font-size:10px;color:var(--sec);opacity:.6;text-align:center;margin-top:4px;font-family:'JetBrains Mono',monospace}"""
 
 # ---------- API-Football 赔率源(单次 /odds 调用拿全 14 家书商×所有盘口)----------
 PIN = 4  # Pinnacle(锐庄)bookmaker id
@@ -1806,6 +1856,256 @@ def wdl_rec_block(rows, cfg, slug=''):
              f'{grid_rows}</div>')
     return f'<div class="glass">{sec_head("how_to_vote","胜平负推荐")}{inner}</div>'
 
+def grade_bets(cfg, rows, rich, grid):
+    """对每场比赛的三类押注进行评级，返回可直接渲染的结构。"""
+    slug = cfg['slug']
+    my = cfg['my']
+    result = {'wdl': None, 'score': None, 'goals': None}
+
+    # ── 1. 胜平负评级 ─────────────────────────────────────────────
+    if rows:
+        p = rows[-1].get('pin_h2h')
+        if p:
+            # 计算各方向EV = 我的概率 × 市场赔率
+            evs = {k: my[k] * p[k] for k in ('home','draw','away')}
+            best_k = max(evs, key=evs.get)
+            best_ev = evs[best_k]
+            fav_k = min(p, key=p.get)
+            fav_od = p[fav_k]
+            label = {'home': cfg['cn_h'], 'draw': '平局', 'away': cfg['cn_a']}
+
+            # 超热门规则：热门@<1.5 改押平局
+            if fav_od < 1.5 and best_k == fav_k:
+                best_k = 'draw'; best_ev = evs['draw']
+
+            od = p[best_k]; ev = best_ev
+            pick_label = f'{label[best_k]} @{od}'
+            meta = f'EV {ev:.2f} · 我估 {my[best_k]*100:.0f}% · 市场 {100/od:.0f}%'
+            if ev >= 1.08:
+                grade = 'S'
+            elif ev >= 1.02:
+                grade = 'O'
+            else:
+                grade = 'X'
+            # 大漂移降级
+            if len(rows) >= 5:
+                f1 = rows[0].get('pin_h2h'); f2 = rows[-1].get('pin_h2h')
+                if f1 and f2:
+                    max_drift = max(abs(f1[k]-f2[k]) for k in ('home','draw','away'))
+                    if max_drift > 0.3:
+                        if grade == 'S': grade = 'O'
+                        meta += f' · ⚠️漂移{max_drift:.2f}'
+            result['wdl'] = {'grade': grade, 'pick': pick_label, 'meta': meta,
+                             'odds': od, 'prob': my[best_k], 'bet_type': 'wdl',
+                             'bet_label': pick_label, 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+
+    # ── 2. 比分评级 ─────────────────────────────────────────────────
+    so = (rich.get('score_odds') or {}).get('odds', {})
+    model_top = sorted(grid.items(), key=lambda x: -x[1])[:3]
+    # 找模型TOP3里赔率在@6~8的
+    sweet_picks = []
+    for sc, prob in model_top:
+        od = so.get(sc)
+        if od and 6.0 <= od <= 8.0:
+            sweet_picks.append((sc, prob, od))
+    # 也纳入大众数据
+    cd = CROWD_DATA.get(slug)
+    if cd and not sweet_picks:
+        slug_odds = CROWD_SCORE_ODDS.get(slug, {})
+        for s, votes in cd['top'][:3]:
+            od = slug_odds.get(s)
+            if od and 6.0 <= od <= 8.0:
+                sc = s.replace('-','-'); sweet_picks.append((sc, grid.get(sc, 0.05), od))
+
+    if sweet_picks:
+        sc, prob, od = sweet_picks[0]
+        sc_disp = sc.replace('-',':')
+        grade = 'S' if prob >= 0.08 else 'O'
+        result['score'] = {'grade': grade, 'pick': f'{sc_disp} @{od}',
+                           'meta': f'模型估 {prob*100:.1f}% · @6~8甜区 · EV≈{prob*od:.2f}',
+                           'odds': od, 'prob': prob, 'bet_type': 'score',
+                           'bet_label': f'比分 {sc_disp}', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+    elif model_top:
+        sc, prob = model_top[0]; od = so.get(sc)
+        if od and od <= 9.0:
+            sc_disp = sc.replace('-',':')
+            result['score'] = {'grade': 'O', 'pick': f'{sc_disp} @{od}',
+                               'meta': f'模型TOP1 {prob*100:.1f}% · 赔率{od}偏高',
+                               'odds': od, 'prob': prob, 'bet_type': 'score',
+                               'bet_label': f'比分 {sc_disp}', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+        else:
+            result['score'] = {'grade': 'X', 'pick': '赔率均>@8', 'meta': '所有比分赔率超过甜区上限',
+                               'odds': 0, 'prob': 0, 'bet_type': 'score',
+                               'bet_label': '', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+    else:
+        result['score'] = {'grade': 'X', 'pick': '暂无数据', 'meta': '等待比分赔率采样',
+                           'odds': 0, 'prob': 0, 'bet_type': 'score',
+                           'bet_label': '', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+
+    # ── 3. 大小球评级 ────────────────────────────────────────────────
+    if rows:
+        t25 = rows[-1].get('pin_tot25') or {}
+        u_od = t25.get('under'); o_od = t25.get('over')
+        if u_od and o_od:
+            ov_prob = sum(p for s, p in grid.items() if sum(map(int, s.split('-'))) > 2)
+            un_prob = 1 - ov_prob
+            ev_over = ov_prob * o_od; ev_under = un_prob * u_od
+            if u_od > 2.1:
+                # 大球价值区
+                grade = 'S' if ev_over >= 1.08 else 'O'
+                result['goals'] = {'grade': grade, 'pick': f'大球(≥3) @{o_od}',
+                                   'meta': f'EV {ev_over:.2f} · U2.5@{u_od}偏高→大球价值区',
+                                   'odds': o_od, 'prob': ov_prob, 'bet_type': 'goals',
+                                   'bet_label': f'大球 ≥3', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+            elif u_od < 1.65:
+                grade = 'S' if ev_under >= 1.05 else 'O'
+                result['goals'] = {'grade': grade, 'pick': f'小球(≤2) @{u_od}',
+                                   'meta': f'EV {ev_under:.2f} · 极端小球场',
+                                   'odds': u_od, 'prob': un_prob, 'bet_type': 'goals',
+                                   'bet_label': f'小球 ≤2', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+            elif ev_over > ev_under and ev_over >= 1.04:
+                result['goals'] = {'grade': 'O', 'pick': f'大球(≥3) @{o_od}',
+                                   'meta': f'EV {ev_over:.2f} · 轻微大球优势',
+                                   'odds': o_od, 'prob': ov_prob, 'bet_type': 'goals',
+                                   'bet_label': f'大球 ≥3', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+            elif ev_under >= 1.04:
+                result['goals'] = {'grade': 'O', 'pick': f'小球(≤2) @{u_od}',
+                                   'meta': f'EV {ev_under:.2f} · 轻微小球优势',
+                                   'odds': u_od, 'prob': un_prob, 'bet_type': 'goals',
+                                   'bet_label': f'小球 ≤2', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+            else:
+                result['goals'] = {'grade': 'X', 'pick': f'市场高效', 'meta': f'EV大球{ev_over:.2f}/小球{ev_under:.2f} · 无明显优势',
+                                   'odds': 0, 'prob': 0, 'bet_type': 'goals',
+                                   'bet_label': '', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+        else:
+            result['goals'] = {'grade': 'X', 'pick': '暂无数据', 'meta': '等待大小球赔率采样',
+                               'odds': 0, 'prob': 0, 'bet_type': 'goals',
+                               'bet_label': '', 'match': f'{cfg["cn_h"]} vs {cfg["cn_a"]}'}
+    return result
+
+
+def rec_card_block(grades, slug):
+    """渲染推荐卡片：三行（胜平负/比分/大小球），每行带评级+串关按钮。"""
+    GRADE_ICON = {'S': '<span class="grade-s">⭐⭐</span>', 'O': '<span class="grade-o">⭐</span>', 'X': '<span class="grade-x">—</span>'}
+    GRADE_LBL = {'S': '强推', 'O': '可选', 'X': '跳过'}
+    TYPE_LABEL = {'wdl': '胜平负', 'score': '比  分', 'goals': '大小球'}
+
+    rows_html = ''
+    for key, type_cn in [('wdl','胜平负'), ('score','比  分'), ('goals','大小球')]:
+        g = grades.get(key)
+        if not g: continue
+        grade = g['grade']
+        icon = GRADE_ICON[grade]
+        add_btn = ''
+        if grade in ('S', 'O') and g.get('odds', 0) > 0:
+            item_json = json.dumps({
+                'id': f'{slug}_{key}',
+                'match': g['match'],
+                'bet_label': g['bet_label'],
+                'odds': g['odds'],
+                'prob': round(g['prob'], 3),
+                'grade': grade,
+            }, ensure_ascii=False)
+            add_btn = (f'<button class="rec-add" id="btn_{slug}_{key}" '
+                       f'onclick="parlayAdd({item_json},this)" '
+                       f'aria-label="加入串关">+串关</button>')
+        rows_html += (f'<div class="rec-row">'
+                      f'<div class="rec-type">{type_cn}</div>'
+                      f'<div class="rec-body">'
+                      f'<div class="rec-pick">{GRADE_LBL[grade]}  {g["pick"]}</div>'
+                      f'<div class="rec-meta">{g["meta"]}</div>'
+                      f'</div>'
+                      f'<div class="rec-grade">{icon}</div>'
+                      f'{add_btn}'
+                      f'</div>')
+
+    return (f'<div class="rec-card">'
+            f'<div class="rec-card-head">'
+            f'<span class="material-symbols-outlined">bolt</span>'
+            f'<span class="rt">本场推荐</span>'
+            f'</div>'
+            f'{rows_html}'
+            f'</div>')
+
+
+PARLAY_JS = r"""
+<script>
+(function(){
+var KEY='parlay_v1';
+function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
+function save(d){localStorage.setItem(KEY,JSON.stringify(d))}
+function syncFab(){
+  var d=load();
+  var fab=document.getElementById('parlay-fab');
+  if(!fab)return;
+  if(d.length===0){fab.classList.add('hidden');}
+  else{fab.classList.remove('hidden');fab.querySelector('.cnt').textContent=d.length;}
+}
+function syncBtns(){
+  var d=load();
+  var ids=d.map(function(x){return x.id});
+  document.querySelectorAll('.rec-add').forEach(function(b){
+    var key=b.getAttribute('onclick').match(/"id":"([^"]+)"/);
+    if(key&&ids.indexOf(key[1])>=0){b.textContent='已选✓';b.classList.add('added');}
+    else{b.textContent='+串关';b.classList.remove('added');}
+  });
+}
+window.parlayAdd=function(item,btn){
+  var d=load();
+  var idx=d.findIndex(function(x){return x.id===item.id});
+  if(idx>=0){d.splice(idx,1);btn.textContent='+串关';btn.classList.remove('added');}
+  else{d.push(item);btn.textContent='已选✓';btn.classList.add('added');}
+  save(d);syncFab();renderDrawer();
+};
+window.parlayRemove=function(id){
+  var d=load().filter(function(x){return x.id!==id});
+  save(d);syncFab();renderDrawer();syncBtns();
+};
+window.parlayClear=function(){save([]);syncFab();renderDrawer();syncBtns();};
+function renderDrawer(){
+  var dr=document.getElementById('parlay-drawer');if(!dr)return;
+  var d=load();
+  if(d.length===0){
+    dr.innerHTML='<div class="pd-head"><span class="pd-title">串关篮子</span><span class="pd-close" onclick="document.getElementById(\'parlay-drawer\').classList.remove(\'open\')">✕</span></div><div class="pd-empty">还没有选择任何押注<br>在比赛详情页点「+串关」</div>';
+    return;
+  }
+  var legs='';
+  var combOdds=1.0; var combProb=1.0;
+  d.forEach(function(x){
+    combOdds*=x.odds; combProb*=x.prob;
+    legs+='<div class="pd-leg"><span class="pd-leg-del" onclick="parlayRemove(\''+x.id+'\')">✕</span><div class="pd-leg-info"><div class="pd-leg-match">'+x.match+'</div><div class="pd-leg-bet">'+x.bet_label+'</div></div><span class="pd-leg-od">@'+x.odds.toFixed(2)+'</span></div>';
+  });
+  var ev=combProb*combOdds;
+  var evCls=ev>=1.1?'ev-good':(ev<0.9?'ev-bad':'');
+  var pct=(combProb*100);var pctStr=pct<1?pct.toFixed(1)+'%':pct.toFixed(0)+'%';
+  var stats='<div class="pd-stats">'
+    +'<div class="pd-stat-row"><span>'+d.length+'腿串关</span><b>合并赔率 @'+combOdds.toFixed(1)+'</b></div>'
+    +'<div class="pd-stat-row"><span>命中概率</span><b>≈'+pctStr+'</b></div>'
+    +'<div class="pd-stat-row '+evCls+'"><span>期望值 EV</span><b>'+ev.toFixed(2)+(ev>=1.0?' ✅':' ❌')+'</b></div>'
+    +'</div>';
+  var copyText=d.map(function(x){return x.match+' · '+x.bet_label+' @'+x.odds.toFixed(2)}).join('\n');
+  copyText+= '\n合并赔率: @'+combOdds.toFixed(1)+' | 命中率≈'+pctStr+' | EV '+ev.toFixed(2);
+  var btns='<div class="pd-btns">'
+    +'<button class="pd-btn primary" onclick="navigator.clipboard&&navigator.clipboard.writeText(\''+copyText.replace(/'/g,"\\'").replace(/\n/g,'\\n')+'\').then(function(){alert(\'已复制到剪贴板\')})">复制分析</button>'
+    +'<button class="pd-btn secondary" onclick="parlayClear()">清空</button>'
+    +'</div>';
+  dr.innerHTML='<div class="pd-head"><span class="pd-title">串关篮子 ('+d.length+'腿)</span><span class="pd-close" onclick="document.getElementById(\'parlay-drawer\').classList.remove(\'open\')">✕</span></div>'+legs+stats+btns;
+}
+document.addEventListener('DOMContentLoaded',function(){
+  // 注入FAB
+  var fab=document.createElement('div');fab.id='parlay-fab';fab.innerHTML='<span class="material-symbols-outlined" style="font-size:18px">casino</span>串关篮子 <span class="cnt">0</span>';
+  fab.classList.add('hidden');
+  fab.onclick=function(){var dr=document.getElementById('parlay-drawer');dr.classList.toggle('open');renderDrawer();};
+  document.body.appendChild(fab);
+  // 注入抽屉
+  var dr=document.createElement('div');dr.id='parlay-drawer';
+  document.body.appendChild(dr);
+  syncFab();syncBtns();renderDrawer();
+});
+})();
+</script>
+"""
+
 def goals_block(rich, my, grid):
     """进球推荐：大小球 2.5 + BTTS + xG 预期。"""
     t25 = rich.get('tot') or {}
@@ -1851,8 +2151,10 @@ def build_detail(cfg, rows, rich):
         tp_html = f'<div class="glass">{tp}</div>' if tp else ''
         fb = form_block(cfg)
         fb_html = f'<div class="glass">{fb}</div>' if fb else ''
+        grades = grade_bets(cfg, rows, rich, grid)
+        rec_html = rec_card_block(grades, cfg['slug'])
         inner = (f'{match_header(rows, cfg)}'
-                 f''
+                 f'{rec_html}'
                  f'{score_top3_block(rich, cfg["my"], grid, cfg["slug"])}'
                  f'{wdl_rec_block(rows, cfg, cfg["slug"])}'
                  f'{goals_block(rich, cfg["my"], grid)}'
@@ -1865,7 +2167,7 @@ def build_detail(cfg, rows, rich):
     body = (f'<main>'
             f'<a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
             f'<div style="height:12px"></div>{inner}'
-            f'<div class="foot">自动每 1h 更新 · 仅供研究,非投注建议</div></main>{script}')
+            f'<div class="foot">自动每 1h 更新 · 仅供研究,非投注建议</div></main>{script}{PARLAY_JS}')
     open(os.path.join(DOCS, cfg['slug']+'.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title)}</head><body>{body}</body></html>')
 
 def sec_h(t, c=''):
@@ -2038,6 +2340,48 @@ def line_row(f, pmap, cur_fid, prob_map):
     if slug: return f'<a class="fxbig star{cc}"{ida} href="{slug}.html">{inner}</a>'
     return f'<div class="fxbig{cc}"{ida}>{inner}</div>'
 
+def build_stats_block(past):
+    """首页战绩统计卡片：胜平负/比分/大小球 各自命中率 + 综合ROI。"""
+    scored = [p for p in past if p.get('devig')]
+    if not scored: return ''
+    n = len(scored)
+    # 胜平负
+    wdl_hits = sum(1 for p in scored if p.get('wdl_hit'))
+    wdl_rate = wdl_hits / n if n else 0
+    # 比分（score2_hit = 推荐比分命中）
+    sc_hits = sum(1 for p in scored if p.get('score2_hit'))
+    sc_rate = sc_hits / n if n else 0
+    # 大小球：通过 tot_u(U2.5赔率) + 实际进球判断
+    tot_correct = 0; tot_n = 0
+    for p in scored:
+        u_od = p.get('tot_u'); gh = p.get('gh', 0); ga = p.get('ga', 0)
+        if not u_od: continue
+        tot_n += 1
+        actual_under = (gh + ga) <= 2
+        press_over = u_od > 2.1
+        press_under = not press_over
+        if (press_over and not actual_under) or (press_under and actual_under):
+            tot_correct += 1
+    tot_rate = tot_correct / tot_n if tot_n else 0
+    # 综合ROI
+    invest = n * 100; won = sum(p.get('won', 0) for p in scored)
+    pl = won - invest; roi = pl / invest * 100 if invest else 0
+    roi_sign = '+' if roi >= 0 else ''; roi_col = 'var(--lime)' if roi >= 0 else '#FF0055'
+
+    cells = (
+        f'<div class="stat-cell"><div class="stat-val">{wdl_rate*100:.0f}%</div><div class="stat-lbl">胜平负命中</div><div class="stat-sub">{wdl_hits}/{n}场</div></div>'
+        f'<div class="stat-cell"><div class="stat-val">{sc_rate*100:.0f}%</div><div class="stat-lbl">比分命中</div><div class="stat-sub">{sc_hits}/{n}场</div></div>'
+        f'<div class="stat-cell"><div class="stat-val">{tot_rate*100:.0f}%</div><div class="stat-lbl">大小球命中</div><div class="stat-sub">{tot_correct}/{tot_n}场</div></div>'
+    )
+    roi_row = (f'<div class="stat-sub" style="text-align:center;font-size:13px;font-weight:700;color:{roi_col};margin-top:6px">'
+               f'综合 ROI {roi_sign}{roi:.1f}%  ·  {n}场样本  ·  基于策略B(均势区)</div>')
+    return (f'<div class="glass" style="margin-bottom:14px">'
+            f'{sec_head("emoji_events","AI推演战绩")}'
+            f'<div class="stats-grid">{cells}</div>'
+            f'{roi_row}'
+            f'</div>')
+
+
 def build_index(items):
     past = build_past()
     for p in past: build_past_detail(p)
@@ -2051,6 +2395,7 @@ def build_index(items):
              f'<div class="pnl {pcls}">ROI {sign}{abs(roi)}%<small></small></div>'
              f'<div class="pnl-row"><span>本金 ¥{invest}</span><span>收回 ¥{won}</span>'
              f'<span>净盈亏 {sign}¥{abs(pl)}</span><span>胜负中 {nwin}/{ntot}</span></div></div>')
+    stats_html = build_stats_block(past)
     # ---------- 本期购彩参考(嵌入时间线过去/未来分界处)----------
     up = fetch_upcoming(hours=48, limit=3)
     tickets = build_tickets(up)
@@ -2084,8 +2429,8 @@ def build_index(items):
           'if(t)setTimeout(function(){t.scrollIntoView({block:"start"});},80);})();</script>')
     bt = crowd_backtest_block()
     body = (f'<main>'
-            f'<div style="height:12px"></div>{track}{filt}{tl}{bt}'
-            f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{js}')
+            f'<div style="height:12px"></div>{stats_html}{track}{filt}{tl}{bt}'
+            f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{js}{PARLAY_JS}')
     open(os.path.join(DOCS, 'index.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赔率追踪")}</head><body>{body}</body></html>')
 
 items = []

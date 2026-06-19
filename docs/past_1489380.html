@@ -319,4 +319,54 @@ a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
 .cmp-r{text-align:left;color:var(--crim)}
 .cmp-bar{flex:1;height:6px;background:rgba(255,0,85,.35);border-radius:3px;overflow:hidden}
 .cmp-bar i{display:block;height:100%;background:var(--lime);border-radius:3px}
-.cmp-c{flex:0 0 56px;color:var(--sec);opacity:.7;font-size:11px}</style></head><body><main><a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a><div style="height:12px"></div><div class="glass" style="text-align:center"><div class="pd-flags">🇪🇸 <span class="pd-sc">0 - 0</span> 🇨🇻</div><div class="pd-tn">西班牙 vs 佛得角</div><div style="margin:8px 0"><span class="pres no">✗ 胜负未中</span></div><div class="pd-meta">6/16 00:00(北京) · 已结束 FT · ①悬殊</div></div><div class="glass"><div class="sech"><span class="sech-ic"><span class="material-symbols-outlined">emoji_events</span></span><span class="sech-t">竞猜推荐 vs 实际</span></div><table class="rectab"><tr><td class="rt-l">胜负倾向</td><td class="rt-m">西班牙 胜(让球)</td><td class="rt-r no">✗</td></tr><tr><td class="rt-l">推荐比分</td><td class="rt-m">2 : 0 / 1 : 0</td><td class="rt-r no">✗</td></tr><tr><td class="rt-l">实际结果</td><td class="rt-m"><b>平局 · 0 : 0</b></td><td class="rt-r"></td></tr></table><div class="vs-note">价值逻辑:砍屠杀 / 小球 / 弱队受让(顺此产出推荐);胜负为主、2 个比分供参考。</div></div><div class="glass"><div class="sech"><span class="sech-ic"><span class="material-symbols-outlined">grid_view</span></span><span class="sech-t">模型推测比分分布 Top 6</span></div><div class="scg"><div class="scg-cell hot"><div class="scg-s">2 - 0</div><div class="scg-p">20.8%</div></div><div class="scg-cell"><div class="scg-s">1 - 0</div><div class="scg-p">17.6%</div></div><div class="scg-cell"><div class="scg-s">3 - 0</div><div class="scg-p">16.4%</div></div><div class="scg-cell"><div class="scg-s">4 - 0</div><div class="scg-p">9.7%</div></div><div class="scg-cell"><div class="scg-s">0 - 0</div><div class="scg-p">7.4%</div></div><div class="scg-cell"><div class="scg-s">2 - 1</div><div class="scg-p">4.9%</div></div></div><div class="xg"><span class="xg-badge">xG</span><span class="xg-l">预期进球</span><span class="xg-v">主 <b style="color:#CCFF00">2.37</b> / 客 <b style="color:#FF0055">0.23</b></span></div></div><div class="glass"><div class="sech"><span class="sech-ic"><span class="material-symbols-outlined">balance</span></span><span class="sech-t">赛前市场预期(锐庄去水位)</span></div><div class="tp-pct"><span style="color:#CCFF00">西班牙 91%</span><span style="color:#8e9379">平 7%</span><span style="color:#FF0055">佛得角 3%</span></div><div class="tp-bar"><i style="flex:91;background:#CCFF00"></i><i style="flex:7;background:#3f465c"></i><i style="flex:3;background:#FF0055"></i></div><div class="vs-note">这是赛前市场对该场的真实定价(去水位);模型据此反推价值方向,再与实际赛果对账。</div></div><div class="foot">价值≠会赢、看长期;赛前去水位自动判定方向,逐场仅供参考</div></main></body></html>
+.cmp-c{flex:0 0 56px;color:var(--sec);opacity:.7;font-size:11px}
+/* ── 推荐卡片 ── */
+.rec-card{background:rgba(13,28,45,.85);border:1px solid rgba(204,255,0,.22);border-radius:10px;padding:0;margin-bottom:16px;overflow:hidden}
+.rec-card-head{display:flex;align-items:center;gap:6px;padding:10px 14px 8px;border-bottom:1px solid var(--line);background:rgba(204,255,0,.04)}
+.rec-card-head .material-symbols-outlined{color:var(--lime);font-size:16px}
+.rec-card-head span.rt{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--lime)}
+.rec-row{display:flex;align-items:stretch;border-bottom:1px solid rgba(255,255,255,.06)}
+.rec-row:last-child{border-bottom:none}
+.rec-type{flex:0 0 54px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--sec);letter-spacing:.04em;border-right:1px solid rgba(255,255,255,.06);padding:10px 0}
+.rec-body{flex:1;padding:10px 12px;min-width:0}
+.rec-pick{font-size:15px;font-weight:700;color:var(--on);margin-bottom:2px}
+.rec-meta{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--sec);line-height:1.5}
+.rec-grade{flex:0 0 36px;display:flex;align-items:center;justify-content:center;padding:10px 6px}
+.grade-s{color:var(--lime);font-size:15px}
+.grade-o{color:#f0a500;font-size:13px}
+.grade-x{color:var(--sec);opacity:.4;font-size:12px}
+.rec-add{margin-left:auto;flex:0 0 auto;align-self:center;padding:4px 10px;border-radius:5px;border:1px solid rgba(204,255,0,.35);background:rgba(204,255,0,.08);color:var(--lime);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
+.rec-add:active{background:rgba(204,255,0,.22)}
+.rec-add.added{background:rgba(204,255,0,.22);border-color:var(--lime)}
+/* ── 串关篮子 ── */
+#parlay-fab{position:fixed;bottom:24px;right:16px;z-index:200;background:var(--lime);color:var(--navy);border-radius:28px;padding:10px 16px;font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px;cursor:pointer;box-shadow:0 4px 20px rgba(204,255,0,.35);transition:transform .15s}
+#parlay-fab:active{transform:scale(.95)}
+#parlay-fab .cnt{background:var(--navy);color:var(--lime);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
+#parlay-fab.hidden{display:none}
+#parlay-drawer{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;z-index:300;background:var(--low);border-top:2px solid var(--lime);border-radius:16px 16px 0 0;padding:16px 16px 32px;display:none;max-height:85vh;overflow-y:auto}
+#parlay-drawer.open{display:block}
+.pd-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.pd-title{font-weight:800;font-size:16px;color:var(--lime)}
+.pd-close{color:var(--sec);cursor:pointer;font-size:22px;line-height:1}
+.pd-leg{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.pd-leg-del{color:var(--sec);cursor:pointer;opacity:.6;font-size:18px;flex-shrink:0}
+.pd-leg-info{flex:1;min-width:0}
+.pd-leg-match{font-size:11px;color:var(--sec);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pd-leg-bet{font-weight:700;color:var(--on)}
+.pd-leg-od{font-family:'JetBrains Mono',monospace;color:var(--lime);font-weight:700;flex-shrink:0}
+.pd-stats{background:rgba(204,255,0,.06);border:1px solid rgba(204,255,0,.2);border-radius:8px;padding:12px;margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:12px}
+.pd-stat-row{display:flex;justify-content:space-between;padding:3px 0;color:var(--sec)}
+.pd-stat-row b{color:var(--on)}
+.pd-stat-row.ev-good b{color:var(--lime)}
+.pd-stat-row.ev-bad b{color:var(--crim)}
+.pd-btns{display:flex;gap:8px;margin-top:12px}
+.pd-btn{flex:1;padding:10px;border-radius:8px;font-weight:700;font-size:13px;text-align:center;cursor:pointer;border:none}
+.pd-btn.primary{background:var(--lime);color:var(--navy)}
+.pd-btn.secondary{background:rgba(255,255,255,.08);color:var(--on)}
+.pd-empty{text-align:center;color:var(--sec);font-size:13px;padding:20px 0;opacity:.6}
+/* ── 首页战绩统计 ── */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.stat-cell{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;padding:10px 8px;text-align:center}
+.stat-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--lime)}
+.stat-lbl{font-size:10px;color:var(--sec);margin-top:3px;letter-spacing:.03em}
+.stat-sub{font-size:10px;color:var(--sec);opacity:.6;text-align:center;margin-top:4px;font-family:'JetBrains Mono',monospace}</style></head><body><main><a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a><div style="height:12px"></div><div class="glass" style="text-align:center"><div class="pd-flags">🇪🇸 <span class="pd-sc">0 - 0</span> 🇨🇻</div><div class="pd-tn">西班牙 vs 佛得角</div><div style="margin:8px 0"><span class="pres no">✗ 胜负未中</span></div><div class="pd-meta">6/16 00:00(北京) · 已结束 FT · ①悬殊</div></div><div class="glass"><div class="sech"><span class="sech-ic"><span class="material-symbols-outlined">emoji_events</span></span><span class="sech-t">竞猜推荐 vs 实际</span></div><table class="rectab"><tr><td class="rt-l">胜负倾向</td><td class="rt-m">西班牙 胜(让球)</td><td class="rt-r no">✗</td></tr><tr><td class="rt-l">推荐比分</td><td class="rt-m">2 : 0 / 1 : 0</td><td class="rt-r no">✗</td></tr><tr><td class="rt-l">实际结果</td><td class="rt-m"><b>平局 · 0 : 0</b></td><td class="rt-r"></td></tr></table><div class="vs-note">价值逻辑:砍屠杀 / 小球 / 弱队受让(顺此产出推荐);胜负为主、2 个比分供参考。</div></div><div class="glass"><div class="sech"><span class="sech-ic"><span class="material-symbols-outlined">grid_view</span></span><span class="sech-t">模型推测比分分布 Top 6</span></div><div class="scg"><div class="scg-cell hot"><div class="scg-s">2 - 0</div><div class="scg-p">20.8%</div></div><div class="scg-cell"><div class="scg-s">1 - 0</div><div class="scg-p">17.6%</div></div><div class="scg-cell"><div class="scg-s">3 - 0</div><div class="scg-p">16.4%</div></div><div class="scg-cell"><div class="scg-s">4 - 0</div><div class="scg-p">9.7%</div></div><div class="scg-cell"><div class="scg-s">0 - 0</div><div class="scg-p">7.4%</div></div><div class="scg-cell"><div class="scg-s">2 - 1</div><div class="scg-p">4.9%</div></div></div><div class="xg"><span class="xg-badge">xG</span><span class="xg-l">预期进球</span><span class="xg-v">主 <b style="color:#CCFF00">2.37</b> / 客 <b style="color:#FF0055">0.23</b></span></div></div><div class="glass"><div class="sech"><span class="sech-ic"><span class="material-symbols-outlined">balance</span></span><span class="sech-t">赛前市场预期(锐庄去水位)</span></div><div class="tp-pct"><span style="color:#CCFF00">西班牙 91%</span><span style="color:#8e9379">平 7%</span><span style="color:#FF0055">佛得角 3%</span></div><div class="tp-bar"><i style="flex:91;background:#CCFF00"></i><i style="flex:7;background:#3f465c"></i><i style="flex:3;background:#FF0055"></i></div><div class="vs-note">这是赛前市场对该场的真实定价(去水位);模型据此反推价值方向,再与实际赛果对账。</div></div><div class="foot">价值≠会赢、看长期;赛前去水位自动判定方向,逐场仅供参考</div></main></body></html>
