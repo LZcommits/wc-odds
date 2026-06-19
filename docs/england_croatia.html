@@ -467,7 +467,7 @@ function renderModal(){
     +'\n--- 合并赔率 @'+combOdds.toFixed(2)+' | 命中率≈'+pctStr+' | EV '+ev.toFixed(2);
   var safeTxt=txt.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n');
   var actions='<div class="pm-actions">'
-    +'<button class="pm-btn primary" onclick="(navigator.clipboard?navigator.clipboard.writeText(\''+safeTxt+'\').then(function(){alert(\'已复制')}):alert(\'浏览器不支持\'))">复制分析</button>'
+    +'<button class="pm-btn primary" onclick="(navigator.clipboard?navigator.clipboard.writeText(\''+safeTxt+'\').then(function(){alert(\'已复制\')}):alert(\'浏览器不支持\'))">复制分析</button>'
     +'<button class="pm-btn ghost" onclick="parlayClear()">清空全部</button>'
     +'</div>';
   modal.innerHTML='<div class="pm-head"><span class="pm-title">串关分析 ('+d.length+'腿)</span>'+closeBtn+'</div>'
