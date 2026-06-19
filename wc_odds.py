@@ -2003,10 +2003,7 @@ def rec_card_block(grades, slug, is_past=False, past_hits=None):
                       f'<div class="rec-act">{act}</div>'
                       f'</div>')
     return (f'<div class="rec-card">'
-            f'<div class="rec-card-head">'
-            f'<span class="material-symbols-outlined" style="color:var(--lime);font-size:17px">bolt</span>'
-            f'<span class="rch-title">本场推荐</span>'
-            f'</div>'
+            f'<div class="rec-card-head">{sec_head("bolt","本场推荐")}</div>'
             f'{rows_html}'
             f'</div>')
 
