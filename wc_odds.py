@@ -2373,12 +2373,9 @@ def build_stats_block(past):
         f'<div class="stat-cell"><div class="stat-val">{sc_rate*100:.0f}%</div><div class="stat-lbl">比分命中</div><div class="stat-sub">{sc_hits}/{n}场</div></div>'
         f'<div class="stat-cell"><div class="stat-val">{tot_rate*100:.0f}%</div><div class="stat-lbl">大小球命中</div><div class="stat-sub">{tot_correct}/{tot_n}场</div></div>'
     )
-    roi_row = (f'<div class="stat-sub" style="text-align:center;font-size:13px;font-weight:700;color:{roi_col};margin-top:6px">'
-               f'综合 ROI {roi_sign}{roi:.1f}%  ·  {n}场样本  ·  基于策略B(均势区)</div>')
     return (f'<div class="glass" style="margin-bottom:14px">'
             f'{sec_head("emoji_events","AI推演战绩")}'
             f'<div class="stats-grid">{cells}</div>'
-            f'{roi_row}'
             f'</div>')
 
 
@@ -2429,7 +2426,7 @@ def build_index(items):
           'if(t)setTimeout(function(){t.scrollIntoView({block:"start"});},80);})();</script>')
     bt = crowd_backtest_block()
     body = (f'<main>'
-            f'<div style="height:12px"></div>{stats_html}{track}{filt}{tl}{bt}'
+            f'<div style="height:12px"></div>{stats_html}{filt}{tl}{bt}'
             f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{js}{PARLAY_JS}')
     open(os.path.join(DOCS, 'index.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赔率追踪")}</head><body>{body}</body></html>')
 
