@@ -340,58 +340,21 @@ a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
 .pr-add-btn{width:100%;margin-top:10px;padding:12px;background:var(--lime);color:var(--navy);font-weight:800;font-size:13px;border:none;border-radius:8px;cursor:pointer}
 .pr-add-btn:active{opacity:.8}
 .pr-empty{text-align:center;color:var(--sec);font-size:13px;padding:16px 0;opacity:.6}
-.rec-row{display:grid;grid-template-columns:72px 1fr auto auto;align-items:center;border-bottom:1px solid rgba(255,255,255,.05);min-height:56px}
+.rec-row{display:grid;grid-template-columns:72px 1fr 96px auto;align-items:center;border-bottom:1px solid rgba(255,255,255,.05);min-height:56px}
 .rec-row:last-child{border-bottom:none}
 .rec-type{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--sec);letter-spacing:.03em;border-right:1px solid rgba(255,255,255,.06);padding:12px 6px;align-self:stretch;text-align:center;line-height:1.4}
-.rec-body{padding:10px 10px;min-width:0}
-.rec-pick{font-size:14px;font-weight:700;color:var(--on);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rec-meta{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--sec);line-height:1.5;opacity:.8}
-.rec-badge{padding:0 8px;display:flex;align-items:center;justify-content:center;min-width:52px}
+.rec-pick{padding:10px 10px;font-size:14px;font-weight:700;color:var(--on);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.rec-meta{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--sec);line-height:1.7;opacity:.8;padding:8px 6px 8px 0;border-left:1px solid rgba(255,255,255,.06)}
+.rec-badge{padding:0 10px;display:flex;align-items:center;justify-content:center;min-width:52px}
 .badge-s{font-size:11px;font-weight:800;color:var(--lime);white-space:nowrap}
 .badge-o{font-size:11px;font-weight:700;color:#f0c040;white-space:nowrap}
 .badge-x{font-size:11px;color:var(--sec);opacity:.35;white-space:nowrap}
-.rec-act{padding:0 10px 0 4px;display:flex;align-items:center}
-.rec-btn{background:rgba(204,255,0,.1);border:1px solid rgba(204,255,0,.3);color:var(--lime);font-size:11px;font-weight:700;border-radius:5px;padding:5px 10px;cursor:pointer;white-space:nowrap;transition:background .15s;font-family:'JetBrains Mono',monospace}
-.rec-btn:active{background:rgba(204,255,0,.25)}
-.rec-btn.in-parlay{background:rgba(204,255,0,.22);border-color:var(--lime)}
 .rec-hit{font-size:20px;font-weight:900;line-height:1}
 .rec-hit.ok{color:var(--lime)}
 .rec-hit.no{color:var(--crim);opacity:.7}
-/* ── 串关弹窗 ── */
-#parlay-fab{position:fixed;bottom:20px;right:14px;z-index:200;background:var(--lime);color:var(--navy);border-radius:24px;padding:9px 14px;font-weight:800;font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;box-shadow:0 4px 18px rgba(204,255,0,.4);transition:transform .15s;border:none}
-#parlay-fab:active{transform:scale(.94)}
-#parlay-fab.hidden{display:none}
-#parlay-fab .p-cnt{background:var(--navy);color:var(--lime);border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900}
-#parlay-overlay{position:fixed;inset:0;z-index:400;background:rgba(2,6,23,.7);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center}
-#parlay-overlay.open{display:flex}
-#parlay-modal{width:100%;max-width:520px;background:var(--low);border-top:2px solid var(--lime);border-radius:18px 18px 0 0;padding:18px 16px 36px;max-height:88vh;overflow-y:auto;animation:slideUp .25s ease}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.pm-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.pm-title{font-size:16px;font-weight:800;color:var(--lime);display:flex;align-items:center;gap:6px}
-.pm-close{color:var(--sec);cursor:pointer;font-size:24px;line-height:1;background:none;border:none}
-.pm-leg{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
-.pm-del{color:var(--sec);cursor:pointer;opacity:.55;font-size:18px;flex-shrink:0;background:none;border:none;line-height:1}
-.pm-info{flex:1;min-width:0}
-.pm-match{font-size:11px;color:var(--sec);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pm-bet{font-size:13px;font-weight:700;color:var(--on)}
-.pm-od{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--lime);font-weight:700;flex-shrink:0}
-.pm-stats{background:rgba(204,255,0,.06);border:1px solid rgba(204,255,0,.18);border-radius:8px;padding:12px;margin-top:12px}
-.pm-stat{display:flex;justify-content:space-between;font-size:12px;font-family:'JetBrains Mono',monospace;padding:3px 0;color:var(--sec)}
-.pm-stat b{color:var(--on)}
-.pm-stat.ev-ok b{color:var(--lime)}
-.pm-stat.ev-no b{color:var(--crim)}
-.pm-verdict{margin-top:10px;padding:10px 12px;border-radius:7px;font-size:13px;font-weight:700;text-align:center}
-.pm-verdict.v-ok{background:rgba(204,255,0,.1);color:var(--lime);border:1px solid rgba(204,255,0,.25)}
-.pm-verdict.v-no{background:rgba(255,0,85,.08);color:var(--crim);border:1px solid rgba(255,0,85,.2)}
-.pm-verdict.v-mid{background:rgba(255,255,255,.05);color:var(--sec);border:1px solid var(--line)}
-.pm-actions{display:flex;gap:8px;margin-top:12px}
-.pm-btn{flex:1;padding:11px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;border:none;text-align:center}
-.pm-btn.primary{background:var(--lime);color:var(--navy)}
-.pm-btn.ghost{background:rgba(255,255,255,.07);color:var(--sec)}
-.pm-empty{text-align:center;color:var(--sec);font-size:13px;padding:24px 0;opacity:.55}
 /* ── 首页战绩统计 ── */
 .stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px}
 .stat-cell{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;padding:10px 8px;text-align:center}
 .stat-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--lime)}
 .stat-lbl{font-size:10px;color:var(--sec);margin-top:3px;letter-spacing:.03em}
-.stat-sub{font-size:10px;color:var(--sec);opacity:.55;text-align:center;margin-top:2px;font-family:'JetBrains Mono',monospace}</style></head><body><main><a class="back" href="list.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a><div style="height:12px"></div><div class="vshead"><div class="vsrow"><div class="vsteam"><span class="flag-xl">🇭🇹</span><div class="tn">海地</div></div><div class="vsmid"><div class="kot" style="font-size:32px;letter-spacing:.06em">0 <small style="font-size:18px;opacity:.5">-</small> 1</div><div class="kol">苏格兰 胜</div><div style="margin-top:6px"><span class="pres no">✗ 未中</span></div><div class="kol" style="margin-top:6px">6/14 09:00(北京) · 已结束</div></div><div class="vsteam"><span class="flag-xl">🏴󠁧󠁢󠁳󠁣󠁴󠁿</span><div class="tn">苏格兰</div></div></div></div><div class="rec-card"><div class="rec-card-head"><div class="sech"><span class="sech-ic"><span class="material-symbols-outlined">bolt</span></span><span class="sech-t">AI推荐</span></div></div><div class="rec-row"><div class="rec-type">胜平负</div><div class="rec-body"><div class="rec-pick">平 或 海地(双重机会)</div><div class="rec-meta">赔率：4.84<br>市场预估21%<br>模型预估21%</div></div><div class="rec-badge"><span class="badge-o">推荐</span></div><div class="rec-act"><span class="rec-hit no">✗</span></div></div><div class="rec-row"><div class="rec-type">比分1</div><div class="rec-body"><div class="rec-pick">1:1</div><div class="rec-meta">赔率：9.52<br>市场预估10%<br>模型预估10.5%</div></div><div class="rec-badge"><span class="badge-o">推荐</span></div><div class="rec-act"><span class="rec-hit no">✗</span></div></div><div class="rec-row"><div class="rec-type">比分2</div><div class="rec-body"><div class="rec-pick">0:0</div><div class="rec-meta">赔率：13.46<br>市场预估7%<br>模型预估7.4%</div></div><div class="rec-badge"><span class="badge-o">推荐</span></div><div class="rec-act"><span class="rec-hit no">✗</span></div></div><div class="rec-row"><div class="rec-type">进球数</div><div class="rec-body"><div class="rec-pick">大球 ≥3</div><div class="rec-meta">赔率：2.13<br>市场预估47%<br>模型预估47%</div></div><div class="rec-badge"><span class="badge-o">推荐</span></div><div class="rec-act"><span class="rec-hit no">✗</span></div></div></div><div class="foot">仅供研究 · 非投注建议</div></main></body></html>
+.stat-sub{font-size:10px;color:var(--sec);opacity:.55;text-align:center;margin-top:2px;font-family:'JetBrains Mono',monospace}</style></head><body><main><a class="back" href="list.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a><div style="height:12px"></div><div class="vshead"><div class="vsrow"><div class="vsteam"><span class="flag-xl">🇭🇹</span><div class="tn">海地</div></div><div class="vsmid"><div class="kot" style="font-size:32px;letter-spacing:.06em">0 <small style="font-size:18px;opacity:.5">-</small> 1</div><div class="kol">苏格兰 胜</div><div style="margin-top:6px"><span class="pres no">✗ 未中</span></div><div class="kol" style="margin-top:6px">6/14 09:00(北京) · 已结束</div></div><div class="vsteam"><span class="flag-xl">🏴󠁧󠁢󠁳󠁣󠁴󠁿</span><div class="tn">苏格兰</div></div></div></div><div class="rec-card"><div class="rec-card-head"><div class="sech"><span class="sech-ic"><span class="material-symbols-outlined">bolt</span></span><span class="sech-t">AI推荐</span></div></div><div class="rec-row"><div class="rec-type">胜平负</div><div class="rec-pick">平 或 海地(双重机会)</div><div class="rec-meta">赔率：4.84<br>市场预估21%<br>模型预估21%</div><div class="rec-badge"><span class="badge-o">推荐</span> <span class="rec-hit no">✗</span></div></div><div class="rec-row"><div class="rec-type">比分1</div><div class="rec-pick">1:1</div><div class="rec-meta">赔率：9.52<br>市场预估10%<br>模型预估10.5%</div><div class="rec-badge"><span class="badge-o">推荐</span> <span class="rec-hit no">✗</span></div></div><div class="rec-row"><div class="rec-type">比分2</div><div class="rec-pick">0:0</div><div class="rec-meta">赔率：13.46<br>市场预估7%<br>模型预估7.4%</div><div class="rec-badge"><span class="badge-o">推荐</span> <span class="rec-hit no">✗</span></div></div><div class="rec-row"><div class="rec-type">进球数</div><div class="rec-pick">大球 ≥3</div><div class="rec-meta">赔率：2.13<br>市场预估47%<br>模型预估47%</div><div class="rec-badge"><span class="badge-o">推荐</span> <span class="rec-hit no">✗</span></div></div></div><div class="foot">仅供研究 · 非投注建议</div></main></body></html>

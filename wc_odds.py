@@ -946,55 +946,18 @@ a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
 .pr-add-btn{width:100%;margin-top:10px;padding:12px;background:var(--lime);color:var(--navy);font-weight:800;font-size:13px;border:none;border-radius:8px;cursor:pointer}
 .pr-add-btn:active{opacity:.8}
 .pr-empty{text-align:center;color:var(--sec);font-size:13px;padding:16px 0;opacity:.6}
-.rec-row{display:grid;grid-template-columns:72px 1fr auto auto;align-items:center;border-bottom:1px solid rgba(255,255,255,.05);min-height:56px}
+.rec-row{display:grid;grid-template-columns:72px 1fr 96px auto;align-items:center;border-bottom:1px solid rgba(255,255,255,.05);min-height:56px}
 .rec-row:last-child{border-bottom:none}
 .rec-type{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--sec);letter-spacing:.03em;border-right:1px solid rgba(255,255,255,.06);padding:12px 6px;align-self:stretch;text-align:center;line-height:1.4}
-.rec-body{padding:10px 10px;min-width:0}
-.rec-pick{font-size:14px;font-weight:700;color:var(--on);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rec-meta{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--sec);line-height:1.5;opacity:.8}
-.rec-badge{padding:0 8px;display:flex;align-items:center;justify-content:center;min-width:52px}
+.rec-pick{padding:10px 10px;font-size:14px;font-weight:700;color:var(--on);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.rec-meta{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--sec);line-height:1.7;opacity:.8;padding:8px 6px 8px 0;border-left:1px solid rgba(255,255,255,.06)}
+.rec-badge{padding:0 10px;display:flex;align-items:center;justify-content:center;min-width:52px}
 .badge-s{font-size:11px;font-weight:800;color:var(--lime);white-space:nowrap}
 .badge-o{font-size:11px;font-weight:700;color:#f0c040;white-space:nowrap}
 .badge-x{font-size:11px;color:var(--sec);opacity:.35;white-space:nowrap}
-.rec-act{padding:0 10px 0 4px;display:flex;align-items:center}
-.rec-btn{background:rgba(204,255,0,.1);border:1px solid rgba(204,255,0,.3);color:var(--lime);font-size:11px;font-weight:700;border-radius:5px;padding:5px 10px;cursor:pointer;white-space:nowrap;transition:background .15s;font-family:'JetBrains Mono',monospace}
-.rec-btn:active{background:rgba(204,255,0,.25)}
-.rec-btn.in-parlay{background:rgba(204,255,0,.22);border-color:var(--lime)}
 .rec-hit{font-size:20px;font-weight:900;line-height:1}
 .rec-hit.ok{color:var(--lime)}
 .rec-hit.no{color:var(--crim);opacity:.7}
-/* ── 串关弹窗 ── */
-#parlay-fab{position:fixed;bottom:20px;right:14px;z-index:200;background:var(--lime);color:var(--navy);border-radius:24px;padding:9px 14px;font-weight:800;font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;box-shadow:0 4px 18px rgba(204,255,0,.4);transition:transform .15s;border:none}
-#parlay-fab:active{transform:scale(.94)}
-#parlay-fab.hidden{display:none}
-#parlay-fab .p-cnt{background:var(--navy);color:var(--lime);border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900}
-#parlay-overlay{position:fixed;inset:0;z-index:400;background:rgba(2,6,23,.7);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center}
-#parlay-overlay.open{display:flex}
-#parlay-modal{width:100%;max-width:520px;background:var(--low);border-top:2px solid var(--lime);border-radius:18px 18px 0 0;padding:18px 16px 36px;max-height:88vh;overflow-y:auto;animation:slideUp .25s ease}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.pm-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.pm-title{font-size:16px;font-weight:800;color:var(--lime);display:flex;align-items:center;gap:6px}
-.pm-close{color:var(--sec);cursor:pointer;font-size:24px;line-height:1;background:none;border:none}
-.pm-leg{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
-.pm-del{color:var(--sec);cursor:pointer;opacity:.55;font-size:18px;flex-shrink:0;background:none;border:none;line-height:1}
-.pm-info{flex:1;min-width:0}
-.pm-match{font-size:11px;color:var(--sec);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pm-bet{font-size:13px;font-weight:700;color:var(--on)}
-.pm-od{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--lime);font-weight:700;flex-shrink:0}
-.pm-stats{background:rgba(204,255,0,.06);border:1px solid rgba(204,255,0,.18);border-radius:8px;padding:12px;margin-top:12px}
-.pm-stat{display:flex;justify-content:space-between;font-size:12px;font-family:'JetBrains Mono',monospace;padding:3px 0;color:var(--sec)}
-.pm-stat b{color:var(--on)}
-.pm-stat.ev-ok b{color:var(--lime)}
-.pm-stat.ev-no b{color:var(--crim)}
-.pm-verdict{margin-top:10px;padding:10px 12px;border-radius:7px;font-size:13px;font-weight:700;text-align:center}
-.pm-verdict.v-ok{background:rgba(204,255,0,.1);color:var(--lime);border:1px solid rgba(204,255,0,.25)}
-.pm-verdict.v-no{background:rgba(255,0,85,.08);color:var(--crim);border:1px solid rgba(255,0,85,.2)}
-.pm-verdict.v-mid{background:rgba(255,255,255,.05);color:var(--sec);border:1px solid var(--line)}
-.pm-actions{display:flex;gap:8px;margin-top:12px}
-.pm-btn{flex:1;padding:11px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;border:none;text-align:center}
-.pm-btn.primary{background:var(--lime);color:var(--navy)}
-.pm-btn.ghost{background:rgba(255,255,255,.07);color:var(--sec)}
-.pm-empty{text-align:center;color:var(--sec);font-size:13px;padding:24px 0;opacity:.55}
 /* ── 首页战绩统计 ── */
 .stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px}
 .stat-cell{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;padding:10px 8px;text-align:center}
@@ -2053,32 +2016,18 @@ def rec_card_block(grades, slug, is_past=False, past_hits=None):
         grade = g.get('grade', 'X')
         pick  = g.get('pick', '—')
         meta  = g.get('meta', '')
-        odds  = g.get('odds', 0)
         badge = BADGE.get(grade, '')
         if is_past:
             hit = past_hits.get(key)
-            if hit is True:    act = '<span class="rec-hit ok">✓</span>'
-            elif hit is False: act = '<span class="rec-hit no">✗</span>'
-            else:              act = '<span class="rec-hit" style="opacity:.25">—</span>'
-        else:
-            if odds > 0:
-                item_raw = json.dumps({'id': f'{slug}_{key}', 'match': g.get('match',''),
-                                      'bet_label': g.get('bet_label',''), 'odds': odds,
-                                      'prob': g.get('my_pct', 5) / 100, 'grade': grade},
-                                     ensure_ascii=False)
-                item_esc = _html.escape(item_raw, quote=True)
-                act = (f'<button class="rec-btn" id="pbtn_{slug}_{key}" '
-                       f'onclick="parlayAdd({item_esc},this)">串关</button>')
-            else:
-                act = '<span style="opacity:.2;font-size:12px;color:var(--sec)">—</span>'
+            if hit is True:    hit_tag = '<span class="rec-hit ok">✓</span>'
+            elif hit is False: hit_tag = '<span class="rec-hit no">✗</span>'
+            else:              hit_tag = ''
+            badge = f'{badge} {hit_tag}'
         return (f'<div class="rec-row">'
                 f'<div class="rec-type">{label}</div>'
-                f'<div class="rec-body">'
                 f'<div class="rec-pick">{pick}</div>'
                 f'<div class="rec-meta">{meta}</div>'
-                f'</div>'
                 f'<div class="rec-badge">{badge}</div>'
-                f'<div class="rec-act">{act}</div>'
                 f'</div>')
 
     # ── AI推荐卡 ──────────────────────────────────────
@@ -2104,128 +2053,7 @@ def rec_card_block(grades, slug, is_past=False, past_hits=None):
     return ai_card + deep_card
 
 
-PARLAY_JS = r"""
-<script>
-(function(){
-var KEY='parlay_v1';
-function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
-function save(d){localStorage.setItem(KEY,JSON.stringify(d))}
-
-function syncFab(){
-  var d=load(),fab=document.getElementById('parlay-fab');
-  if(!fab)return;
-  if(d.length===0){fab.classList.add('hidden');}
-  else{fab.classList.remove('hidden');fab.querySelector('.p-cnt').textContent=d.length;}
-}
-function syncBtns(){
-  var ids=load().map(function(x){return x.id});
-  document.querySelectorAll('.rec-btn[id^="pbtn_"]').forEach(function(b){
-    var m=b.id.replace('pbtn_','');
-    if(ids.indexOf(m)>=0){b.textContent='已选 ✓';b.classList.add('in-parlay');}
-    else{b.textContent='串关';b.classList.remove('in-parlay');}
-  });
-}
-function openModal(){
-  var ov=document.getElementById('parlay-overlay');
-  if(ov){ov.classList.add('open');renderModal();}
-}
-function closeModal(){
-  var ov=document.getElementById('parlay-overlay');
-  if(ov)ov.classList.remove('open');
-}
-
-window.parlayAdd=function(item,btn){
-  var d=load();
-  var idx=d.findIndex(function(x){return x.id===item.id});
-  if(idx>=0){
-    d.splice(idx,1);
-    if(btn){btn.textContent='串关';btn.classList.remove('in-parlay');}
-  } else {
-    d.push(item);
-    if(btn){btn.textContent='已选 ✓';btn.classList.add('in-parlay');}
-  }
-  save(d);syncFab();openModal();
-};
-window.parlayAddAll=function(items){
-  var d=load();
-  items.forEach(function(item){
-    if(d.findIndex(function(x){return x.id===item.id})<0) d.push(item);
-  });
-  save(d);syncFab();syncBtns();openModal();
-};
-window.parlayRemove=function(id){
-  save(load().filter(function(x){return x.id!==id}));
-  syncFab();syncBtns();renderModal();
-};
-window.parlayClear=function(){
-  save([]);syncFab();syncBtns();renderModal();
-};
-
-function renderModal(){
-  var modal=document.getElementById('parlay-modal');
-  if(!modal)return;
-  var d=load();
-  var closeBtn='<button class="pm-close" onclick="closeModal()">✕</button>';
-  if(d.length===0){
-    modal.innerHTML='<div class="pm-head"><span class="pm-title">串关分析</span>'+closeBtn+'</div>'
-      +'<div class="pm-empty">还没有选注<br><small>在推荐卡片点「串关」加入</small></div>';
-    return;
-  }
-  var legs=''; var combOdds=1.0; var combProb=1.0;
-  d.forEach(function(x){
-    combOdds*=x.odds; combProb*=x.prob;
-    var gradeTag=x.grade==='S'?'<span class="badge-s" style="font-size:9px">强推荐</span>':
-                 x.grade==='O'?'<span class="badge-o" style="font-size:9px">推荐</span>':'';
-    legs+='<div class="pm-leg">'
-      +'<button class="pm-del" onclick="parlayRemove(\''+x.id+'\')">✕</button>'
-      +'<div class="pm-info"><div class="pm-match">'+x.match+'</div>'
-      +'<div class="pm-bet">'+x.bet_label+' '+gradeTag+'</div></div>'
-      +'<span class="pm-od">@'+x.odds.toFixed(2)+'</span>'
-      +'</div>';
-  });
-  var ev=combProb*combOdds;
-  var pct=combProb*100; var pctStr=pct<1?pct.toFixed(2)+'%':pct.toFixed(1)+'%';
-  var evOk=ev>=1.05; var evBad=ev<0.90;
-  var evCls=evOk?'ev-ok':evBad?'ev-no':'';
-  var verdict=evOk?'<div class="pm-verdict v-ok">期望值正向，值得考虑 ✓</div>'
-              :evBad?'<div class="pm-verdict v-no">期望值偏低，建议减腿 ✗</div>'
-              :'<div class="pm-verdict v-mid">期望值接近平衡，谨慎参考</div>';
-  var stats='<div class="pm-stats">'
-    +'<div class="pm-stat"><span>'+d.length+'腿串关</span><b>合并赔率 @'+combOdds.toFixed(2)+'</b></div>'
-    +'<div class="pm-stat"><span>命中概率</span><b>≈'+pctStr+'</b></div>'
-    +'<div class="pm-stat '+evCls+'"><span>期望值 EV</span><b>'+ev.toFixed(2)+(ev>=1.0?' ✓':' ✗')+'</b></div>'
-    +'</div>'+verdict;
-  var txt=d.map(function(x){return x.match+' · '+x.bet_label+' @'+x.odds.toFixed(2)}).join('\n')
-    +'\n--- 合并赔率 @'+combOdds.toFixed(2)+' | 命中率≈'+pctStr+' | EV '+ev.toFixed(2);
-  var safeTxt=txt.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n');
-  var actions='<div class="pm-actions">'
-    +'<button class="pm-btn primary" onclick="(navigator.clipboard?navigator.clipboard.writeText(\''+safeTxt+'\').then(function(){alert(\'已复制\')}):alert(\'浏览器不支持\'))">复制分析</button>'
-    +'<button class="pm-btn ghost" onclick="parlayClear()">清空全部</button>'
-    +'</div>';
-  modal.innerHTML='<div class="pm-head"><span class="pm-title">串关分析 ('+d.length+'腿)</span>'+closeBtn+'</div>'
-    +legs+stats+actions;
-}
-
-document.addEventListener('DOMContentLoaded',function(){
-  // 注入 FAB
-  var fab=document.createElement('button');
-  fab.id='parlay-fab';fab.className='hidden';
-  fab.innerHTML='<span class="material-symbols-outlined" style="font-size:16px">casino</span>串关篮子 <span class="p-cnt">0</span>';
-  fab.onclick=openModal;
-  document.body.appendChild(fab);
-  // 注入弹窗遮罩
-  var ov=document.createElement('div');ov.id='parlay-overlay';
-  ov.onclick=function(e){if(e.target===ov)closeModal();};
-  var modal=document.createElement('div');modal.id='parlay-modal';
-  ov.appendChild(modal);document.body.appendChild(ov);
-  // 初始化
-  syncFab();syncBtns();
-  // 关闭弹窗快捷键
-  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
-});
-})();
-</script>
-"""
+PARLAY_JS = ''  # 串关弹窗已移除
 
 def goals_block(rich, my, grid):
     """进球推荐：大小球 2.5 + BTTS + xG 预期。"""
@@ -2674,17 +2502,13 @@ def build_recommended_parlay(items):
             f'</div>'
         )
 
-    arr_esc = _html.escape('[' + ','.join(raw_items) + ']', quote=True)
-    add_btn = f'<button class="pr-add-btn" onclick="parlayAddAll({arr_esc})">一键加入串关篮</button>'
-
     return (f'<div class="glass parlay-rec">{hdr}'
             f'{legs_html}'
             f'<div class="pr-summary">'
             f'<span>合并赔率 <b>@{best["odds"]:.2f}</b></span>'
             f'<span>命中率 <b>≈{best["prob"]*100:.1f}%</b></span>'
             f'<span>合并EV <b>{best["ev"]:.2f}</b></span>'
-            f'</div>'
-            f'{add_btn}</div>')
+            f'</div></div>')
 
 
 def build_index(items):
