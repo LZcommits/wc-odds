@@ -662,7 +662,7 @@ tr.bad td{background:rgba(255,0,85,.09)}
 .sech-ic .material-symbols-outlined{font-size:18px}
 .sech-t{font-size:17px;font-weight:800;letter-spacing:-.01em}
 .sech-sub{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--sec);opacity:.6}
-.vshead{position:relative}
+.vshead{position:relative;padding-bottom:20px;margin-bottom:4px}
 .hotpick{position:absolute;top:0;right:0;display:flex;align-items:center;gap:3px;background:var(--lime);color:var(--navy);font-weight:800;font-size:12px;padding:4px 10px;border-radius:6px;box-shadow:0 0 14px rgba(204,255,0,.4)}
 .vsrow{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin:6px 0 2px}
 .vsteam{display:flex;flex-direction:column;align-items:center;gap:6px;width:84px}
@@ -2205,7 +2205,7 @@ def goals_block(rich, my, grid):
     return f'<div class="glass">{sec_head("sports_score","进球推荐")}{rows}</div>'
 
 def build_detail(cfg, rows, rich):
-    l = L(cfg); title = f'{cfg["cn_h"]} vs {cfg["cn_a"]}'; script = ''
+    l = L(cfg); title = f'{cfg["cn_h"]} VS {cfg["cn_a"]}'; script = ''
     if not rows:
         inner = '<div class="glass"><p class="note">暂无数据(比赛可能已开赛或尚未采样)</p></div>'; sub = cfg['tier']
     else:
@@ -2230,7 +2230,7 @@ def build_detail(cfg, rows, rich):
             f'<a class="back" href="list.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
             f'<div style="height:12px"></div>{inner}'
             f'<div class="foot">自动每 1h 更新 · 仅供研究,非投注建议</div></main>{script}{PARLAY_JS}')
-    open(os.path.join(DOCS, cfg['slug']+'.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title)}</head><body>{body}</body></html>')
+    open(os.path.join(DOCS, cfg['slug']+'.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title,raw_title=True)}</head><body>{body}</body></html>')
 
 def sec_h(t, c=''):
     return f'<div class="sec-h"><span class="t">{t}</span><span class="c">{c}</span></div>'
@@ -2326,7 +2326,7 @@ def build_past_detail(p, items_map=None):
         past_hits[f'crowd_score{i+1}'] = (actual_sc == cp['score'])
     rec_html = rec_card_block(grades_past, f'p{fid}', is_past=True, past_hits=past_hits)
 
-    title = f'{cnh} vs {cna}'
+    title = f'{cnh} VS {cna}'
     # ── 比分 header（与未开始 header 相同结构，倒计时换成比分）─────
     okw = p.get('wdl_hit')
     wdl_badge = '<span class="pres ok">✓ 命中</span>' if okw else '<span class="pres no">✗ 未中</span>'
@@ -2370,7 +2370,7 @@ def build_past_detail(p, items_map=None):
             f'<div style="height:12px"></div>{inner}'
             f'<div class="foot">仅供研究 · 非投注建议</div></main>')
     open(os.path.join(DOCS, f'past_{fid}.html'), 'w').write(
-        f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title)}</head><body>{body}</body></html>')
+        f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title,raw_title=True)}</head><body>{body}</body></html>')
 
 FID2SLUG = {v: k for k, v in AFID.items()}
 def fetch_upcoming(hours=72, limit=6):
@@ -2614,7 +2614,7 @@ def build_index(items):
     list_body = (f'<main>{back_home}<div style="height:4px"></div>{filt}{tl}'
                  f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{PARLAY_JS}{scroll_to_cur}')
     open(os.path.join(DOCS, 'list.html'), 'w').write(
-        f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("赛程 · 世界杯")}</head><body>{list_body}</body></html>')
+        f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赛程",raw_title=True)}</head><body>{list_body}</body></html>')
 
 items = []
 for cfg in MATCHES:
