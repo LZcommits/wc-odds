@@ -1865,13 +1865,58 @@ def wdl_rec_block(rows, cfg, slug=''):
              f'{grid_rows}</div>')
     return f'<div class="glass">{sec_head("how_to_vote","胜平负推荐")}{inner}</div>'
 
+def _crowd_picks(slug, grid, mn, cnh, cna):
+    """返回大众胜平负 + 大众比分推荐列表（供 grade_bets 和 build_past_detail 共用）。"""
+    cd = CROWD_DATA.get(slug)
+    if not cd: return None, []
+    label = {'home': cnh, 'draw': '平局', 'away': cna}
+    total_v = sum(v for _, v in cd['top'])
+    scored_n = cd.get('scored', total_v) or 1
+    # 大众胜平负
+    wdl_v = {'home': 0, 'draw': 0, 'away': 0}
+    for s, v in cd['top']:
+        h, a = map(int, s.split('-'))
+        if h > a: wdl_v['home'] += v
+        elif h == a: wdl_v['draw'] += v
+        else: wdl_v['away'] += v
+    cwd = max(wdl_v, key=wdl_v.get)
+    cwd_pct = round(wdl_v[cwd] / max(sum(wdl_v.values()), 1) * 100)
+    crowd_wdl = {
+        'grade': 'O', 'pick': label[cwd], 'outcome': cwd,
+        'odds': 0, 'mkt_pct': 0, 'my_pct': cwd_pct,
+        'meta': f'大众投票 {cwd_pct}% · 共{total_v}票',
+        'bet_label': label[cwd], 'match': mn,
+    }
+    # 大众比分推荐（价差比 ≥ 1.5，最多3个）
+    slug_odds = CROWD_SCORE_ODDS.get(slug, {})
+    cands = []
+    for s, votes in cd['top']:
+        od = slug_odds.get(s)
+        vote_share = votes / scored_n
+        implied = (1 / od) if od else 0
+        ratio = vote_share / implied if implied else 0
+        if ratio < 1.5: continue
+        mkt_pct = round(100 / od) if od else 0
+        vote_pct = round(vote_share * 100, 1)
+        grade = 'S' if ratio >= 2.0 else 'O'
+        cands.append({
+            'grade': grade, 'score': s, 'pick': s.replace('-', ':'),
+            'odds': od or 0, 'mkt_pct': mkt_pct, 'my_pct': vote_pct,
+            'meta': (f'赔率 @{od} · 市场预估{mkt_pct}% · 大众票选{vote_pct}%'
+                     if od else f'大众票选{vote_pct}% · 暂无赔率'),
+            'bet_label': f'比分 {s.replace("-",":")}'  , 'match': mn, 'ratio': ratio,
+        })
+    cands.sort(key=lambda x: -x['ratio'])
+    return crowd_wdl, cands[:3]
+
+
 def grade_bets(cfg, rows, rich, grid):
-    """对每场比赛评级，返回 wdl/score1/score2/goals 四项。"""
+    """对每场比赛评级：赔率胜平负/大众胜平负/赔率比分×3/大众比分×3/进球数。"""
     slug = cfg['slug']; my = cfg['my']
     mn = f'{cfg["cn_h"]} vs {cfg["cn_a"]}'
-    result = {'wdl': None, 'score1': None, 'score2': None, 'goals': None}
+    result = {}
 
-    # ── 1. 胜平负 ─────────────────────────────────────────────────
+    # ── 1. 赔率推测胜平负 ────────────────────────────────────────
     if rows:
         p = rows[-1].get('pin_h2h')
         if p:
@@ -1879,8 +1924,7 @@ def grade_bets(cfg, rows, rich, grid):
             best_k = max(evs, key=evs.get)
             fav_k = min(p, key=p.get); fav_od = p[fav_k]
             label = {'home': cfg['cn_h'], 'draw': '平局', 'away': cfg['cn_a']}
-            if fav_od < 1.5 and best_k == fav_k:
-                best_k = 'draw'
+            if fav_od < 1.5 and best_k == fav_k: best_k = 'draw'
             od = p[best_k]; ev = evs[best_k]
             mkt_pct = round(100/od); my_pct = round(my[best_k]*100)
             drift_warn = ''
@@ -1900,33 +1944,31 @@ def grade_bets(cfg, rows, rich, grid):
                 'bet_label': label[best_k], 'match': mn, 'ev': round(ev, 2),
             }
 
-    # ── 2. 比分 TOP2 ─────────────────────────────────────────────
+    # ── 2. 大众推测胜平负 + 大众比分 ─────────────────────────────
+    crowd_wdl, crowd_scores = _crowd_picks(slug, grid, mn, cfg['cn_h'], cfg['cn_a'])
+    if crowd_wdl: result['crowd_wdl'] = crowd_wdl
+    for i, cp in enumerate(crowd_scores): result[f'crowd_score{i+1}'] = cp
+
+    # ── 3. 赔率推测比分（满足规则，最多3个）────────────────────────
     so = (rich.get('score_odds') or {}).get('odds', {})
-    model_top = sorted(grid.items(), key=lambda x: -x[1])
-    candidates = []
-    for sc, prob in model_top:
+    cands = []
+    for sc, prob in sorted(grid.items(), key=lambda x: -x[1]):
         od = so.get(sc)
         if not od: continue
-        ev = prob * od
         if 6.0 <= od < 8.0 and prob >= 0.05: grade = 'S'
         elif od <= 9.0 and prob >= 0.04: grade = 'O'
-        else: grade = 'X'
+        else: continue  # 不满足规则直接跳过
         mkt_pct = round(100/od); my_pct = round(prob*100, 1)
-        candidates.append({
+        cands.append({
             'grade': grade, 'score': sc, 'pick': sc.replace('-',':'),
-            'odds': od, 'mkt_pct': mkt_pct, 'my_pct': my_pct, 'ev': round(ev, 2),
+            'odds': od, 'mkt_pct': mkt_pct, 'my_pct': my_pct, 'ev': round(prob*od, 2),
             'meta': f'赔率 @{od} · 市场预估{mkt_pct}% · 模型预估{my_pct}%',
             'bet_label': f'比分 {sc.replace("-",":")}', 'match': mn,
         })
-    # 优先选 S/O，最多取2个
-    ranked = sorted(candidates, key=lambda x: ('X','O','S').index(x['grade']) * -1 if x['grade'] in ('S','O','X') else -1)
-    top2 = ranked[:2]
-    while len(top2) < 2:
-        top2.append({'grade': 'X', 'pick': '—', 'score': '', 'odds': 0, 'mkt_pct': 0, 'my_pct': 0,
-                     'meta': '暂无赔率数据', 'bet_label': '', 'match': mn, 'ev': 0})
-    result['score1'] = top2[0]; result['score2'] = top2[1]
+    cands.sort(key=lambda x: 0 if x['grade']=='S' else 1)
+    for i, c in enumerate(cands[:3]): result[f'score{i+1}'] = c
 
-    # ── 3. 大小球 ────────────────────────────────────────────────
+    # ── 4. 大小球 ────────────────────────────────────────────────
     if rows:
         t25 = rows[-1].get('pin_tot25') or {}
         u_od = t25.get('under'); o_od = t25.get('over')
@@ -1941,14 +1983,11 @@ def grade_bets(cfg, rows, rich, grid):
                 od, prob, ev, pick, pick_dir = u_od, un_prob, ev_under, '小球 ≤2', 'under'
                 grade = 'S' if ev >= 1.05 else 'O'
             elif ev_over > ev_under and ev_over >= 1.04:
-                od, prob, ev, pick, pick_dir = o_od, ov_prob, ev_over, '大球 ≥3', 'over'
-                grade = 'O'
+                od, prob, ev, pick, pick_dir = o_od, ov_prob, ev_over, '大球 ≥3', 'over'; grade = 'O'
             elif ev_under >= 1.04:
-                od, prob, ev, pick, pick_dir = u_od, un_prob, ev_under, '小球 ≤2', 'under'
-                grade = 'O'
+                od, prob, ev, pick, pick_dir = u_od, un_prob, ev_under, '小球 ≤2', 'under'; grade = 'O'
             else:
-                od, prob, ev, pick, pick_dir = 0, 0, 0, '市场高效', ''
-                grade = 'X'
+                od, prob, ev, pick, pick_dir = 0, 0, 0, '市场高效', ''; grade = 'X'
             mkt_pct = round(100/od) if od else 0; my_pct = round(prob*100) if prob else 0
             result['goals'] = {
                 'grade': grade, 'pick': pick, 'pick_dir': pick_dir,
@@ -1957,32 +1996,40 @@ def grade_bets(cfg, rows, rich, grid):
                 'bet_label': pick, 'match': mn,
             }
         else:
-            result['goals'] = {'grade': 'X', 'pick': '暂无数据', 'pick_dir': '',
-                               'odds': 0, 'mkt_pct': 0, 'my_pct': 0, 'ev': 0,
+            result['goals'] = {'grade': 'X', 'pick': '暂无数据', 'pick_dir': '', 'odds': 0,
+                               'mkt_pct': 0, 'my_pct': 0, 'ev': 0,
                                'meta': '等待大小球赔率采样', 'bet_label': '', 'match': mn}
     return result
 
 
 def rec_card_block(grades, slug, is_past=False, past_hits=None):
-    """渲染本场推荐卡：胜平负/比分1/比分2/进球数 四行。
-    is_past=True 时串关按钮改为 ✓/✗ 命中图标。"""
+    """渲染本场推荐卡（动态行数）。is_past=True 时串关按钮改为 ✓/✗。"""
     if past_hits is None: past_hits = {}
     BADGE = {'S': '<span class="badge-s">强推荐</span>',
              'O': '<span class="badge-o">推荐</span>',
              'X': '<span class="badge-x">不推荐</span>'}
+    # 固定行 + 可选行（按顺序）
+    ROW_ORDER = (
+        [('wdl',       '赔率胜平负', True)]
+        + ([('crowd_wdl', '大众胜平负', False)] if grades.get('crowd_wdl') else [])
+        + [(f'score{i}', f'赔率比分 {i}', False) for i in range(1,4) if grades.get(f'score{i}')]
+        + [(f'crowd_score{i}', f'大众比分 {i}', False) for i in range(1,4) if grades.get(f'crowd_score{i}')]
+        + [('goals', '进球数', True)]
+    )
     rows_html = ''
-    for key, type_cn in [('wdl','胜平负'), ('score1','比分 1'), ('score2','比分 2'), ('goals','进球数')]:
+    for key, type_cn, required in ROW_ORDER:
         g = grades.get(key) or {}
+        if not g and not required: continue
         grade = g.get('grade', 'X')
-        pick = g.get('pick', '—')
-        meta = g.get('meta', '')
-        odds = g.get('odds', 0)
-        badge = BADGE[grade]
+        pick  = g.get('pick', '—')
+        meta  = g.get('meta', '')
+        odds  = g.get('odds', 0)
+        badge = BADGE.get(grade, '')
         if is_past:
             hit = past_hits.get(key)
-            if hit is True:   act = '<span class="rec-hit ok">✓</span>'
+            if hit is True:    act = '<span class="rec-hit ok">✓</span>'
             elif hit is False: act = '<span class="rec-hit no">✗</span>'
-            else:             act = '<span class="rec-hit" style="opacity:.25">—</span>'
+            else:              act = '<span class="rec-hit" style="opacity:.25">—</span>'
         else:
             if odds > 0:
                 item = json.dumps({'id': f'{slug}_{key}', 'match': g.get('match',''),
@@ -2260,12 +2307,21 @@ def build_past_detail(p):
     goals_hit = None
     if tot_u:
         goals_hit = (goals_dir == 'over' and actual_tot > 2) or (goals_dir == 'under' and actual_tot <= 2)
+    # 大众推荐
+    slug = FID2SLUG.get(fid, '')
+    crowd_wdl_g, crowd_sc_list = _crowd_picks(slug, grid, f'{cnh} vs {cna}', cnh, cna)
+    if crowd_wdl_g: grades_past['crowd_wdl'] = crowd_wdl_g
+    for i, cp in enumerate(crowd_sc_list): grades_past[f'crowd_score{i+1}'] = cp
     past_hits = {
-        'wdl':    p.get('wdl_hit'),
-        'score1': (actual_sc == sc1.replace(':','-')) if sc1 else None,
-        'score2': (actual_sc == sc2.replace(':','-')) if sc2 else None,
-        'goals':  goals_hit,
+        'wdl':      p.get('wdl_hit'),
+        'score1':   (actual_sc == sc1.replace(':','-')) if sc1 else None,
+        'score2':   (actual_sc == sc2.replace(':','-')) if sc2 else None,
+        'goals':    goals_hit,
     }
+    if crowd_wdl_g:
+        past_hits['crowd_wdl'] = (actual_wdl == crowd_wdl_g['outcome'])
+    for i, cp in enumerate(crowd_sc_list):
+        past_hits[f'crowd_score{i+1}'] = (actual_sc == cp['score'])
     rec_html = rec_card_block(grades_past, f'p{fid}', is_past=True, past_hits=past_hits)
 
     okw = p.get('wdl_hit')
@@ -2397,42 +2453,56 @@ def line_row(f, pmap, cur_fid, prob_map):
     return f'<div class="fxbig{cc}"{ida}>{inner}</div>'
 
 def build_stats_block(past):
-    """首页战绩统计：胜平负 / 比分(2选中1) / 大小球 三格命中率。"""
+    """首页战绩统计：胜平负 / 比分 / 大小球 / 大众比分 四格命中率（2×2）。"""
     scored = [p for p in past if p.get('devig')]
     if not scored: return ''
     n = len(scored)
 
-    # 胜平负命中
     wdl_hits = sum(1 for p in scored if p.get('wdl_hit'))
+    sc_hits  = sum(1 for p in scored if p.get('score2_hit'))
 
-    # 比分：2个推荐中任意一个命中即算（score2_hit 已含此逻辑）
-    sc_hits = sum(1 for p in scored if p.get('score2_hit'))
-
-    # 大小球：按 U2.5 赔率方向 vs 实际结果
     tot_hits = 0; tot_n = 0
     for p in scored:
-        u_od = p.get('tot_u'); gh = p.get('gh', 0); ga = p.get('ga', 0)
+        u_od = p.get('tot_u')
         if not u_od: continue
         tot_n += 1
-        press_over = u_od > 2.1
-        actual_over = (gh + ga) > 2
-        if press_over == actual_over: tot_hits += 1
+        if (u_od > 2.1) == ((p.get('gh',0)+p.get('ga',0)) > 2): tot_hits += 1
 
-    wdl_pct = f'{wdl_hits/n*100:.0f}%'
-    sc_pct  = f'{sc_hits/n*100:.0f}%'
-    tot_pct = f'{tot_hits/tot_n*100:.0f}%' if tot_n else '—'
+    # 大众推测命中率（分母=有评论数据的已赛场次，分子=推荐0-3个中有1个命中）
+    crowd_hits = 0; crowd_n = 0
+    for p in scored:
+        slug = FID2SLUG.get(p['fid'])
+        if not slug: continue
+        cd = CROWD_DATA.get(slug)
+        if not cd: continue
+        crowd_n += 1
+        actual_sc = f'{p["gh"]}-{p["ga"]}'
+        scored_n = cd.get('scored', sum(v for _, v in cd['top'])) or 1
+        slug_odds = CROWD_SCORE_ODDS.get(slug, {})
+        tops = []
+        for s, votes in cd['top']:
+            od = slug_odds.get(s)
+            share = votes / scored_n
+            ratio = share / (1/od) if od else 0
+            if ratio >= 1.5: tops.append(s)
+        tops.sort(key=lambda s: -next((v for ss,v in cd['top'] if ss==s), 0))
+        if actual_sc in tops[:3]: crowd_hits += 1
 
-    cells = (
-        f'<div class="stat-cell"><div class="stat-val">{wdl_pct}</div>'
-        f'<div class="stat-lbl">胜平负命中</div><div class="stat-sub">{wdl_hits}/{n}场</div></div>'
-        f'<div class="stat-cell"><div class="stat-val">{sc_pct}</div>'
-        f'<div class="stat-lbl">比分命中</div><div class="stat-sub">{sc_hits}/{n}场</div></div>'
-        f'<div class="stat-cell"><div class="stat-val">{tot_pct}</div>'
-        f'<div class="stat-lbl">大小球命中</div><div class="stat-sub">{tot_hits}/{tot_n}场</div></div>'
-    )
+    wdl_pct   = f'{wdl_hits/n*100:.0f}%'
+    sc_pct    = f'{sc_hits/n*100:.0f}%'
+    tot_pct   = f'{tot_hits/tot_n*100:.0f}%' if tot_n else '—'
+    crowd_pct = f'{crowd_hits/crowd_n*100:.0f}%' if crowd_n else '—'
+
+    def cell(val, lbl, sub):
+        return (f'<div class="stat-cell"><div class="stat-val">{val}</div>'
+                f'<div class="stat-lbl">{lbl}</div><div class="stat-sub">{sub}</div></div>')
+    cells = (cell(wdl_pct,   '赔率胜平负命中', f'{wdl_hits}/{n}场')
+           + cell(sc_pct,    '赔率比分命中',   f'{sc_hits}/{n}场')
+           + cell(tot_pct,   '大小球命中',     f'{tot_hits}/{tot_n}场')
+           + cell(crowd_pct, '大众比分命中',   f'{crowd_hits}/{crowd_n}场'))
     return (f'<div class="glass" style="margin-bottom:14px">'
             f'{sec_head("emoji_events","AI推演战绩")}'
-            f'<div class="stats-grid">{cells}</div>'
+            f'<div class="stats-grid" style="grid-template-columns:1fr 1fr">{cells}</div>'
             f'</div>')
 
 
@@ -2466,11 +2536,9 @@ def build_index(items):
         if day != cur_day: tl += f'<div class="tl-day">{day}</div>'; cur_day = day
         tl += line_row(f, pmap, cur_fid, {})
     filt = '<div class="filt"><a href="#r1">第 1 轮</a><a href="#r2">第 2 轮</a><a href="#r3">第 3 轮</a></div>'
-    js = ''
-    bt = crowd_backtest_block()
     body = (f'<main>'
-            f'<div style="height:12px"></div>{stats_html}{filt}{tl}{bt}'
-            f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{js}{PARLAY_JS}')
+            f'<div style="height:12px"></div>{stats_html}{filt}{tl}'
+            f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{PARLAY_JS}')
     open(os.path.join(DOCS, 'index.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赔率追踪")}</head><body>{body}</body></html>')
 
 items = []
