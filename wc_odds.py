@@ -933,9 +933,9 @@ a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
 .rec-pick{font-size:14px;font-weight:700;color:var(--on);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rec-meta{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--sec);line-height:1.5;opacity:.8}
 .rec-badge{padding:0 8px;display:flex;align-items:center;justify-content:center;min-width:52px}
-.badge-s{font-size:10px;font-weight:800;color:var(--lime);background:rgba(204,255,0,.12);border:1px solid rgba(204,255,0,.35);border-radius:4px;padding:2px 6px;white-space:nowrap}
-.badge-o{font-size:10px;font-weight:700;color:#f0c040;background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.3);border-radius:4px;padding:2px 6px;white-space:nowrap}
-.badge-x{font-size:10px;color:var(--sec);opacity:.35}
+.badge-s{font-size:11px;font-weight:800;color:var(--lime);white-space:nowrap}
+.badge-o{font-size:11px;font-weight:700;color:#f0c040;white-space:nowrap}
+.badge-x{font-size:11px;color:var(--sec);opacity:.35;white-space:nowrap}
 .rec-act{padding:0 10px 0 4px;display:flex;align-items:center}
 .rec-btn{background:rgba(204,255,0,.1);border:1px solid rgba(204,255,0,.3);color:var(--lime);font-size:11px;font-weight:700;border-radius:5px;padding:5px 10px;cursor:pointer;white-space:nowrap;transition:background .15s;font-family:'JetBrains Mono',monospace}
 .rec-btn:active{background:rgba(204,255,0,.25)}
@@ -1885,7 +1885,7 @@ def _crowd_picks(slug, grid, mn, cnh, cna):
     crowd_wdl = {
         'grade': 'O', 'pick': label[cwd], 'outcome': cwd,
         'odds': 0, 'mkt_pct': 0, 'my_pct': cwd_pct,
-        'meta': f'大众投票 {cwd_pct}% · 共{total_v}票',
+        'meta': f'大众投票 {cwd_pct}%<br>共{total_v}票',
         'bet_label': label[cwd], 'match': mn,
     }
     # 大众比分推荐（价差比 ≥ 1.5，最多3个）
@@ -1903,7 +1903,7 @@ def _crowd_picks(slug, grid, mn, cnh, cna):
         cands.append({
             'grade': grade, 'score': s, 'pick': s.replace('-', ':'),
             'odds': od or 0, 'mkt_pct': mkt_pct, 'my_pct': vote_pct,
-            'meta': (f'赔率 @{od} · 市场预估{mkt_pct}% · 大众票选{vote_pct}%'
+            'meta': (f'赔率：{od}<br>市场预估{mkt_pct}%<br>大众票选{vote_pct}%'
                      if od else f'大众票选{vote_pct}% · 暂无赔率'),
             'bet_label': f'比分 {s.replace("-",":")}'  , 'match': mn, 'ratio': ratio,
         })
@@ -1941,7 +1941,7 @@ def grade_bets(cfg, rows, rich, grid):
             result['wdl'] = {
                 'grade': grade, 'pick': label[best_k], 'outcome': best_k,
                 'odds': od, 'mkt_pct': mkt_pct, 'my_pct': my_pct,
-                'meta': f'赔率 @{od} · 市场预估{mkt_pct}% · 模型预估{my_pct}%{drift_warn}',
+                'meta': f'赔率：{od}<br>市场预估{mkt_pct}%<br>模型预估{my_pct}%{drift_warn}',
                 'bet_label': label[best_k], 'match': mn, 'ev': round(ev, 2),
             }
 
@@ -1963,7 +1963,7 @@ def grade_bets(cfg, rows, rich, grid):
         cands.append({
             'grade': grade, 'score': sc, 'pick': sc.replace('-',':'),
             'odds': od, 'mkt_pct': mkt_pct, 'my_pct': my_pct, 'ev': round(prob*od, 2),
-            'meta': f'赔率 @{od} · 市场预估{mkt_pct}% · 模型预估{my_pct}%',
+            'meta': f'赔率：{od}<br>市场预估{mkt_pct}%<br>模型预估{my_pct}%',
             'bet_label': f'比分 {sc.replace("-",":")}', 'match': mn,
         })
     cands.sort(key=lambda x: 0 if x['grade']=='S' else 1)
@@ -1993,7 +1993,7 @@ def grade_bets(cfg, rows, rich, grid):
             result['goals'] = {
                 'grade': grade, 'pick': pick, 'pick_dir': pick_dir,
                 'odds': od, 'mkt_pct': mkt_pct, 'my_pct': my_pct, 'ev': round(ev, 2),
-                'meta': f'赔率 @{od} · 市场预估{mkt_pct}% · 模型预估{my_pct}%' if od else '等待赔率采样',
+                'meta': f'赔率：{od}<br>市场预估{mkt_pct}%<br>模型预估{my_pct}%' if od else '等待赔率采样',
                 'bet_label': pick, 'match': mn,
             }
         else:
@@ -2290,7 +2290,7 @@ def build_past_detail(p, items_map=None):
     goals_od = approx_od(ov_prob if goals_dir=='over' else 1-ov_prob)
     goals_pct = round((ov_prob if goals_dir=='over' else 1-ov_prob)*100)
 
-    def meta_str(od, mkt, my): return f'赔率 @{od} · 市场预估{mkt}% · 模型预估{my}%' if od else '无赔率记录'
+    def meta_str(od, mkt, my): return f'赔率：{od}<br>市场预估{mkt}%<br>模型预估{my}%' if od else '无赔率记录'
     grades_past = {
         'wdl':   {'grade': 'O', 'pick': wdl_pk, 'outcome': wdl_fav,
                   'odds': wdl_od, 'mkt_pct': wdl_pct, 'my_pct': wdl_pct,
