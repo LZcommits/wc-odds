@@ -2225,7 +2225,7 @@ def build_detail(cfg, rows, rich):
                  f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
                  f'{fb_html}')
     body = (f'<main>'
-            f'<a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
+            f'<a class="back" href="list.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
             f'<div style="height:12px"></div>{inner}'
             f'<div class="foot">自动每 1h 更新 · 仅供研究,非投注建议</div></main>{script}{PARLAY_JS}')
     open(os.path.join(DOCS, cfg['slug']+'.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title)}</head><body>{body}</body></html>')
@@ -2249,7 +2249,7 @@ def past_card(p):
             f'<div class="pmeta"><span class="pchip">{ds}</span>{sc_tag}'
             f'<span class="pval">荐:<b>{p.get("wdl_txt","")}</b></span><span class="pmore">推演 ›</span></div></a>')
 
-def build_past_detail(p):
+def build_past_detail(p, items_map=None):
     if not p.get('devig'): return
     fid = p['fid']; cnh = cn_of(p['h']); cna = cn_of(p['a']); fh = flag_of(p['h']); fa = flag_of(p['a'])
     gh, ga = p['gh'], p['ga']; d = p['devig']
@@ -2308,7 +2308,7 @@ def build_past_detail(p):
     if tot_u:
         goals_hit = (goals_dir == 'over' and actual_tot > 2) or (goals_dir == 'under' and actual_tot <= 2)
     # 大众推荐
-    slug = FID2SLUG.get(fid, '')
+    slug = FID2SLUG.get(int(fid), '')
     crowd_wdl_g, crowd_sc_list = _crowd_picks(slug, grid, f'{cnh} vs {cna}', cnh, cna)
     if crowd_wdl_g: grades_past['crowd_wdl'] = crowd_wdl_g
     for i, cp in enumerate(crowd_sc_list): grades_past[f'crowd_score{i+1}'] = cp
@@ -2324,29 +2324,48 @@ def build_past_detail(p):
         past_hits[f'crowd_score{i+1}'] = (actual_sc == cp['score'])
     rec_html = rec_card_block(grades_past, f'p{fid}', is_past=True, past_hits=past_hits)
 
-    okw = p.get('wdl_hit')
-    badge = '<span class="pres ok">✓ 胜负命中</span>' if okw else '<span class="pres no">✗ 胜负未中</span>'
     title = f'{cnh} vs {cna}'
-    dv = lambda k: f'{d[k]*100:.0f}%'
-    rescn = f'{cnh} 胜' if gh > ga else (f'{cna} 胜' if ga > gh else '平局')
-    head_card = (f'<div class="glass" style="text-align:center">'
-                 f'<div class="pd-flags">{fh} <span class="pd-sc">{gh} - {ga}</span> {fa}</div>'
-                 f'<div class="pd-tn">{cnh} vs {cna}</div>'
-                 f'<div style="margin:8px 0">{badge}</div>'
-                 f'<div class="pd-meta">{ds}(北京) · 已结束 FT · {p.get("tier","")}</div></div>')
-    grid_card = f'<div class="glass">{sec_head("grid_view","模型推测比分分布 Top 6")}{scores_grid(lh, la, grid)}</div>'
-    devig_card = (f'<div class="glass">{sec_head("balance","赛前市场预期(锐庄去水位)")}'
-                  f'<div class="tp-pct"><span style="color:#CCFF00">{cnh} {dv("home")}</span>'
-                  f'<span style="color:#8e9379">平 {dv("draw")}</span>'
-                  f'<span style="color:#FF0055">{cna} {dv("away")}</span></div>'
-                  f'<div class="tp-bar"><i style="flex:{max(d["home"]*100,3):.0f};background:#CCFF00"></i>'
-                  f'<i style="flex:{max(d["draw"]*100,3):.0f};background:#3f465c"></i>'
-                  f'<i style="flex:{max(d["away"]*100,3):.0f};background:#FF0055"></i></div>'
-                  f'<div class="vs-note">实际结果：<b>{rescn} · {gh}:{ga}</b>（{ds} 北京）</div></div>')
+    # ── 比分 header（与未开始 header 相同结构，倒计时换成比分）─────
+    okw = p.get('wdl_hit')
+    wdl_badge = '<span class="pres ok">✓ 命中</span>' if okw else '<span class="pres no">✗ 未中</span>'
+    rescn = f'{cnh} 胜' if gh>ga else (f'{cna} 胜' if ga>gh else '平局')
+    past_header = (f'<div class="glass vshead">'
+                   f'<div class="vsrow">'
+                   f'<div class="vsteam">{team_badge(p["h"],cnh)}<div class="tn">{cnh}</div></div>'
+                   f'<div class="vsmid">'
+                   f'<div class="kot" style="font-size:32px;letter-spacing:.06em">{gh} <small style="font-size:18px;opacity:.5">-</small> {ga}</div>'
+                   f'<div class="kol">{rescn}</div>'
+                   f'<div style="margin-top:6px">{wdl_badge}</div>'
+                   f'<div class="kol" style="margin-top:6px">{ds}(北京) · 已结束</div>'
+                   f'</div>'
+                   f'<div class="vsteam">{team_badge(p["a"],cna)}<div class="tn">{cna}</div></div>'
+                   f'</div></div>')
+    # ── 从 items_map 取 cfg/rich 以复用未开始模板各模块 ──────────
+    cfg = rich = None
+    if items_map:
+        slug = FID2SLUG.get(int(fid), '')
+        entry = items_map.get(slug)
+        if entry: cfg, _, rich = entry
+    tp_html = ''
+    matchup_html = ''
+    reasoning_html = ''
+    fb_html = ''
+    if cfg and rich:
+        tp = third_party_block(cfg, rich.get('pred'))
+        if tp: tp_html = f'<div class="glass">{tp}</div>'
+        matchup_html = f'{sec_head("analytics","对阵分析")}{matchup_analysis(cfg)}'
+        reasoning_html = f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
+        fb = form_block(cfg)
+        if fb: fb_html = f'<div class="glass">{fb}</div>'
+    inner = (f'{past_header}'
+             f'{rec_html}'
+             f'{tp_html}'
+             f'{matchup_html}'
+             f'{reasoning_html}'
+             f'{fb_html}')
     body = (f'<main>'
-            f'<a class="back" href="index.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
-            f'<div style="height:12px"></div>'
-            f'{head_card}{rec_html}{grid_card}{devig_card}'
+            f'<a class="back" href="list.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
+            f'<div style="height:12px"></div>{inner}'
             f'<div class="foot">仅供研究 · 非投注建议</div></main>')
     open(os.path.join(DOCS, f'past_{fid}.html'), 'w').write(
         f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title)}</head><body>{body}</body></html>')
@@ -2445,22 +2464,21 @@ def line_row(f, pmap, cur_fid, prob_map):
     live = st not in ('NS',)
     hrs = (dt - now).total_seconds() / 3600
     when = f'{tm} 北京 · 进行中' if live else f'{tm} 北京 · 距开赛 {hrs:.0f}h'
-    slug = FID2SLUG.get(fid)
+    slug = FID2SLUG.get(int(fid))
     tag = ''
     inner = (f'<div class="fxbig-top"><span class="fxbig-tm"><span class="material-symbols-outlined">schedule</span>{when}</span>{tag}</div>'
              f'<div class="fxbig-vs"><span class="fxbig-team">{th}</span><span class="fxbig-mid">VS</span><span class="fxbig-team">{ta}</span></div>')
     if slug: return f'<a class="fxbig star{cc}"{ida} href="{slug}.html">{inner}</a>'
     return f'<div class="fxbig{cc}"{ida}>{inner}</div>'
 
-def build_stats_block(past):
-    """首页战绩统计：胜平负 / 比分 / 大小球 / 大众比分 四格命中率（2×2）。"""
+def compute_stats(past):
+    """计算所有战绩数字，返回 dict 供首页两个模块共用。"""
     scored = [p for p in past if p.get('devig')]
-    if not scored: return ''
     n = len(scored)
+    if not n: return {}
 
     wdl_hits = sum(1 for p in scored if p.get('wdl_hit'))
     sc_hits  = sum(1 for p in scored if p.get('score2_hit'))
-
     tot_hits = 0; tot_n = 0
     for p in scored:
         u_od = p.get('tot_u')
@@ -2468,78 +2486,111 @@ def build_stats_block(past):
         tot_n += 1
         if (u_od > 2.1) == ((p.get('gh',0)+p.get('ga',0)) > 2): tot_hits += 1
 
-    # 大众推测命中率（分母=有评论数据的已赛场次，分子=推荐0-3个中有1个命中）
-    crowd_hits = 0; crowd_n = 0
+    crowd_sc_hits = 0; crowd_n = 0; crowd_wdl_hits = 0
     for p in scored:
-        slug = FID2SLUG.get(p['fid'])
-        if not slug: continue
-        cd = CROWD_DATA.get(slug)
+        sl = FID2SLUG.get(int(p['fid']))
+        if not sl: continue
+        cd = CROWD_DATA.get(sl)
         if not cd: continue
         crowd_n += 1
-        actual_sc = f'{p["gh"]}-{p["ga"]}'
-        scored_n = cd.get('scored', sum(v for _, v in cd['top'])) or 1
-        slug_odds = CROWD_SCORE_ODDS.get(slug, {})
+        actual_sc  = f'{p["gh"]}-{p["ga"]}'
+        actual_wdl = 'home' if p['gh']>p['ga'] else ('away' if p['ga']>p['gh'] else 'draw')
+        scored_n = cd.get('scored', sum(v for _,v in cd['top'])) or 1
+        slug_odds = CROWD_SCORE_ODDS.get(sl, {})
+        # 比分命中
         tops = []
         for s, votes in cd['top']:
             od = slug_odds.get(s)
-            share = votes / scored_n
-            ratio = share / (1/od) if od else 0
+            ratio = (votes/scored_n)/(1/od) if od else 0
             if ratio >= 1.5: tops.append(s)
         tops.sort(key=lambda s: -next((v for ss,v in cd['top'] if ss==s), 0))
-        if actual_sc in tops[:3]: crowd_hits += 1
+        if actual_sc in tops[:3]: crowd_sc_hits += 1
+        # 胜平负命中
+        wdl_v = {'home':0,'draw':0,'away':0}
+        for s, v in cd['top']:
+            h, a = map(int, s.split('-'))
+            if h>a: wdl_v['home']+=v
+            elif h==a: wdl_v['draw']+=v
+            else: wdl_v['away']+=v
+        if max(wdl_v, key=wdl_v.get) == actual_wdl: crowd_wdl_hits += 1
 
-    wdl_pct   = f'{wdl_hits/n*100:.0f}%'
-    sc_pct    = f'{sc_hits/n*100:.0f}%'
-    tot_pct   = f'{tot_hits/tot_n*100:.0f}%' if tot_n else '—'
-    crowd_pct = f'{crowd_hits/crowd_n*100:.0f}%' if crowd_n else '—'
+    return {'n': n, 'wdl_hits': wdl_hits, 'sc_hits': sc_hits,
+            'tot_hits': tot_hits, 'tot_n': tot_n,
+            'crowd_n': crowd_n, 'crowd_sc_hits': crowd_sc_hits, 'crowd_wdl_hits': crowd_wdl_hits}
 
-    def cell(val, lbl, sub):
-        return (f'<div class="stat-cell"><div class="stat-val">{val}</div>'
-                f'<div class="stat-lbl">{lbl}</div><div class="stat-sub">{sub}</div></div>')
-    cells = (cell(wdl_pct,   '赔率胜平负命中', f'{wdl_hits}/{n}场')
-           + cell(sc_pct,    '赔率比分命中',   f'{sc_hits}/{n}场')
-           + cell(tot_pct,   '大小球命中',     f'{tot_hits}/{tot_n}场')
-           + cell(crowd_pct, '大众比分命中',   f'{crowd_hits}/{crowd_n}场'))
+
+def _pct(hits, total): return f'{hits/total*100:.0f}%' if total else '—'
+def _cell(val, lbl, sub):
+    return (f'<div class="stat-cell"><div class="stat-val">{val}</div>'
+            f'<div class="stat-lbl">{lbl}</div><div class="stat-sub">{sub}</div></div>')
+
+def ai_stats_block(st):
+    """AI推演战绩卡（胜平负/比分/大小球）。"""
+    if not st: return ''
+    n = st['n']
+    cells = (_cell(_pct(st['wdl_hits'],n),   '胜平负命中', f'{st["wdl_hits"]}/{n}场')
+           + _cell(_pct(st['sc_hits'],n),    '比分命中',   f'{st["sc_hits"]}/{n}场')
+           + _cell(_pct(st['tot_hits'],st['tot_n']), '大小球命中', f'{st["tot_hits"]}/{st["tot_n"]}场'))
     return (f'<div class="glass" style="margin-bottom:14px">'
-            f'{sec_head("emoji_events","AI推演战绩")}'
-            f'<div class="stats-grid" style="grid-template-columns:1fr 1fr">{cells}</div>'
-            f'</div>')
+            f'{sec_head("emoji_events","AI 推演战绩")}'
+            f'<div class="stats-grid">{cells}</div></div>')
+
+def crowd_stats_block(st):
+    """大众推演战绩卡（胜平负/比分）。"""
+    if not st or not st.get('crowd_n'): return ''
+    cn = st['crowd_n']
+    cells = (_cell(_pct(st['crowd_wdl_hits'],cn), '胜平负命中', f'{st["crowd_wdl_hits"]}/{cn}场')
+           + _cell(_pct(st['crowd_sc_hits'],cn),  '比分命中',   f'{st["crowd_sc_hits"]}/{cn}场'))
+    return (f'<div class="glass" style="margin-bottom:14px">'
+            f'{sec_head("groups","大众推演战绩")}'
+            f'<div class="stats-grid" style="grid-template-columns:1fr 1fr">{cells}</div></div>')
 
 
 def build_index(items):
     past = build_past()
-    for p in past: build_past_detail(p)
+    items_map = {cfg['slug']: (cfg, rows, rich) for cfg, rows, rich in items}
+    for p in past: build_past_detail(p, items_map)
     pmap = {str(p['fid']): p for p in past}
-    scored = [p for p in past if p.get('devig')]
-    ntot = len(scored); nwin = sum(1 for p in scored if p.get('wdl_hit'))
-    invest = ntot * 100; won = sum(p.get('won', 0) for p in scored); pl = won - invest
-    roi = round(pl/invest*100) if invest else 0
-    pcls = 'pos' if pl >= 0 else 'neg'; sign = '+' if pl >= 0 else '−'
-    track = (f'<div class="track">'
-             f'<div class="pnl {pcls}">ROI {sign}{abs(roi)}%<small></small></div>'
-             f'<div class="pnl-row"><span>本金 ¥{invest}</span><span>收回 ¥{won}</span>'
-             f'<span>净盈亏 {sign}¥{abs(pl)}</span><span>胜负中 {nwin}/{ntot}</span></div></div>')
-    stats_html = build_stats_block(past)
-    # ---------- 统一时间线(全部小组赛按时间从上到下)----------
+    st = compute_stats(past)
+
+    # ── 首页 index.html（仅两组战绩统计）───────────────────────
+    list_btn = ('<a href="list.html" style="display:block;text-align:center;'
+                'margin:20px auto 8px;padding:14px 0;max-width:400px;border-radius:12px;'
+                'background:var(--lime);color:#000;font-weight:800;font-size:15px;'
+                'text-decoration:none">查看完整赛程 →</a>')
+    home_body = (f'<main><div style="height:16px"></div>'
+                 f'{ai_stats_block(st)}'
+                 f'{crowd_stats_block(st)}'
+                 f'{list_btn}'
+                 f'<div class="foot">AI推演 · 仅供参考</div></main>')
+    open(os.path.join(DOCS, 'index.html'), 'w').write(
+        f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯 AI 推演")}</head><body>{home_body}</body></html>')
+
+    # ── 列表页 list.html（赛程，无战绩）─────────────────────────
     fx = sorted(fetch_fixtures(), key=lambda f: f['fixture']['date'])
-    cur_fid = next((f['fixture']['id'] for f in fx if f['fixture']['status']['short'] not in ('FT', 'AET', 'PEN')), None)
-    RMAP = {'Group Stage - 1': ('r1', '小组赛 · 第 1 轮'), 'Group Stage - 2': ('r2', '小组赛 · 第 2 轮'), 'Group Stage - 3': ('r3', '小组赛 · 第 3 轮')}
+    cur_fid = next((f['fixture']['id'] for f in fx
+                    if f['fixture']['status']['short'] not in ('FT','AET','PEN')), None)
+    RMAP = {'Group Stage - 1': ('r1','小组赛 · 第 1 轮'),
+            'Group Stage - 2': ('r2','小组赛 · 第 2 轮'),
+            'Group Stage - 3': ('r3','小组赛 · 第 3 轮')}
     tl = ''; cur_round = None; cur_day = None
     for f in fx:
-        st = f['fixture']['status']['short']
         rd = f['league']['round']; rid, rname = RMAP.get(rd, ('rx', rd))
         if rd != cur_round:
-            tl += f'<div class="round-head" id="{rid}"><span class="material-symbols-outlined">sports_soccer</span>{rname}</div>'; cur_round = rd; cur_day = None
+            tl += f'<div class="round-head" id="{rid}"><span class="material-symbols-outlined">sports_soccer</span>{rname}</div>'
+            cur_round = rd; cur_day = None
         try: bj = datetime.datetime.fromisoformat(f['fixture']['date']).astimezone(BJ)
         except Exception: continue
         wd = '一二三四五六日'[bj.weekday()]; day = f'{bj.month}/{bj.day} 周{wd}'
         if day != cur_day: tl += f'<div class="tl-day">{day}</div>'; cur_day = day
         tl += line_row(f, pmap, cur_fid, {})
     filt = '<div class="filt"><a href="#r1">第 1 轮</a><a href="#r2">第 2 轮</a><a href="#r3">第 3 轮</a></div>'
-    body = (f'<main>'
-            f'<div style="height:12px"></div>{stats_html}{filt}{tl}'
-            f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{PARLAY_JS}')
-    open(os.path.join(DOCS, 'index.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赔率追踪")}</head><body>{body}</body></html>')
+    back_home = ('<a href="index.html" class="back">'
+                 '<span class="material-symbols-outlined">arrow_back</span>首页</a>')
+    list_body = (f'<main>{back_home}<div style="height:4px"></div>{filt}{tl}'
+                 f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{PARLAY_JS}')
+    open(os.path.join(DOCS, 'list.html'), 'w').write(
+        f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("赛程 · 世界杯")}</head><body>{list_body}</body></html>')
 
 items = []
 for cfg in MATCHES:
