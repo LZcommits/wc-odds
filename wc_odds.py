@@ -1881,9 +1881,9 @@ def grade_bets(cfg, rows, rich, grid):
             od = p[best_k]; ev = best_ev
             pick_label = f'{label[best_k]} @{od}'
             meta = f'EV {ev:.2f} · 我估 {my[best_k]*100:.0f}% · 市场 {100/od:.0f}%'
-            if ev >= 1.08:
+            if ev >= 1.08 and my[best_k] >= 0.12:
                 grade = 'S'
-            elif ev >= 1.02:
+            elif ev >= 1.02 and my[best_k] >= 0.07:
                 grade = 'O'
             else:
                 grade = 'X'
@@ -1906,7 +1906,7 @@ def grade_bets(cfg, rows, rich, grid):
     sweet_picks = []
     for sc, prob in model_top:
         od = so.get(sc)
-        if od and 6.0 <= od <= 8.0:
+        if od and 6.0 <= od < 8.0:
             sweet_picks.append((sc, prob, od))
     # 也纳入大众数据
     cd = CROWD_DATA.get(slug)
@@ -1914,7 +1914,7 @@ def grade_bets(cfg, rows, rich, grid):
         slug_odds = CROWD_SCORE_ODDS.get(slug, {})
         for s, votes in cd['top'][:3]:
             od = slug_odds.get(s)
-            if od and 6.0 <= od <= 8.0:
+            if od and 6.0 <= od < 8.0:
                 sc = s.replace('-','-'); sweet_picks.append((sc, grid.get(sc, 0.05), od))
 
     if sweet_picks:
