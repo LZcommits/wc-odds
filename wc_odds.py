@@ -934,6 +934,17 @@ a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
 .rec-card.deep{border-color:rgba(100,180,255,.25);background:rgba(10,20,40,.9)}
 .rec-card.deep .rec-card-head{background:rgba(100,180,255,.06)}
 .rec-card.deep .rec-card-head .material-symbols-outlined{color:#64b4ff}
+.deep-info-btn{margin-left:auto;background:none;border:none;cursor:pointer;color:#64b4ff;opacity:.55;padding:2px 4px;display:flex;align-items:center;line-height:1;flex-shrink:0}
+.deep-info-btn:hover{opacity:1}.deep-info-btn .material-symbols-outlined{font-size:16px;color:#64b4ff}
+.deep-modal-overlay{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.65);align-items:center;justify-content:center;padding:20px}
+.deep-modal{background:#0a1422;border:1px solid rgba(100,180,255,.3);border-radius:12px;padding:20px;max-width:340px;width:100%}
+.deep-modal h3{font-size:14px;font-weight:800;color:#64b4ff;margin:0 0 14px}
+.deep-modal table{width:100%;border-collapse:collapse;font-size:11px}
+.deep-modal tr{border-bottom:1px solid rgba(255,255,255,.06)}
+.deep-modal td{padding:7px 4px;line-height:1.45;color:var(--sec);vertical-align:top}
+.deep-modal td:first-child{color:var(--on);font-weight:700;white-space:nowrap;font-family:'JetBrains Mono',monospace;padding-right:10px;min-width:72px}
+.dm-formula{margin-top:12px;font-size:10px;color:var(--sec);font-family:'JetBrains Mono',monospace;background:rgba(100,180,255,.06);padding:8px 10px;border-radius:6px;line-height:1.7}
+.dm-formula b{color:#64b4ff}.dm-close{display:block;margin-top:14px;text-align:center;color:var(--sec);font-size:12px;cursor:pointer;padding:6px;border:1px solid var(--line);border-radius:6px}
 .parlay-rec{margin-bottom:14px}
 .pr-leg{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
 .pr-leg:last-of-type{border-bottom:none}
@@ -1895,7 +1906,7 @@ def _crowd_picks(slug, grid, mn, cnh, cna, rows=None):
             if ratio < 1.5: continue
             mkt_pct = round(100 / od)
             grade = 'S' if ratio >= 2.0 else 'O'
-            meta = f'赔率：{od}<br>市场预估{mkt_pct}%<br>大众票选{vote_pct}%'
+            meta = f'价差比：{ratio:.1f}<br>赔率：{od}<br>大众投票{vote_pct}%<br>市场预估{mkt_pct}%'
         else:
             if has_any_odds: continue        # 有赔率库但该比分无赔率，跳过
             if vote_share < 0.05: continue   # 无赔率时：票选≥5% 才展示
@@ -2044,8 +2055,9 @@ def rec_card_block(grades, slug, is_past=False, past_hits=None):
     for i in range(1, 4):
         deep_rows += make_row(f'crowd_score{i}', f'比分{i}')
     if deep_rows:
+        info_btn = '<button class="deep-info-btn" onclick="showDeepInfo()"><span class="material-symbols-outlined">info</span></button>'
         deep_card = (f'<div class="rec-card deep">'
-                     f'<div class="rec-card-head">{sec_head("groups","深度推荐")}</div>'
+                     f'<div class="rec-card-head">{sec_head("groups","深度推荐")}{info_btn}</div>'
                      f'{deep_rows}</div>')
     else:
         deep_card = ''
@@ -2054,6 +2066,23 @@ def rec_card_block(grades, slug, is_past=False, past_hits=None):
 
 
 PARLAY_JS = ''  # 串关弹窗已移除
+
+DEEP_INFO_MODAL = (
+    '<div id="deep-info-modal" class="deep-modal-overlay" onclick="if(event.target===this)hideDeepInfo()">'
+    '<div class="deep-modal">'
+    '<h3>深度推荐 · 价差比说明</h3>'
+    '<table>'
+    '<tr><td>&lt; 1.5</td><td>大众和市场方向一致，无增量信息，忽略</td></tr>'
+    '<tr><td>1.5 – 2.0</td><td>大众比市场"贵"50–100%，有偏离，观察为主，不单独行动</td></tr>'
+    '<tr><td>≥ 2.0</td><td>大众与市场出现系统性背离，有参考价值</td></tr>'
+    '<tr><td>≥ 3.0</td><td>强信号——市场定价明显低估这个比分，值得认真对待</td></tr>'
+    '</table>'
+    '<div class="dm-formula"><b>价差比</b> = (票数 / 有效总票) ÷ (1 / 赔率)</div>'
+    '<span class="dm-close" onclick="hideDeepInfo()">关闭</span>'
+    '</div></div>'
+    '<script>function showDeepInfo(){document.getElementById("deep-info-modal").style.display="flex"}'
+    'function hideDeepInfo(){document.getElementById("deep-info-modal").style.display="none"}</script>'
+)
 
 def goals_block(rich, my, grid):
     """进球推荐：大小球 2.5 + BTTS + xG 预期。"""
@@ -2119,7 +2148,7 @@ def build_detail(cfg, rows, rich):
     body = (f'<main>'
             f'<a class="back" href="list.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
             f'<div style="height:12px"></div>{inner}'
-            f'<div class="foot">{_detail_ts(rows)}</div></main>{script}')
+            f'<div class="foot">{_detail_ts(rows)}</div></main>{DEEP_INFO_MODAL}{script}')
 
     open(os.path.join(DOCS, cfg['slug']+'.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title,raw_title=True)}</head><body>{body}</body></html>')
 
