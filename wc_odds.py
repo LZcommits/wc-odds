@@ -2086,6 +2086,14 @@ def goals_block(rich, my, grid):
              f'xG 预期：主 <b style="color:#CCFF00">{lh:.2f}</b> / 客 <b style="color:#FF0055">{la:.2f}</b>（泊松模型）</div>')
     return f'<div class="glass">{sec_head("sports_score","进球推荐")}{rows}</div>'
 
+def _detail_ts(rows):
+    if not rows: return '暂无数据'
+    try:
+        bj = datetime.datetime.fromisoformat(rows[-1]['ts']).astimezone(BJ)
+        return f'{bj.year}/{bj.month}/{bj.day} {bj.hour:02d}:{bj.minute:02d} 更新'
+    except Exception:
+        return rows[-1].get('ts', '—')
+
 def build_detail(cfg, rows, rich):
     l = L(cfg); title = f'{cfg["cn_h"]} VS {cfg["cn_a"]}'; script = ''
     if not rows:
@@ -2111,7 +2119,8 @@ def build_detail(cfg, rows, rich):
     body = (f'<main>'
             f'<a class="back" href="list.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
             f'<div style="height:12px"></div>{inner}'
-            f'<div class="foot">自动每 1h 更新 · 仅供研究,非投注建议</div></main>{script}{PARLAY_JS}')
+            f'<div class="foot">{_detail_ts(rows)}</div></main>{script}')
+
     open(os.path.join(DOCS, cfg['slug']+'.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title,raw_title=True)}</head><body>{body}</body></html>')
 
 def sec_h(t, c=''):
@@ -2431,7 +2440,7 @@ def crowd_stats_block(st):
 
 
 def build_recommended_parlay(items):
-    """扫描48h内未开始场次，取S级WDL腿(@1.5~3.5)，组最优2-3腿串。"""
+    """从传入场次取S级WDL腿(@1.5~6)，组最优2-3腿串。"""
     from itertools import combinations as _comb
     import html as _html
 
@@ -2439,7 +2448,7 @@ def build_recommended_parlay(items):
     for cfg, rows, rich in items:
         if not rows: continue
         hrs = (cfg['ko'] - now).total_seconds() / 3600
-        if hrs <= 0 or hrs > 48: continue
+        if hrs <= 0: continue
         last = rows[-1]; d = last['devig']
         t25 = last.get('pin_tot25') or {}
         up = None
@@ -2462,11 +2471,10 @@ def build_recommended_parlay(items):
             'ev': wdl['ev'],
         })
 
-    hdr = sec_head('local_fire_department', '今日推荐串关')
+    hdr = sec_head('local_fire_department', '推荐串关')
 
     if len(candidates) < 2:
-        return (f'<div class="glass parlay-rec">{hdr}'
-                f'<div class="pr-empty">今日S级串腿不足，暂无推荐</div></div>')
+        return ''
 
     best = None; best_ev = 0.0
     for r in (3, 2):  # 优先3腿
@@ -2482,8 +2490,7 @@ def build_recommended_parlay(items):
                 best = {'legs': combo, 'ev': ev, 'prob': prob, 'odds': odds}
 
     if not best:
-        return (f'<div class="glass parlay-rec">{hdr}'
-                f'<div class="pr-empty">今日暂无合并EV≥1.05的串关组合</div></div>')
+        return ''
 
     legs_html = ''
     raw_items = []
@@ -2557,6 +2564,15 @@ def build_index(items):
     RMAP = {'Group Stage - 1': ('r1','小组赛 · 第 1 轮'),
             'Group Stage - 2': ('r2','小组赛 · 第 2 轮'),
             'Group Stage - 3': ('r3','小组赛 · 第 3 轮')}
+    # 按北京日期预分组 items（只含未开始）
+    from collections import defaultdict as _dd
+    items_by_day = _dd(list)
+    for _cfg, _rows, _rich in items:
+        _hrs = (_cfg['ko'] - now).total_seconds() / 3600
+        if _hrs > 0:
+            _d = _cfg['ko'].astimezone(BJ).date()
+            items_by_day[_d].append((_cfg, _rows, _rich))
+
     tl = ''; cur_round = None; cur_day = None
     for f in fx:
         rd = f['league']['round']; rid, rname = RMAP.get(rd, ('rx', rd))
@@ -2566,7 +2582,12 @@ def build_index(items):
         try: bj = datetime.datetime.fromisoformat(f['fixture']['date']).astimezone(BJ)
         except Exception: continue
         wd = '一二三四五六日'[bj.weekday()]; day = f'{bj.month}/{bj.day} 周{wd}'
-        if day != cur_day: tl += f'<div class="tl-day">{day}</div>'; cur_day = day
+        if day != cur_day:
+            # 插入该日推荐串关（无推荐时返回空字符串，静默跳过）
+            day_parlay = build_recommended_parlay(items_by_day.get(bj.date(), []))
+            tl += day_parlay
+            tl += f'<div class="tl-day">{day}</div>'
+            cur_day = day
         tl += line_row(f, pmap, cur_fid, {})
     filt = '<div class="filt"><a href="#r1">第 1 轮</a><a href="#r2">第 2 轮</a><a href="#r3">第 3 轮</a></div>'
     back_home = ('<a href="index.html" class="back">'
@@ -2574,9 +2595,8 @@ def build_index(items):
     scroll_to_cur = ('<script>document.addEventListener("DOMContentLoaded",function(){'
                      'var el=document.getElementById("cur");'
                      'if(el)el.scrollIntoView({block:"center"});});</script>')
-    rec_parlay = build_recommended_parlay(items)
-    list_body = (f'<main>{back_home}<div style="height:4px"></div>{rec_parlay}{filt}{tl}'
-                 f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{PARLAY_JS}{scroll_to_cur}')
+    list_body = (f'<main>{back_home}<div style="height:4px"></div>{filt}{tl}'
+                 f'<div class="foot">{updated_str}</div></main>{scroll_to_cur}')
     open(os.path.join(DOCS, 'list.html'), 'w').write(
         f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赛程",raw_title=True)}</head><body>{list_body}</body></html>')
 
