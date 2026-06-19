@@ -2466,10 +2466,6 @@ def build_index(items):
              f'<div class="pnl-row"><span>本金 ¥{invest}</span><span>收回 ¥{won}</span>'
              f'<span>净盈亏 {sign}¥{abs(pl)}</span><span>胜负中 {nwin}/{ntot}</span></div></div>')
     stats_html = build_stats_block(past)
-    # ---------- 本期购彩参考(嵌入时间线过去/未来分界处)----------
-    up = fetch_upcoming(hours=48, limit=3)
-    tickets = build_tickets(up)
-    ticket_sec = f'<div id="tickets">{sec_h("今日串关推荐", "最近 3 场 · 2 注串关")}{tickets}</div>' if tickets else ''
     # ---------- 统一时间线(全部小组赛按时间从上到下)----------
     prob_map = {}  # 精选场 fid → (cfg, 最新去水位),供大气卡底部展示概率条
     for cfg, rows, rich in items:
@@ -2478,12 +2474,9 @@ def build_index(items):
     fx = sorted(fetch_fixtures(), key=lambda f: f['fixture']['date'])
     cur_fid = next((f['fixture']['id'] for f in fx if f['fixture']['status']['short'] not in ('FT', 'AET', 'PEN')), None)
     RMAP = {'Group Stage - 1': ('r1', '小组赛 · 第 1 轮'), 'Group Stage - 2': ('r2', '小组赛 · 第 2 轮'), 'Group Stage - 3': ('r3', '小组赛 · 第 3 轮')}
-    tl = ''; cur_round = None; cur_day = None; crossed = False
+    tl = ''; cur_round = None; cur_day = None
     for f in fx:
         st = f['fixture']['status']['short']
-        # 在"最后一场已结束"→"第一场未开赛"边界插入串关推荐
-        if not crossed and st not in ('FT', 'AET', 'PEN'):
-            tl += ticket_sec; crossed = True
         rd = f['league']['round']; rid, rname = RMAP.get(rd, ('rx', rd))
         if rd != cur_round:
             tl += f'<div class="round-head" id="{rid}"><span class="material-symbols-outlined">sports_soccer</span>{rname}</div>'; cur_round = rd; cur_day = None
@@ -2492,11 +2485,8 @@ def build_index(items):
         wd = '一二三四五六日'[bj.weekday()]; day = f'{bj.month}/{bj.day} 周{wd}'
         if day != cur_day: tl += f'<div class="tl-day">{day}</div>'; cur_day = day
         tl += line_row(f, pmap, cur_fid, prob_map)
-    if not crossed: tl += ticket_sec  # 全部比赛已结束时追加到末尾
     filt = '<div class="filt"><a href="#r1">第 1 轮</a><a href="#r2">第 2 轮</a><a href="#r3">第 3 轮</a></div>'
-    js = ('<script>(function(){if(location.hash)return;'
-          'var t=document.getElementById("tickets");'
-          'if(t)setTimeout(function(){t.scrollIntoView({block:"start"});},80);})();</script>')
+    js = ''
     bt = crowd_backtest_block()
     body = (f'<main>'
             f'<div style="height:12px"></div>{stats_html}{filt}{tl}{bt}'
