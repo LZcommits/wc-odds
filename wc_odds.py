@@ -1390,8 +1390,7 @@ def match_header(rows, cfg):
             f'<div class="vsteam">{team_badge(cfg["home"], l["home"])}<div class="tn">{l["home"]}</div></div>'
             f'<div class="vsmid"><div class="kol">距离开赛</div><div class="kot" id="cd">{ch:02d}<small>H</small> {cm:02d}<small>M</small></div></div>'
             f'<div class="vsteam">{team_badge(cfg["away"], l["away"])}<div class="tn">{l["away"]}</div></div>'
-            f'</div><div class="prob3">{cell("home")}{cell("draw")}{cell("away")}</div>'
-            f'<div class="pbar">{segs}</div></div>')
+            f'</div></div>')
 
 def ev_cards(rows, cfg):
     l = L(cfg); p = rows[-1].get('pin_h2h')
@@ -2177,9 +2176,6 @@ def build_detail(cfg, rows, rich):
         rec_html = rec_card_block(grades, cfg['slug'])
         inner = (f'{match_header(rows, cfg)}'
                  f'{rec_html}'
-                 f'{score_top3_block(rich, cfg["my"], grid, cfg["slug"])}'
-                 f'{wdl_rec_block(rows, cfg, cfg["slug"])}'
-                 f'{goals_block(rich, cfg["my"], grid)}'
                  f'{tp_html}'
                  f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
                  f'<div class="glass">{sec_head("view_list","比分赔率")}{score_odds_html(rich, grid)}</div>'
@@ -2400,15 +2396,8 @@ def line_row(f, pmap, cur_fid, prob_map):
     when = f'{tm} 北京 · 进行中' if live else f'{tm} 北京 · 距开赛 {hrs:.0f}h'
     slug = FID2SLUG.get(fid)
     tag = ''
-    if slug and prob_map.get(fid):           # 精选场:展示去水位概率行 + 比例条
-        pcfg, pd = prob_map[fid]; bottom = f'{probrow(pd, pcfg)}{minibar(pd)}'
-    elif slug:                               # 精选场但暂无采样数据
-        bottom = '<div class="fxbig-cta">⭐ 查看竞猜方案<span class="material-symbols-outlined">arrow_forward</span></div>'
-    else:                                    # 无分析场:占位待补
-        bottom = '<div class="fxbig-ph"><span class="material-symbols-outlined">hourglass_empty</span>竞猜分析筹备中,赛前补充</div>'
     inner = (f'<div class="fxbig-top"><span class="fxbig-tm"><span class="material-symbols-outlined">schedule</span>{when}</span>{tag}</div>'
-             f'<div class="fxbig-vs"><span class="fxbig-team">{th}</span><span class="fxbig-mid">VS</span><span class="fxbig-team">{ta}</span></div>'
-             f'{bottom}')
+             f'<div class="fxbig-vs"><span class="fxbig-team">{th}</span><span class="fxbig-mid">VS</span><span class="fxbig-team">{ta}</span></div>')
     if slug: return f'<a class="fxbig star{cc}"{ida} href="{slug}.html">{inner}</a>'
     return f'<div class="fxbig{cc}"{ida}>{inner}</div>'
 
@@ -2467,10 +2456,6 @@ def build_index(items):
              f'<span>净盈亏 {sign}¥{abs(pl)}</span><span>胜负中 {nwin}/{ntot}</span></div></div>')
     stats_html = build_stats_block(past)
     # ---------- 统一时间线(全部小组赛按时间从上到下)----------
-    prob_map = {}  # 精选场 fid → (cfg, 最新去水位),供大气卡底部展示概率条
-    for cfg, rows, rich in items:
-        afid = AFID.get(cfg['slug'])
-        if afid and rows: prob_map[afid] = (cfg, rows[-1]['devig'])
     fx = sorted(fetch_fixtures(), key=lambda f: f['fixture']['date'])
     cur_fid = next((f['fixture']['id'] for f in fx if f['fixture']['status']['short'] not in ('FT', 'AET', 'PEN')), None)
     RMAP = {'Group Stage - 1': ('r1', '小组赛 · 第 1 轮'), 'Group Stage - 2': ('r2', '小组赛 · 第 2 轮'), 'Group Stage - 3': ('r3', '小组赛 · 第 3 轮')}
@@ -2484,7 +2469,7 @@ def build_index(items):
         except Exception: continue
         wd = '一二三四五六日'[bj.weekday()]; day = f'{bj.month}/{bj.day} 周{wd}'
         if day != cur_day: tl += f'<div class="tl-day">{day}</div>'; cur_day = day
-        tl += line_row(f, pmap, cur_fid, prob_map)
+        tl += line_row(f, pmap, cur_fid, {})
     filt = '<div class="filt"><a href="#r1">第 1 轮</a><a href="#r2">第 2 轮</a><a href="#r3">第 3 轮</a></div>'
     js = ''
     bt = crowd_backtest_block()
