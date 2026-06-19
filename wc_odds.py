@@ -1268,9 +1268,10 @@ def build_past():
 def L(cfg): return {'home': cfg['cn_h'], 'draw': '平局', 'away': cfg['cn_a']}
 
 # ---------- UI 组件 ----------
-def head(title):
+def head(title, raw_title=False):
+    t = title if raw_title else f'{title} · 世界杯推演分析'
     return ('<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-            f'<title>{title} · 世界杯推演分析</title>'
+            f'<title>{t}</title>'
             '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
             '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">'
             '<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet">'
@@ -2554,6 +2555,25 @@ def build_index(items):
     pmap = {str(p['fid']): p for p in past}
     st = compute_stats(past)
 
+    # ── 最新采样时间（扫所有 jsonl，取最大 ts 转北京时间）─────────
+    latest_ts = ''
+    for fn in os.listdir(DATA_DIR):
+        if not fn.endswith('.jsonl'): continue
+        try:
+            last_line = ''
+            for line in open(os.path.join(DATA_DIR, fn)):
+                if line.strip(): last_line = line.strip()
+            if last_line:
+                ts = json.loads(last_line).get('ts', '')
+                if ts > latest_ts: latest_ts = ts
+        except Exception: pass
+    if latest_ts:
+        try:
+            bj = datetime.datetime.fromisoformat(latest_ts).astimezone(BJ)
+            updated_str = f'{bj.year}/{bj.month}/{bj.day} {bj.hour:02d}:{bj.minute:02d} 更新'
+        except Exception: updated_str = '数据已更新'
+    else: updated_str = '数据已更新'
+
     # ── 首页 index.html（仅两组战绩统计）───────────────────────
     list_btn = ('<a href="list.html#cur" style="display:block;text-align:center;'
                 'margin:20px auto 8px;padding:14px 0;max-width:400px;border-radius:12px;'
@@ -2563,9 +2583,9 @@ def build_index(items):
                  f'{ai_stats_block(st)}'
                  f'{crowd_stats_block(st)}'
                  f'{list_btn}'
-                 f'<div class="foot">AI推演 · 仅供参考</div></main>')
+                 f'<div class="foot">{updated_str}</div></main>')
     open(os.path.join(DOCS, 'index.html'), 'w').write(
-        f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯 AI 推演")}</head><body>{home_body}</body></html>')
+        f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯AI推演",raw_title=True)}</head><body>{home_body}</body></html>')
 
     # ── 列表页 list.html（赛程，无战绩）─────────────────────────
     fx = sorted(fetch_fixtures(), key=lambda f: f['fixture']['date'])
