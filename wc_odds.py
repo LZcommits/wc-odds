@@ -927,10 +927,13 @@ a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
 .cmp-bar i{display:block;height:100%;background:var(--lime);border-radius:3px}
 .cmp-c{flex:0 0 56px;color:var(--sec);opacity:.7;font-size:11px}
 /* ── 推荐卡片 ── */
-.rec-card{background:rgba(13,28,45,.9);border:1px solid rgba(204,255,0,.25);border-radius:10px;padding:0;margin-bottom:16px;overflow:hidden}
+.rec-card{background:rgba(13,28,45,.9);border:1px solid rgba(204,255,0,.25);border-radius:10px;padding:0;margin-bottom:12px;overflow:hidden}
 .rec-card-head{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line);background:rgba(204,255,0,.05)}
 .rec-card-head .material-symbols-outlined{color:var(--lime);font-size:17px}
 .rec-card-head .rch-title{font-size:13px;font-weight:800;color:var(--on);letter-spacing:-.01em}
+.rec-card.deep{border-color:rgba(100,180,255,.25);background:rgba(10,20,40,.9)}
+.rec-card.deep .rec-card-head{background:rgba(100,180,255,.06)}
+.rec-card.deep .rec-card-head .material-symbols-outlined{color:#64b4ff}
 .parlay-rec{margin-bottom:14px}
 .pr-leg{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
 .pr-leg:last-of-type{border-bottom:none}
@@ -1905,26 +1908,33 @@ def _crowd_picks(slug, grid, mn, cnh, cna):
         'meta': f'大众投票 {cwd_pct}%<br>共{total_v}票',
         'bet_label': label[cwd], 'match': mn,
     }
-    # 大众比分推荐（价差比 ≥ 1.5，最多3个）
+    # 大众比分推荐（有赔率：价差比≥1.5；无赔率：票选≥5%，最多3个）
     slug_odds = CROWD_SCORE_ODDS.get(slug, {})
+    has_any_odds = any(slug_odds.get(s) for s, _ in cd['top'])
     cands = []
     for s, votes in cd['top']:
         od = slug_odds.get(s)
         vote_share = votes / scored_n
-        implied = (1 / od) if od else 0
-        ratio = vote_share / implied if implied else 0
-        if ratio < 1.5: continue
-        mkt_pct = round(100 / od) if od else 0
         vote_pct = round(vote_share * 100, 1)
-        grade = 'S' if ratio >= 2.0 else 'O'
+        if od:
+            implied = 1 / od
+            ratio = vote_share / implied
+            if ratio < 1.5: continue
+            mkt_pct = round(100 / od)
+            grade = 'S' if ratio >= 2.0 else 'O'
+            meta = f'赔率：{od}<br>市场预估{mkt_pct}%<br>大众票选{vote_pct}%'
+        else:
+            if has_any_odds: continue        # 有赔率库但该比分无赔率，跳过
+            if vote_share < 0.05: continue   # 无赔率时：票选≥5% 才展示
+            ratio = 0; mkt_pct = 0; grade = 'O'
+            meta = f'大众票选{vote_pct}%<br>暂无赔率参照'
         cands.append({
             'grade': grade, 'score': s, 'pick': s.replace('-', ':'),
             'odds': od or 0, 'mkt_pct': mkt_pct, 'my_pct': vote_pct,
-            'meta': (f'赔率：{od}<br>市场预估{mkt_pct}%<br>大众票选{vote_pct}%'
-                     if od else f'大众票选{vote_pct}% · 暂无赔率'),
+            'meta': meta,
             'bet_label': f'比分 {s.replace("-",":")}'  , 'match': mn, 'ratio': ratio,
         })
-    cands.sort(key=lambda x: -x['ratio'])
+    cands.sort(key=lambda x: -x['ratio'] if x['ratio'] else -x['my_pct'])
     return crowd_wdl, cands[:3]
 
 
@@ -2021,23 +2031,15 @@ def grade_bets(cfg, rows, rich, grid):
 
 
 def rec_card_block(grades, slug, is_past=False, past_hits=None):
-    """渲染本场推荐卡（动态行数）。is_past=True 时串关按钮改为 ✓/✗。"""
+    """渲染推荐卡：拆成 AI推荐 + 深度推荐 两张卡。"""
     if past_hits is None: past_hits = {}
     BADGE = {'S': '<span class="badge-s">强推荐</span>',
              'O': '<span class="badge-o">推荐</span>',
              'X': '<span class="badge-x">不推荐</span>'}
-    # 固定行 + 可选行（按顺序）
-    ROW_ORDER = (
-        [('wdl',       '赔率胜平负', True)]
-        + ([('crowd_wdl', '大众胜平负', False)] if grades.get('crowd_wdl') else [])
-        + [(f'score{i}', f'赔率比分 {i}', False) for i in range(1,4) if grades.get(f'score{i}')]
-        + [(f'crowd_score{i}', f'大众比分 {i}', False) for i in range(1,4) if grades.get(f'crowd_score{i}')]
-        + [('goals', '进球数', True)]
-    )
-    rows_html = ''
-    for key, type_cn, required in ROW_ORDER:
+
+    def make_row(key, label, required=False):
         g = grades.get(key) or {}
-        if not g and not required: continue
+        if not g and not required: return ''
         grade = g.get('grade', 'X')
         pick  = g.get('pick', '—')
         meta  = g.get('meta', '')
@@ -2059,19 +2061,37 @@ def rec_card_block(grades, slug, is_past=False, past_hits=None):
                        f'onclick="parlayAdd({item_esc},this)">串关</button>')
             else:
                 act = '<span style="opacity:.2;font-size:12px;color:var(--sec)">—</span>'
-        rows_html += (f'<div class="rec-row">'
-                      f'<div class="rec-type">{type_cn}</div>'
-                      f'<div class="rec-body">'
-                      f'<div class="rec-pick">{pick}</div>'
-                      f'<div class="rec-meta">{meta}</div>'
-                      f'</div>'
-                      f'<div class="rec-badge">{badge}</div>'
-                      f'<div class="rec-act">{act}</div>'
-                      f'</div>')
-    return (f'<div class="rec-card">'
-            f'<div class="rec-card-head">{sec_head("bolt","本场推荐")}</div>'
-            f'{rows_html}'
-            f'</div>')
+        return (f'<div class="rec-row">'
+                f'<div class="rec-type">{label}</div>'
+                f'<div class="rec-body">'
+                f'<div class="rec-pick">{pick}</div>'
+                f'<div class="rec-meta">{meta}</div>'
+                f'</div>'
+                f'<div class="rec-badge">{badge}</div>'
+                f'<div class="rec-act">{act}</div>'
+                f'</div>')
+
+    # ── AI推荐卡 ──────────────────────────────────────
+    ai_rows = make_row('wdl', '胜平负', required=True)
+    for i in range(1, 4):
+        ai_rows += make_row(f'score{i}', f'比分{i}')
+    ai_rows += make_row('goals', '进球数', required=True)
+    ai_card = (f'<div class="rec-card">'
+               f'<div class="rec-card-head">{sec_head("bolt","AI推荐")}</div>'
+               f'{ai_rows}</div>')
+
+    # ── 深度推荐卡（有数据才显示）─────────────────────
+    deep_rows = make_row('crowd_wdl', '胜平负')
+    for i in range(1, 4):
+        deep_rows += make_row(f'crowd_score{i}', f'比分{i}')
+    if deep_rows:
+        deep_card = (f'<div class="rec-card deep">'
+                     f'<div class="rec-card-head">{sec_head("groups","深度推荐")}</div>'
+                     f'{deep_rows}</div>')
+    else:
+        deep_card = ''
+
+    return ai_card + deep_card
 
 
 PARLAY_JS = r"""
