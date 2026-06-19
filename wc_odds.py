@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # 多场采样 + 手机 H5(Midnight Quantum 暗色玻璃拟态设计)
-import json, os, sys, math, datetime, urllib.request
+import json, os, sys, math, datetime, urllib.request, html as _html
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(ROOT, 'data'); DOCS = os.path.join(ROOT, 'docs')
@@ -926,12 +926,12 @@ a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
 .rec-card-head{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line);background:rgba(204,255,0,.05)}
 .rec-card-head .material-symbols-outlined{color:var(--lime);font-size:17px}
 .rec-card-head .rch-title{font-size:13px;font-weight:800;color:var(--on);letter-spacing:-.01em}
-.rec-row{display:grid;grid-template-columns:52px 1fr auto auto;align-items:center;border-bottom:1px solid rgba(255,255,255,.05);min-height:56px}
+.rec-row{display:grid;grid-template-columns:72px 1fr auto auto;align-items:center;border-bottom:1px solid rgba(255,255,255,.05);min-height:56px}
 .rec-row:last-child{border-bottom:none}
-.rec-type{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--sec);letter-spacing:.03em;border-right:1px solid rgba(255,255,255,.06);padding:12px 4px;align-self:stretch}
+.rec-type{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--sec);letter-spacing:.03em;border-right:1px solid rgba(255,255,255,.06);padding:12px 6px;align-self:stretch;text-align:center;line-height:1.4}
 .rec-body{padding:10px 10px;min-width:0}
 .rec-pick{font-size:14px;font-weight:700;color:var(--on);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rec-meta{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--sec);line-height:1.5}
+.rec-meta{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--sec);line-height:1.5;opacity:.8}
 .rec-badge{padding:0 8px;display:flex;align-items:center;justify-content:center;min-width:52px}
 .badge-s{font-size:10px;font-weight:800;color:var(--lime);background:rgba(204,255,0,.12);border:1px solid rgba(204,255,0,.35);border-radius:4px;padding:2px 6px;white-space:nowrap}
 .badge-o{font-size:10px;font-weight:700;color:#f0c040;background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.3);border-radius:4px;padding:2px 6px;white-space:nowrap}
@@ -1386,7 +1386,7 @@ def match_header(rows, cfg):
                 f'<div class="ph-big" style="color:{"#CCFF00" if k==mx else "#d4e4fa"}">{cur:.1f}%</div>'
                 f'<div class="ph-chg mono" style="color:{ac}">{arr} {abs(dv):.1f}%</div></div>')
     segs = ''.join(f'<div style="flex:{max(d[k]*100,3):.1f};background:{"#CCFF00" if k==mx else "#3f465c"}"></div>' for k in ('home','draw','away'))
-    return (f'<div class="glass vshead">{hot}<div class="vsrow">'
+    return (f'<div class="vshead">{hot}<div class="vsrow">'
             f'<div class="vsteam">{team_badge(cfg["home"], l["home"])}<div class="tn">{l["home"]}</div></div>'
             f'<div class="vsmid"><div class="kol">距离开赛</div><div class="kot" id="cd">{ch:02d}<small>H</small> {cm:02d}<small>M</small></div></div>'
             f'<div class="vsteam">{team_badge(cfg["away"], l["away"])}<div class="tn">{l["away"]}</div></div>'
@@ -2032,12 +2032,13 @@ def rec_card_block(grades, slug, is_past=False, past_hits=None):
             else:              act = '<span class="rec-hit" style="opacity:.25">—</span>'
         else:
             if odds > 0:
-                item = json.dumps({'id': f'{slug}_{key}', 'match': g.get('match',''),
-                                   'bet_label': g.get('bet_label',''), 'odds': odds,
-                                   'prob': g.get('my_pct', 5) / 100, 'grade': grade},
-                                  ensure_ascii=False)
+                item_raw = json.dumps({'id': f'{slug}_{key}', 'match': g.get('match',''),
+                                      'bet_label': g.get('bet_label',''), 'odds': odds,
+                                      'prob': g.get('my_pct', 5) / 100, 'grade': grade},
+                                     ensure_ascii=False)
+                item_esc = _html.escape(item_raw, quote=True)
                 act = (f'<button class="rec-btn" id="pbtn_{slug}_{key}" '
-                       f'onclick="parlayAdd({item},this)">串关</button>')
+                       f'onclick="parlayAdd({item_esc},this)">串关</button>')
             else:
                 act = '<span style="opacity:.2;font-size:12px;color:var(--sec)">—</span>'
         rows_html += (f'<div class="rec-row">'
@@ -2329,7 +2330,7 @@ def build_past_detail(p, items_map=None):
     okw = p.get('wdl_hit')
     wdl_badge = '<span class="pres ok">✓ 命中</span>' if okw else '<span class="pres no">✗ 未中</span>'
     rescn = f'{cnh} 胜' if gh>ga else (f'{cna} 胜' if ga>gh else '平局')
-    past_header = (f'<div class="glass vshead">'
+    past_header = (f'<div class="vshead">'
                    f'<div class="vsrow">'
                    f'<div class="vsteam">{team_badge(p["h"],cnh)}<div class="tn">{cnh}</div></div>'
                    f'<div class="vsmid">'
@@ -2554,7 +2555,7 @@ def build_index(items):
     st = compute_stats(past)
 
     # ── 首页 index.html（仅两组战绩统计）───────────────────────
-    list_btn = ('<a href="list.html" style="display:block;text-align:center;'
+    list_btn = ('<a href="list.html#cur" style="display:block;text-align:center;'
                 'margin:20px auto 8px;padding:14px 0;max-width:400px;border-radius:12px;'
                 'background:var(--lime);color:#000;font-weight:800;font-size:15px;'
                 'text-decoration:none">查看完整赛程 →</a>')
@@ -2587,8 +2588,11 @@ def build_index(items):
     filt = '<div class="filt"><a href="#r1">第 1 轮</a><a href="#r2">第 2 轮</a><a href="#r3">第 3 轮</a></div>'
     back_home = ('<a href="index.html" class="back">'
                  '<span class="material-symbols-outlined">arrow_back</span>首页</a>')
+    scroll_to_cur = ('<script>document.addEventListener("DOMContentLoaded",function(){'
+                     'var el=document.getElementById("cur");'
+                     'if(el)el.scrollIntoView({block:"center"});});</script>')
     list_body = (f'<main>{back_home}<div style="height:4px"></div>{filt}{tl}'
-                 f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{PARLAY_JS}')
+                 f'<div class="foot">API-Football Pro · GitHub Actions</div></main>{PARLAY_JS}{scroll_to_cur}')
     open(os.path.join(DOCS, 'list.html'), 'w').write(
         f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("赛程 · 世界杯")}</head><body>{list_body}</body></html>')
 
