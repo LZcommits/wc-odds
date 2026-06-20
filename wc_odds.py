@@ -1044,13 +1044,16 @@ a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
 .stat-lbl{font-size:10px;color:var(--sec);margin-top:3px;letter-spacing:.03em}
 .stat-sub{font-size:10px;color:var(--sec);opacity:.55;text-align:center;margin-top:2px;font-family:'JetBrains Mono',monospace}
 /* ── 首页 Hero ── */
-.home-hero{position:relative;border-radius:16px;overflow:hidden;margin-bottom:20px;padding:32px 20px 28px;background:linear-gradient(135deg,#020c1b 0%,#051d38 50%,#020c1b 100%);border:1px solid rgba(204,255,0,.18);box-shadow:0 0 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06)}
-.home-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(204,255,0,.12) 0%,transparent 70%);pointer-events:none}
-.hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;color:var(--lime);opacity:.7;text-transform:uppercase;margin-bottom:10px}
-.hero-year{font-size:72px;font-weight:900;line-height:.9;letter-spacing:-.04em;color:#fff;text-shadow:0 0 40px rgba(204,255,0,.3)}
-.hero-wc{font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--lime);text-transform:uppercase;margin:6px 0 2px}
-.hero-tagline{font-size:11px;color:var(--sec);opacity:.6;letter-spacing:.06em}
-.hero-badge{display:inline-flex;align-items:center;gap:5px;margin-top:16px;padding:5px 10px;border-radius:6px;background:rgba(204,255,0,.1);border:1px solid rgba(204,255,0,.3);font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--lime);letter-spacing:.06em}
+.home-hero{position:relative;border-radius:16px;overflow:hidden;margin-bottom:20px;padding:28px 20px 24px;background:linear-gradient(135deg,#020c1b 0%,#051d38 55%,#020c1b 100%);border:1px solid rgba(204,255,0,.18)}
+.home-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(204,255,0,.6),transparent)}
+.hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;color:var(--lime);opacity:.6;text-transform:uppercase;margin-bottom:12px}
+.hero-year{font-size:72px;font-weight:900;line-height:.9;letter-spacing:-.02em;color:#fff}
+.hero-wc{font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--lime);text-transform:uppercase;margin:8px 0 4px}
+.hero-tagline{font-size:11px;color:var(--sec);opacity:.55;letter-spacing:.04em}
+.hero-stat{flex:1;min-width:80px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 10px 8px}
+.hstat-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--lime);line-height:1;margin-bottom:5px}
+.hstat-lbl{font-size:9px;color:var(--sec);opacity:.65;line-height:1.5;letter-spacing:.03em}
+.hstat-sub{font-size:9px;color:var(--sec);opacity:.4;font-family:'JetBrains Mono',monospace}
 /* ── 分轮命中率 ── */
 .round-compare{display:grid;grid-template-columns:1fr 1px 1fr;gap:0;background:rgba(13,28,45,.7);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:14px}
 .rc-col{padding:18px 16px;text-align:center}
@@ -2893,75 +2896,32 @@ def build_index(items):
     else: updated_str = '数据已更新'
 
     # ── 首页 index.html ────────────────────────────────────────
-    # Hero 海报
+    n_all = st.get('n', 0)
+    wh_all = st.get('wdl_hits', 0); sh_all = st.get('sc_hits', 0)
+    th_all = st.get('tot_hits', 0); tn_all = st.get('tot_n', 0)
+    wdl_pct_str = _pct(wh_all, n_all)
+
+    # Hero：命中率为主视觉
     hero = (
         '<div class="home-hero">'
-        '<div class="hero-eyebrow">AI ODDS ANALYSIS · POISSON MODEL</div>'
-        '<div class="hero-year">2026</div>'
-        '<div class="hero-wc">FIFA WORLD CUP</div>'
-        '<div class="hero-tagline">赔率价值 · 技术面校正 · 锐庄去水位</div>'
-        '<div class="hero-badge">'
-        '<span class="material-symbols-outlined" style="font-size:13px">bolt</span>'
-        'AI 推演已覆盖全部小组赛</div>'
+        '<div class="hero-eyebrow">2026 FIFA WORLD CUP · AI 推演</div>'
+        f'<div class="hero-year">{wdl_pct_str}</div>'
+        '<div class="hero-wc">胜平负命中率</div>'
+        f'<div class="hero-tagline">已推演 {n_all} 场 · 赔率价值 · 技术面校正 · 锐庄去水位</div>'
+        '<div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">'
+        f'<div class="hero-stat"><div class="hstat-val">{_pct(sh_all, n_all)}</div><div class="hstat-lbl">比分命中率<br><span class="hstat-sub">{sh_all}/{n_all}场</span></div></div>'
+        f'<div class="hero-stat"><div class="hstat-val">{_pct(th_all, tn_all)}</div><div class="hstat-lbl">大小球命中率<br><span class="hstat-sub">{th_all}/{tn_all}场</span></div></div>'
+        f'<div class="hero-stat"><div class="hstat-val">{wh_all}/{n_all}</div><div class="hstat-lbl">胜平负场次<br><span class="hstat-sub">已结束场次</span></div></div>'
+        '</div>'
         '</div>'
     )
 
-    # 分轮命中率对比
-    def _rc(rs, label, round_name):
-        n = rs.get('n', 0)
-        if not n:
-            return (f'<div class="rc-col"><div class="rc-label">{round_name}</div>'
-                    f'<div class="rc-pct dim">—</div>'
-                    f'<div class="rc-detail"><div class="rc-row">暂无数据</div></div></div>')
-        wh = rs['wdl_hits']; sh = rs['sc_hits']; th = rs['tot_hits']; tn = rs['tot_n']
-        wdl_pct = f'{wh/n*100:.0f}%'
-        # 趋势标签
-        rate = wh / n if n else 0
-        tag = (f'<span class="rc-tag up">命中率 {wdl_pct}</span>' if rate >= 0.45
-               else f'<span class="rc-tag dn">命中率 {wdl_pct}</span>')
-        return (f'<div class="rc-col">'
-                f'<div class="rc-label">{round_name}</div>'
-                f'<div class="rc-pct">{wdl_pct}</div>'
-                f'<div class="rc-detail">'
-                f'<div class="rc-row">胜平负 <b>{wh}/{n}</b> 场</div>'
-                f'<div class="rc-row">比分 <b>{sh}/{n}</b> · 大小球 <b>{th}/{tn}</b></div>'
-                f'{tag}'
-                f'</div></div>')
-
-    r1s = st.get('r1', {}); r2s = st.get('r2', {}); r3s = st.get('r3', {})
-    # 动态显示有数据的轮次
-    round_cols = _rc(r1s, '第一轮', '第 1 轮') + '<div class="rc-divider"></div>' + _rc(r2s, '第二轮', '第 2 轮')
-    if r3s.get('n'):
-        round_cols += '<div class="rc-divider"></div>' + _rc(r3s, '第三轮', '第 3 轮')
-        round_grid = f'<div class="round-compare" style="grid-template-columns:1fr 1px 1fr 1px 1fr">{round_cols}</div>'
-    else:
-        round_grid = f'<div class="round-compare">{round_cols}</div>'
-
-    # 总战绩汇总行
-    def _htcell(val, lbl, sub):
-        return (f'<div class="ht-cell"><div class="ht-val">{val}</div>'
-                f'<div class="ht-lbl">{lbl}</div><div class="ht-sub">{sub}</div></div>')
-    n_all = st.get('n', 0)
-    total_row = ''
-    if n_all:
-        wh_all = st['wdl_hits']; sh_all = st['sc_hits']
-        th_all = st['tot_hits']; tn_all = st['tot_n']
-        total_row = (f'<div class="glass" style="padding:14px 16px;margin-bottom:14px">'
-                     f'<div style="font-size:10px;color:var(--sec);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">总计 {n_all} 场</div>'
-                     f'<div class="home-total">'
-                     + _htcell(_pct(wh_all, n_all), '胜平负命中', f'{wh_all}/{n_all}场')
-                     + _htcell(_pct(sh_all, n_all), '比分命中', f'{sh_all}/{n_all}场')
-                     + _htcell(_pct(th_all, tn_all), '大小球命中', f'{th_all}/{tn_all}场')
-                     + '</div></div>')
-
     list_btn = ('<a href="list.html#cur" style="display:block;text-align:center;'
-                'margin:8px auto 16px;padding:16px 0;border-radius:12px;'
+                'margin:16px auto 16px;padding:16px 0;border-radius:12px;'
                 'background:var(--lime);color:#000;font-weight:900;font-size:16px;'
                 'letter-spacing:.02em;text-decoration:none">查看完整赛程 →</a>')
     home_body = (f'<main style="padding-top:68px">'
                  f'{hero}'
-                 f'{round_grid}'
-                 f'{total_row}'
                  f'{list_btn}'
                  f'<div class="foot">{updated_str}</div></main>')
     open(os.path.join(DOCS, 'index.html'), 'w').write(
