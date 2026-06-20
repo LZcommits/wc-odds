@@ -2830,8 +2830,8 @@ def compute_stats(past):
     if not n: return {}
 
     # 按轮次日期分割（第一轮 6.11-6.17，第二轮 6.18-6.24，第三轮 6.25+）
-    r1 = [p for p in scored if p.get('date', '') < '2026-06-18']
-    r2 = [p for p in scored if '2026-06-18' <= p.get('date', '') < '2026-06-25']
+    r1 = [p for p in scored if p.get('date', '') < '2026-06-18T10']
+    r2 = [p for p in scored if '2026-06-18T10' <= p.get('date', '') < '2026-06-25']
     r3 = [p for p in scored if p.get('date', '') >= '2026-06-25']
 
     wdl_hits = sum(1 for p in scored if p.get('wdl_hit'))
