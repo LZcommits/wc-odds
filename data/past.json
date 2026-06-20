@@ -38,6 +38,7 @@
 "Home/Away": 1.25,
 "Draw/Away": 1.91
 },
+"tot_o": 2.31,
 "tot_u": 1.67,
 "under_prob": 0.5804020100502513,
 "po": {
@@ -189,6 +190,7 @@
 "Home/Away": 1.3,
 "Draw/Away": 1.7
 },
+"tot_o": 2.47,
 "tot_u": 1.58,
 "under_prob": 0.6098765432098766,
 "po": {
@@ -340,6 +342,7 @@
 "Home/Away": 1.11,
 "Draw/Away": 1.04
 },
+"tot_o": 1.66,
 "tot_u": 2.32,
 "under_prob": 0.4170854271356784,
 "po": {
@@ -491,6 +494,7 @@
 "Home/Away": 1.25,
 "Draw/Away": 2.05
 },
+"tot_o": 2.1,
 "tot_u": 1.79,
 "under_prob": 0.5398457583547558,
 "po": {
@@ -642,6 +646,7 @@
 "Home/Away": 1.17,
 "Draw/Away": 1.13
 },
+"tot_o": 1.65,
 "tot_u": 2.32,
 "under_prob": 0.4156171284634761,
 "po": {
@@ -793,6 +798,7 @@
 "Home/Away": 1.25,
 "Draw/Away": 1.14
 },
+"tot_o": 2.13,
 "tot_u": 1.77,
 "under_prob": 0.5461538461538462,
 "po": {
@@ -944,6 +950,7 @@
 "Home/Away": 1.02,
 "Draw/Away": 13.0
 },
+"tot_o": null,
 "tot_u": null,
 "under_prob": null,
 "po": {
@@ -1098,6 +1105,7 @@
 "Home/Away": 1.25,
 "Draw/Away": 1.7
 },
+"tot_o": 2.11,
 "tot_u": 1.79,
 "under_prob": 0.541025641025641,
 "po": {
@@ -1249,6 +1257,7 @@
 "Home/Away": 1.36,
 "Draw/Away": 1.35
 },
+"tot_o": 3.06,
 "tot_u": 1.4,
 "under_prob": 0.6860986547085202,
 "po": {
@@ -1400,6 +1409,7 @@
 "Home/Away": 1.28,
 "Draw/Away": 1.85
 },
+"tot_o": 2.22,
 "tot_u": 1.71,
 "under_prob": 0.564885496183206,
 "po": {
@@ -1551,6 +1561,7 @@
 "Home/Away": 1.04,
 "Draw/Away": 7.5
 },
+"tot_o": 1.29,
 "tot_u": 3.51,
 "under_prob": 0.26875,
 "po": {
@@ -1702,6 +1713,7 @@
 "Home/Away": 1.2,
 "Draw/Away": 2.38
 },
+"tot_o": 2.02,
 "tot_u": 1.89,
 "under_prob": 0.5166240409207161,
 "po": {
@@ -1853,6 +1865,7 @@
 "Home/Away": 1.2,
 "Draw/Away": 1.08
 },
+"tot_o": 2.13,
 "tot_u": 1.78,
 "under_prob": 0.5447570332480818,
 "po": {
@@ -2004,6 +2017,7 @@
 "Home/Away": 1.25,
 "Draw/Away": 1.95
 },
+"tot_o": 2.45,
 "tot_u": 1.59,
 "under_prob": 0.6064356435643565,
 "po": {
@@ -2155,6 +2169,7 @@
 "Home/Away": 1.18,
 "Draw/Away": 2.7
 },
+"tot_o": 1.77,
 "tot_u": 2.13,
 "under_prob": 0.45384615384615384,
 "po": {
@@ -2306,6 +2321,7 @@
 "Home/Away": 1.1,
 "Draw/Away": 1.03
 },
+"tot_o": 1.64,
 "tot_u": 2.34,
 "under_prob": 0.41206030150753775,
 "po": {
@@ -2457,6 +2473,7 @@
 "Home/Away": 1.18,
 "Draw/Away": 2.45
 },
+"tot_o": 2.05,
 "tot_u": 1.86,
 "under_prob": 0.5242966751918159,
 "po": {
@@ -2608,6 +2625,7 @@
 "Home/Away": 1.15,
 "Draw/Away": 2.9
 },
+"tot_o": 1.89,
 "tot_u": 2.01,
 "under_prob": 0.4846153846153846,
 "po": {
@@ -2759,6 +2777,7 @@
 "Home/Away": 1.14,
 "Draw/Away": 3.6
 },
+"tot_o": 1.81,
 "tot_u": 2.07,
 "under_prob": 0.46649484536082475,
 "po": {
@@ -2910,6 +2929,7 @@
 "Home/Away": 1.22,
 "Draw/Away": 2.1
 },
+"tot_o": 2.11,
 "tot_u": 1.79,
 "under_prob": 0.541025641025641,
 "po": {
@@ -3061,6 +3081,7 @@
 "Home/Away": 1.3,
 "Draw/Away": 1.62
 },
+"tot_o": 2.43,
 "tot_u": 1.61,
 "under_prob": 0.6014851485148515,
 "po": {
@@ -3212,6 +3233,7 @@
 "Home/Away": 1.18,
 "Draw/Away": 1.05
 },
+"tot_o": 1.98,
 "tot_u": 1.93,
 "under_prob": 0.5063938618925831,
 "po": {
@@ -3363,6 +3385,7 @@
 "Home/Away": 1.25,
 "Draw/Away": 1.93
 },
+"tot_o": 2.21,
 "tot_u": 1.72,
 "under_prob": 0.5623409669211196,
 "po": {
@@ -3514,6 +3537,7 @@
 "Home/Away": 1.2,
 "Draw/Away": 2.45
 },
+"tot_o": 1.92,
 "tot_u": 1.98,
 "under_prob": 0.4923076923076923,
 "po": {
@@ -3665,6 +3689,7 @@
 "Home/Away": 1.15,
 "Draw/Away": 3.45
 },
+"tot_o": 1.74,
 "tot_u": 2.18,
 "under_prob": 0.4438775510204082,
 "po": {
@@ -3816,6 +3841,7 @@
 "Home/Away": 1.3,
 "Draw/Away": 1.77
 },
+"tot_o": 2.2,
 "tot_u": 1.72,
 "under_prob": 0.5612244897959184,
 "po": {
@@ -3967,6 +3993,7 @@
 "Home/Away": 1.2,
 "Draw/Away": 2.2
 },
+"tot_o": 1.95,
 "tot_u": 1.95,
 "under_prob": 0.5,
 "po": {
@@ -4118,6 +4145,7 @@
 "Home/Away": 1.25,
 "Draw/Away": 1.14
 },
+"tot_o": 2.34,
 "tot_u": 1.65,
 "under_prob": 0.5864661654135338,
 "po": {
@@ -4269,6 +4297,7 @@
 "Home/Away": 1.05,
 "Draw/Away": 6.5
 },
+"tot_o": 1.31,
 "tot_u": 3.43,
 "under_prob": 0.2763713080168776,
 "po": {

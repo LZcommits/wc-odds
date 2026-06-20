@@ -1178,9 +1178,9 @@ def call_hit(kind, fav, gh, ga):
     if kind == 'anti_fav': return res != fav
     return abs(gh - ga) <= 1
 def _res(gh, ga): return 'home' if gh > ga else ('away' if ga > gh else 'draw')
-def value_picks(d, kind, fav):
+def value_picks(d, kind, fav, under_prob=None):
     """顺价值方向,从赛前去水位泊松网格里筛 2 个推荐比分 + 胜负倾向。"""
-    lh, la, grid = poisson_calc(d['home'], d['away'], None)
+    lh, la, grid = poisson_calc(d['home'], d['away'], under_prob)
     def r(s): i, j = map(int, s.split('-')); return 'home' if i > j else ('away' if j > i else 'draw')
     if kind == 'anti_blowout':              # 押热门小胜(砍屠杀):候选=热门赢
         cand = [s for s in grid if r(s) == fav]; wdl = ('win', fav)
@@ -1229,8 +1229,8 @@ def build_past():
         if gh is None or ga is None: continue
         h, a = f['teams']['home']['name'], f['teams']['away']['name']
         rec = cache.get(fid)
-        if rec and rec.get('gh') == gh and rec.get('ga') == ga and rec.get('devig') and rec.get('dc') is not None and 'score_odds' in rec:
-            continue  # 已缓存且含完整比分赔率,跳过请求
+        if rec and rec.get('gh') == gh and rec.get('ga') == ga and rec.get('devig') and rec.get('dc') is not None and 'score_odds' in rec and 'under_prob' in rec and 'tot_o' in rec:
+            continue  # 已缓存且含完整比分赔率和大小球,跳过请求
         bms = fetch_af_odds(int(fid))
         mw = af_h2h(af_bet(af_book(bms, PIN), 1)) if bms else None
         if not mw: mw = af_h2h(af_vals(bms, 1)) if bms else None
@@ -1242,12 +1242,14 @@ def build_past():
         dcd = af_pair(af_vals(bms, 12), ('Home/Draw', 'Home/Away', 'Draw/Away')) or {}
         totd = af_tot(af_bet(af_book(bms, PIN), 5)) or af_tot(af_vals(bms, 5)) or {}
         scd = (af_score(bms) or {}).get('odds', {})
-        pk, _w = value_picks(d, kind, fav)
+        under_p = devig({'over': totd['over'], 'under': totd['under']})['under'] if (totd.get('over') and totd.get('under')) else None
+        pk, _w = value_picks(d, kind, fav, under_prob=under_p)
         po = {sc.replace(':', '-'): scd.get(sc.replace(':', '-')) for sc in pk}
         cache[fid] = {'date': f['fixture']['date'], 'h': h, 'a': a, 'gh': gh, 'ga': ga,
                       'devig': d, 'tier': tier, 'fav': fav, 'dir': dirn, 'kind': kind,
                       'hit': bool(call_hit(kind, fav, gh, ga)),
-                      'dc': dcd, 'tot_u': totd.get('under'), 'po': po, 'score_odds': scd}
+                      'dc': dcd, 'tot_o': totd.get('over'), 'tot_u': totd.get('under'), 'under_prob': under_p,
+                      'po': po, 'score_odds': scd}
     with open(PAST_CACHE, 'w') as fp: json.dump(cache, fp, ensure_ascii=False, indent=0)
     out = []
     for fid, v in cache.items():
@@ -2231,6 +2233,39 @@ def _odds_review_block(p, actual_sc, model_picks, grid):
                   else f'模型未选到（推荐：{", ".join(sc for sc in model_picks if sc)}）')
     model_color = 'var(--lime)' if model_hit else 'var(--sec)'
 
+    # ── 大小球分析：赔率→μ推导 ──────────────────────────────────
+    mu_html = ''
+    tot_o = p.get('tot_o'); tot_u = p.get('tot_u'); under_prob = p.get('under_prob')
+    if tot_o and tot_u and under_prob:
+        imp_o = round(100/tot_o, 1); imp_u = round(100/tot_u, 1)
+        total_imp = round(imp_o + imp_u, 1); vig = round(total_imp - 100, 1)
+        under_pct = round(under_prob*100, 1)
+        mu_val = solve_mu(under_prob)
+        d = p.get('devig', {})
+        lh_val, la_val, _ = poisson_calc(d.get('home', 0.5), d.get('away', 0.25), under_prob)
+        cnh = cn_of(p['h']); cna = cn_of(p['a'])
+        mu_html = (
+            f'<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)">'
+            f'<div style="font-size:10px;color:var(--sec);margin-bottom:8px">大小球推导（期望进球数 μ）</div>'
+            f'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 8px;font-size:11px;margin-bottom:8px">'
+            f'<span style="color:var(--sec)">大球 @{tot_o}</span>'
+            f'<span style="color:var(--sec)">→ 隐含 {imp_o}%</span>'
+            f'<span></span>'
+            f'<span style="color:var(--sec)">小球 @{tot_u}</span>'
+            f'<span style="color:var(--sec)">→ 隐含 {imp_u}%</span>'
+            f'<span style="color:var(--sec);font-size:9px">合计 {total_imp}%（水位 {vig}%）</span>'
+            f'<span style="color:var(--on)">去水位</span>'
+            f'<span style="color:var(--on)">小球真实 {under_pct}%</span>'
+            f'<span></span>'
+            f'</div>'
+            f'<div style="font-size:11px;color:var(--lime)">'
+            f'期望进球 μ = {round(mu_val,2)}'
+            f'<span style="color:var(--sec);margin-left:12px">'
+            f'{cnh} λ={round(lh_val,2)} &nbsp;/&nbsp; {cna} λ={round(la_val,2)}'
+            f'</span></div>'
+            f'</div>'
+        )
+
     return (f'<div class="glass" style="margin-bottom:12px">'
             f'{sec_head("query_stats","赔率复盘")}'
             f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">'
@@ -2242,6 +2277,7 @@ def _odds_review_block(p, actual_sc, model_picks, grid):
             f'<div style="font-size:10px;color:var(--sec);margin-bottom:8px">市场最热门比分 Top 5（赛前）</div>'
             f'{top5_html}{extra}'
             f'<div style="margin-top:10px;font-size:11px;color:{model_color}">{model_note}</div>'
+            f'{mu_html}'
             f'</div>')
 
 def build_past_detail(p, items_map=None):
@@ -2273,15 +2309,16 @@ def build_past_detail(p, items_map=None):
         bj = datetime.datetime.fromisoformat(p['date']).astimezone(BJ)
         ds = f'{bj.month}/{bj.day} {bj.hour:02d}:{bj.minute:02d}'
     except Exception: ds = ds0
-    lh, la, grid = poisson_calc(d['home'], d['away'], None)
+    under_prob = p.get('under_prob')  # 赛前真实大小球去水位概率，与 live 页保持一致
+    lh, la, grid = poisson_calc(d['home'], d['away'], under_prob)
     actual_sc = f'{gh}-{ga}'
     actual_wdl = 'home' if gh > ga else ('away' if ga > gh else 'draw')
     actual_tot = gh + ga
 
     # ── 重建赛前推荐结构(仅展示用,无串关按钮) ──────────────────────
-    picks = p.get('picks', [])
     kind = p.get('kind', ''); fav = p.get('fav', 'home')
-    wdl_mode, wdl_fav = value_picks(d, kind, fav)[1]  # (mode, fav)
+    picks, wdl_wdl = value_picks(d, kind, fav, under_prob=under_prob)
+    wdl_mode, wdl_fav = wdl_wdl
     # WDL 方向还原
     label = {'home': cnh, 'draw': '平局', 'away': cna}
     wdl_outcome = wdl_fav if wdl_mode == 'win' else ('draw' if actual_wdl != wdl_fav else 'away')
@@ -2376,8 +2413,8 @@ def build_past_detail(p, items_map=None):
         if fb: fb_html = f'<div class="glass">{fb}</div>'
     odds_review = _odds_review_block(p, actual_sc, picks, grid)
     inner = (f'{past_header}'
-             f'{rec_html}'
              f'{odds_review}'
+             f'{rec_html}'
              f'{tp_html}'
              f'{matchup_html}'
              f'{reasoning_html}'
