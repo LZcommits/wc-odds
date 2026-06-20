@@ -2486,8 +2486,8 @@ def build_past_detail(p, items_map=None):
     matchup_html = ''
     reasoning_html = ''
     fb_html = ''
-    if cfg and rich:
-        tp = third_party_block(cfg, rich.get('pred'))
+    if cfg:
+        tp = third_party_block(cfg, rich.get('pred') if rich else None)
         if tp: tp_html = f'<div class="glass">{tp}</div>'
         matchup_html = f'{sec_head("analytics","对阵分析")}{matchup_analysis(cfg)}'
         reasoning_html = f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
