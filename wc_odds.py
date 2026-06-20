@@ -825,6 +825,10 @@ table.so tr.val td.s,table.so tr.val td.e{color:var(--lime);font-weight:700}
 .tl-vs{color:var(--sec);opacity:.5;font-size:12px;margin:0 4px}
 .tl-pl{flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800}
 .tl-pl.pos{color:var(--lime)} .tl-pl.neg{color:var(--crim)}
+.hit-chips{display:flex;gap:4px;flex:0 0 auto}
+.hc{font-size:10px;font-weight:700;padding:2px 5px;border-radius:4px;letter-spacing:.02em}
+.hc.ok{color:var(--lime);background:rgba(204,255,0,.1)}
+.hc.no{color:var(--sec);background:rgba(255,255,255,.05);opacity:.6}
 .tl-go{flex:0 0 auto;color:var(--lime);font-size:12px;font-weight:600;white-space:nowrap}
 .tl-live{flex:0 0 auto;color:var(--crim);font-size:11px;font-weight:700}
 .tl-row.cur{border-color:rgba(204,255,0,.55);box-shadow:0 0 14px rgba(204,255,0,.18)}
@@ -1255,10 +1259,13 @@ def build_past():
     for fid, v in cache.items():
         v = dict(v); v['fid'] = fid
         if v.get('devig'):  # 纯计算:顺价值方向产出 2 推荐比分 + 胜负倾向,并模拟 ¥100 下注结算
-            picks, wdl = value_picks(v['devig'], v['kind'], v['fav'])
+            under_p = v.get('under_prob')
+            picks, wdl = value_picks(v['devig'], v['kind'], v['fav'], under_prob=under_p)
             v['picks'] = picks; v['wdl_txt'] = wdl_text(wdl, cn_of(v['h']), cn_of(v['a']))
             v['wdl_hit'] = bool(wdl_hit(wdl, v['gh'], v['ga']))
             v['score2_hit'] = (f"{v['gh']}:{v['ga']}" in picks)
+            tot_u = v.get('tot_u'); tot = v.get('gh', 0) + v.get('ga', 0)
+            v['goals_hit'] = bool(tot_u and ((tot_u > 2.1) == (tot > 2)))
             v['won'], v['pl'] = settle100(v)
         out.append(v)
     out.sort(key=lambda x: x['date'], reverse=True)
@@ -2513,11 +2520,14 @@ def line_row(f, pmap, cur_fid, prob_map):
         teams = f'<span class="tl-tt">{th} <span class="tl-sc">{gh}-{ga}</span> {ta}</span>'
         p = pmap.get(str(fid))
         if p and p.get('wdl_hit') is not None:
-            hit = p['wdl_hit']
-            lbl = '中' if hit else '未中'
-            lbl_style = 'color:var(--lime);font-weight:800' if hit else 'color:var(--sec);opacity:.6'
+            def hc(label, hit): return f'<span class="hc {"ok" if hit else "no"}">{label}{"✓" if hit else "✗"}</span>'
+            chips = (f'<span class="hit-chips">'
+                     f'{hc("胜", p["wdl_hit"])}'
+                     f'{hc("分", p.get("score2_hit", False))}'
+                     f'{hc("球", p.get("goals_hit", False))}'
+                     f'</span>')
             return (f'<a class="tl-row done{cc}"{ida} href="past_{fid}.html"><span class="tl-tm">{tm}</span>'
-                    f'{teams}<span class="tl-pl" style="{lbl_style}">{lbl}</span></a>')
+                    f'{teams}{chips}</a>')
         # 无赔率数据但有赛果:仍可点进查看赛果页
         if p and p.get('gh') is not None:
             return (f'<a class="tl-row done{cc}"{ida} href="past_{fid}.html"><span class="tl-tm">{tm}</span>'
