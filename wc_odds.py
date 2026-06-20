@@ -2023,7 +2023,7 @@ def grade_bets(cfg, rows, rich, grid, up=None):
     elif mu_val < 2.2:
         pick, pick_dir, grade = '小球 ≤2', 'under', 'X'
     else:
-        pick, pick_dir, grade = f'μ={round(mu_val,2)} 不确定区间', '', 'X'
+        pick, pick_dir, grade = f'约{round(mu_val)}球', '', 'X'
     prob = ov_prob if pick_dir == 'over' else (1-ov_prob if pick_dir == 'under' else 0)
     od_show = (o_od if pick_dir == 'over' else u_od) if (o_od and u_od) else 0
     mkt_pct = round(100/od_show) if od_show else 0
@@ -2060,7 +2060,7 @@ def _build_mu_html(tot_o, tot_u, under_prob, lh_val, la_val, cnh, cna):
     under_pct = round(under_prob*100, 1)
     mu_val = solve_mu(under_prob)
     return (
-        f'<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)">'
+        f'<div style="margin-top:14px;padding:12px 14px 14px;border-top:1px solid rgba(255,255,255,.08)">'
         f'<div style="font-size:10px;color:var(--sec);margin-bottom:8px">大小球推导（期望进球数 μ）</div>'
         f'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 8px;font-size:11px;margin-bottom:8px">'
         f'<span style="color:var(--sec)">大球 @{tot_o}</span>'
@@ -2112,8 +2112,28 @@ def rec_card_block(grades, slug, is_past=False, past_hits=None, mu_html=''):
     for i in range(1, 4):
         ai_rows += make_row(f'score{i}', f'比分{i}')
     ai_rows += make_row('goals', '进球数', required=True)
-    ai_rows += make_row('margin1', '净胜球1')
-    ai_rows += make_row('margin2', '净胜球2')
+    # 净胜球合并一行
+    m1 = grades.get('margin1') or {}; m2 = grades.get('margin2') or {}
+    if m1:
+        merged_pick = m1['pick']
+        merged_meta = f'概率：{m1["my_pct"]}%'
+        if m2:
+            merged_pick += f' / {m2["pick"]}'
+            merged_meta += f' / {m2["my_pct"]}%'
+        if is_past:
+            hit_m = past_hits.get('margin2')  # TOP2任一命中即可
+            if hit_m is True:    hchip = '<span class="rec-hit ok">✓</span>'
+            elif hit_m is False: hchip = '<span class="rec-hit no">✗</span>'
+            else:                hchip = ''
+            badge_m = f'<span class="badge-o">推荐</span> {hchip}'
+        else:
+            badge_m = '<span class="badge-o">推荐</span>'
+        ai_rows += (f'<div class="rec-row">'
+                    f'<div class="rec-type">净胜球</div>'
+                    f'<div class="rec-pick">{merged_pick}</div>'
+                    f'<div class="rec-meta">{merged_meta}</div>'
+                    f'<div class="rec-badge">{badge_m}</div>'
+                    f'</div>')
     ai_card = (f'<div class="rec-card">'
                f'<div class="rec-card-head">{sec_head("bolt","AI推荐")}</div>'
                f'{ai_rows}{mu_html}</div>')
@@ -2378,7 +2398,7 @@ def build_past_detail(p, items_map=None):
     elif mu_val_p and mu_val_p < 2.2:
         goals_pick, goals_dir = '小球 ≤2', 'under'
     else:
-        goals_pick, goals_dir = f'μ不确定区间', ''
+        goals_pick, goals_dir = (f'约{round(mu_val_p)}球' if mu_val_p else '约3球'), ''
     goals_prob = ov_prob if goals_dir == 'over' else (1-ov_prob if goals_dir == 'under' else 0)
     goals_od = approx_od(goals_prob) if goals_prob else 0
     goals_pct = round(goals_prob*100) if goals_prob else 0
