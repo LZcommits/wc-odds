@@ -2022,7 +2022,35 @@ def grade_bets(cfg, rows, rich, grid):
     return result
 
 
-def rec_card_block(grades, slug, is_past=False, past_hits=None):
+def _build_mu_html(tot_o, tot_u, under_prob, lh_val, la_val, cnh, cna):
+    """生成大小球推导 HTML 块（可嵌入任意卡片）。"""
+    if not (tot_o and tot_u and under_prob): return ''
+    imp_o = round(100/tot_o, 1); imp_u = round(100/tot_u, 1)
+    total_imp = round(imp_o + imp_u, 1); vig = round(total_imp - 100, 1)
+    under_pct = round(under_prob*100, 1)
+    mu_val = solve_mu(under_prob)
+    return (
+        f'<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)">'
+        f'<div style="font-size:10px;color:var(--sec);margin-bottom:8px">大小球推导（期望进球数 μ）</div>'
+        f'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 8px;font-size:11px;margin-bottom:8px">'
+        f'<span style="color:var(--sec)">大球 @{tot_o}</span>'
+        f'<span style="color:var(--sec)">→ 隐含 {imp_o}%</span>'
+        f'<span></span>'
+        f'<span style="color:var(--sec)">小球 @{tot_u}</span>'
+        f'<span style="color:var(--sec)">→ 隐含 {imp_u}%</span>'
+        f'<span style="color:var(--sec);font-size:9px">合计 {total_imp}%（水位 {vig}%）</span>'
+        f'<span style="color:var(--on)">去水位</span>'
+        f'<span style="color:var(--on)">小球真实 {under_pct}%</span>'
+        f'<span></span>'
+        f'</div>'
+        f'<div style="font-size:11px;color:var(--lime)">期望进球 μ = {round(mu_val,2)}'
+        f'<span style="color:var(--sec);margin-left:12px">'
+        f'{cnh} λ={round(lh_val,2)} &nbsp;/&nbsp; {cna} λ={round(la_val,2)}'
+        f'</span></div>'
+        f'</div>'
+    )
+
+def rec_card_block(grades, slug, is_past=False, past_hits=None, mu_html=''):
     """渲染推荐卡：拆成 AI推荐 + 深度推荐 两张卡。"""
     if past_hits is None: past_hits = {}
     BADGE = {'S': '<span class="badge-s">强推荐</span>',
@@ -2056,7 +2084,7 @@ def rec_card_block(grades, slug, is_past=False, past_hits=None):
     ai_rows += make_row('goals', '进球数', required=True)
     ai_card = (f'<div class="rec-card">'
                f'<div class="rec-card-head">{sec_head("bolt","AI推荐")}</div>'
-               f'{ai_rows}</div>')
+               f'{ai_rows}{mu_html}</div>')
 
     # ── 深度推荐卡（有数据才显示）─────────────────────
     deep_rows = make_row('crowd_wdl', '胜平负')
@@ -2146,7 +2174,8 @@ def build_detail(cfg, rows, rich):
         fb = form_block(cfg)
         fb_html = f'<div class="glass">{fb}</div>' if fb else ''
         grades = grade_bets(cfg, rows, rich, grid)
-        rec_html = rec_card_block(grades, cfg['slug'])
+        mu_html_live = _build_mu_html(t25.get('over'), t25.get('under'), up, lh, la, cfg['cn_h'], cfg['cn_a'])
+        rec_html = rec_card_block(grades, cfg['slug'], mu_html=mu_html_live)
         inner = (f'{match_header(rows, cfg)}'
                  f'{rec_html}'
                  f'{tp_html}'
@@ -2234,37 +2263,10 @@ def _odds_review_block(p, actual_sc, model_picks, grid):
     model_color = 'var(--lime)' if model_hit else 'var(--sec)'
 
     # ── 大小球分析：赔率→μ推导 ──────────────────────────────────
-    mu_html = ''
-    tot_o = p.get('tot_o'); tot_u = p.get('tot_u'); under_prob = p.get('under_prob')
-    if tot_o and tot_u and under_prob:
-        imp_o = round(100/tot_o, 1); imp_u = round(100/tot_u, 1)
-        total_imp = round(imp_o + imp_u, 1); vig = round(total_imp - 100, 1)
-        under_pct = round(under_prob*100, 1)
-        mu_val = solve_mu(under_prob)
-        d = p.get('devig', {})
-        lh_val, la_val, _ = poisson_calc(d.get('home', 0.5), d.get('away', 0.25), under_prob)
-        cnh = cn_of(p['h']); cna = cn_of(p['a'])
-        mu_html = (
-            f'<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)">'
-            f'<div style="font-size:10px;color:var(--sec);margin-bottom:8px">大小球推导（期望进球数 μ）</div>'
-            f'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 8px;font-size:11px;margin-bottom:8px">'
-            f'<span style="color:var(--sec)">大球 @{tot_o}</span>'
-            f'<span style="color:var(--sec)">→ 隐含 {imp_o}%</span>'
-            f'<span></span>'
-            f'<span style="color:var(--sec)">小球 @{tot_u}</span>'
-            f'<span style="color:var(--sec)">→ 隐含 {imp_u}%</span>'
-            f'<span style="color:var(--sec);font-size:9px">合计 {total_imp}%（水位 {vig}%）</span>'
-            f'<span style="color:var(--on)">去水位</span>'
-            f'<span style="color:var(--on)">小球真实 {under_pct}%</span>'
-            f'<span></span>'
-            f'</div>'
-            f'<div style="font-size:11px;color:var(--lime)">'
-            f'期望进球 μ = {round(mu_val,2)}'
-            f'<span style="color:var(--sec);margin-left:12px">'
-            f'{cnh} λ={round(lh_val,2)} &nbsp;/&nbsp; {cna} λ={round(la_val,2)}'
-            f'</span></div>'
-            f'</div>'
-        )
+    tot_o = p.get('tot_o'); tot_u = p.get('tot_u'); under_prob_r = p.get('under_prob')
+    d_r = p.get('devig', {})
+    lh_r, la_r, _ = poisson_calc(d_r.get('home', 0.5), d_r.get('away', 0.25), under_prob_r) if under_prob_r else (0, 0, {})
+    mu_html = _build_mu_html(tot_o, tot_u, under_prob_r, lh_r, la_r, cn_of(p['h']), cn_of(p['a']))
 
     return (f'<div class="glass" style="margin-bottom:12px">'
             f'{sec_head("query_stats","赔率复盘")}'
@@ -2376,7 +2378,8 @@ def build_past_detail(p, items_map=None):
         past_hits['crowd_wdl'] = (actual_wdl == crowd_wdl_g['outcome'])
     for i, cp in enumerate(crowd_sc_list):
         past_hits[f'crowd_score{i+1}'] = (actual_sc == cp['score'])
-    rec_html = rec_card_block(grades_past, f'p{fid}', is_past=True, past_hits=past_hits)
+    mu_html_past = _build_mu_html(p.get('tot_o'), p.get('tot_u'), p.get('under_prob'), lh, la, cnh, cna)
+    rec_html = rec_card_block(grades_past, f'p{fid}', is_past=True, past_hits=past_hits, mu_html=mu_html_past)
 
     title = f'{cnh} VS {cna}'
     # ── 比分 header（与未开始 header 相同结构，倒计时换成比分）─────
