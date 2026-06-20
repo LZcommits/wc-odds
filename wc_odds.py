@@ -1931,21 +1931,36 @@ def _crowd_picks(slug, grid, mn, cnh, cna, rows=None, score_odds=None):
     return crowd_wdl, cands[:3]
 
 
-def grade_bets(cfg, rows, rich, grid):
-    """对每场比赛评级：赔率胜平负/大众胜平负/赔率比分×3/大众比分×3/进球数。"""
+def grade_bets(cfg, rows, rich, grid, up=None):
+    """对每场比赛评级：赔率胜平负/大众胜平负/赔率比分×3/大众比分×3/进球数/净胜球。"""
     slug = cfg['slug']; my = cfg['my']
     mn = f'{cfg["cn_h"]} vs {cfg["cn_a"]}'
+    cn_h = cfg['cn_h']; cn_a = cfg['cn_a']
     result = {}
 
-    # ── 1. 赔率推测胜平负 ────────────────────────────────────────
+    # ── 计算 μ（优先用 under_prob，其次从大小球赔率推导，最后用 grid 估算）──
+    mu_val = solve_mu(up) if up else None
+    if not mu_val and rows:
+        t25r = rows[-1].get('pin_tot25') or {}
+        if t25r.get('over') and t25r.get('under'):
+            up_r = devig({'over': t25r['over'], 'under': t25r['under']})['under']
+            mu_val = solve_mu(up_r)
+    if not mu_val:
+        mu_val = sum((int(s.split('-')[0])+int(s.split('-')[1]))*v for s,v in grid.items())
+
+    # ── 1. 赔率推测胜平负（含平局识别）──────────────────────────────
     if rows:
         p = rows[-1].get('pin_h2h')
         if p:
             evs = {k: my[k] * p[k] for k in ('home','draw','away')}
             best_k = max(evs, key=evs.get)
-            fav_k = min(p, key=p.get); fav_od = p[fav_k]
-            label = {'home': cfg['cn_h'], 'draw': '平局', 'away': cfg['cn_a']}
-            if fav_od < 1.5 and best_k == fav_k: best_k = 'draw'
+            label = {'home': cn_h, 'draw': '平局', 'away': cn_a}
+            # 平局识别：μ<2.5 + 两队实力差<15% + 市场平局概率>25%
+            draw_signal = (mu_val < 2.5
+                           and abs(my['home'] - my['away']) < 0.15
+                           and my['draw'] > 0.25)
+            if draw_signal:
+                best_k = 'draw'
             od = p[best_k]; ev = evs[best_k]
             mkt_pct = round(100/od); my_pct = round(my[best_k]*100)
             drift_warn = ''
@@ -1958,21 +1973,21 @@ def grade_bets(cfg, rows, rich, grid):
             elif ev >= 1.02 and my[best_k] >= 0.07: grade = 'O'
             else: grade = 'X'
             if drift_warn and grade == 'S': grade = 'O'
+            draw_note = ' · 平局信号' if draw_signal else ''
             result['wdl'] = {
                 'grade': grade, 'pick': label[best_k], 'outcome': best_k,
                 'odds': od, 'mkt_pct': mkt_pct, 'my_pct': my_pct,
-                'meta': f'赔率：{od}<br>市场预估{mkt_pct}%<br>模型预估{my_pct}%{drift_warn}',
+                'meta': f'赔率：{od}<br>市场预估{mkt_pct}%<br>模型预估{my_pct}%{drift_warn}{draw_note}',
                 'bet_label': label[best_k], 'match': mn, 'ev': round(ev, 2),
             }
 
     # ── 2. 大众推测胜平负 + 大众比分 ─────────────────────────────
-    crowd_wdl, crowd_scores = _crowd_picks(slug, grid, mn, cfg['cn_h'], cfg['cn_a'], rows=rows)
+    crowd_wdl, crowd_scores = _crowd_picks(slug, grid, mn, cn_h, cn_a, rows=rows)
     if crowd_wdl: result['crowd_wdl'] = crowd_wdl
     for i, cp in enumerate(crowd_scores): result[f'crowd_score{i+1}'] = cp
 
     # ── 3. 赔率推测比分（满足规则，最多3个）────────────────────────
     so = (rich.get('score_odds') or {}).get('odds', {})
-    # 兜底：比赛已开赛但 rich 无赔率时，用 JSONL 最近一次采样的 pin_scores
     if not so and rows:
         for row in reversed(rows):
             sc = row.get('pin_scores') or {}
@@ -1984,7 +1999,7 @@ def grade_bets(cfg, rows, rich, grid):
         if not od: continue
         if 6.0 <= od < 8.0 and prob >= 0.05: grade = 'S'
         elif od <= 9.0 and prob >= 0.04: grade = 'O'
-        else: continue  # 不满足规则直接跳过
+        else: continue
         mkt_pct = round(100/od); my_pct = round(prob*100, 1)
         cands.append({
             'grade': grade, 'score': sc, 'pick': sc.replace('-',':'),
@@ -1995,37 +2010,45 @@ def grade_bets(cfg, rows, rich, grid):
     cands.sort(key=lambda x: 0 if x['grade']=='S' else 1)
     for i, c in enumerate(cands[:3]): result[f'score{i+1}'] = c
 
-    # ── 4. 大小球 ────────────────────────────────────────────────
-    if rows:
-        t25 = rows[-1].get('pin_tot25') or {}
-        u_od = t25.get('under'); o_od = t25.get('over')
-        if u_od and o_od:
-            ov_prob = sum(pv for s, pv in grid.items() if sum(map(int, s.split('-'))) > 2)
-            un_prob = 1 - ov_prob
-            ev_over = ov_prob * o_od; ev_under = un_prob * u_od
-            if u_od > 2.1:
-                od, prob, ev, pick, pick_dir = o_od, ov_prob, ev_over, '大球 ≥3', 'over'
-                grade = 'S' if ev >= 1.08 else 'O'
-            elif u_od < 1.65:
-                od, prob, ev, pick, pick_dir = u_od, un_prob, ev_under, '小球 ≤2', 'under'
-                grade = 'S' if ev >= 1.05 else 'O'
-            elif ev_over > ev_under and ev_over >= 1.04:
-                od, prob, ev, pick, pick_dir = o_od, ov_prob, ev_over, '大球 ≥3', 'over'; grade = 'O'
-            elif ev_under >= 1.04:
-                od, prob, ev, pick, pick_dir = u_od, un_prob, ev_under, '小球 ≤2', 'under'; grade = 'O'
-            else:
-                od, prob, ev, pick, pick_dir = 0, 0, 0, '市场高效', ''; grade = 'X'
-            mkt_pct = round(100/od) if od else 0; my_pct = round(prob*100) if prob else 0
-            result['goals'] = {
-                'grade': grade, 'pick': pick, 'pick_dir': pick_dir,
-                'odds': od, 'mkt_pct': mkt_pct, 'my_pct': my_pct, 'ev': round(ev, 2),
-                'meta': f'赔率：{od}<br>市场预估{mkt_pct}%<br>模型预估{my_pct}%' if od else '等待赔率采样',
-                'bet_label': pick, 'match': mn,
-            }
-        else:
-            result['goals'] = {'grade': 'X', 'pick': '暂无数据', 'pick_dir': '', 'odds': 0,
-                               'mkt_pct': 0, 'my_pct': 0, 'ev': 0,
-                               'meta': '等待大小球赔率采样', 'bet_label': '', 'match': mn}
+    # ── 4. 进球数（μ 直接判断）──────────────────────────────────
+    t25 = (rows[-1].get('pin_tot25') or {}) if rows else {}
+    u_od = t25.get('under'); o_od = t25.get('over')
+    ov_prob = sum(pv for s, pv in grid.items() if sum(map(int, s.split('-'))) > 2)
+    if mu_val > 3.5:
+        pick, pick_dir, grade = '大球 ≥3', 'over', 'S'
+    elif mu_val > 3.0:
+        pick, pick_dir, grade = '大球 ≥3', 'over', 'O'
+    elif mu_val < 2.0:
+        pick, pick_dir, grade = '小球 ≤2', 'under', 'O'
+    elif mu_val < 2.2:
+        pick, pick_dir, grade = '小球 ≤2', 'under', 'X'
+    else:
+        pick, pick_dir, grade = f'μ={round(mu_val,2)} 不确定区间', '', 'X'
+    prob = ov_prob if pick_dir == 'over' else (1-ov_prob if pick_dir == 'under' else 0)
+    od_show = (o_od if pick_dir == 'over' else u_od) if (o_od and u_od) else 0
+    mkt_pct = round(100/od_show) if od_show else 0
+    my_pct = round(prob*100) if prob else 0
+    result['goals'] = {
+        'grade': grade, 'pick': pick, 'pick_dir': pick_dir,
+        'odds': od_show, 'mkt_pct': mkt_pct, 'my_pct': my_pct,
+        'meta': f'μ={round(mu_val,2)}<br>赔率：{od_show}<br>市场预估{mkt_pct}%<br>模型预估{my_pct}%' if od_show else f'μ={round(mu_val,2)}',
+        'bet_label': pick, 'match': mn,
+    }
+
+    # ── 5. 净胜球 TOP1 / TOP2 ────────────────────────────────────
+    margin_prob = {}
+    for sc, prob in grid.items():
+        i, j = map(int, sc.split('-'))
+        m = i - j
+        margin_prob[m] = margin_prob.get(m, 0) + prob
+    def fmt_m(m): return f'{cn_h}赢{m}球' if m>0 else (f'{cn_a}赢{-m}球' if m<0 else '平局')
+    top2 = sorted(margin_prob, key=lambda m: -margin_prob[m])[:2]
+    for i, m in enumerate(top2):
+        pct = round(margin_prob[m]*100)
+        result[f'margin{i+1}'] = {
+            'grade': 'O', 'pick': fmt_m(m), 'margin_val': m, 'my_pct': pct,
+            'meta': f'概率：{pct}%', 'bet_label': fmt_m(m), 'match': mn,
+        }
     return result
 
 
@@ -2089,6 +2112,8 @@ def rec_card_block(grades, slug, is_past=False, past_hits=None, mu_html=''):
     for i in range(1, 4):
         ai_rows += make_row(f'score{i}', f'比分{i}')
     ai_rows += make_row('goals', '进球数', required=True)
+    ai_rows += make_row('margin1', '净胜球1')
+    ai_rows += make_row('margin2', '净胜球2')
     ai_card = (f'<div class="rec-card">'
                f'<div class="rec-card-head">{sec_head("bolt","AI推荐")}</div>'
                f'{ai_rows}{mu_html}</div>')
@@ -2180,7 +2205,7 @@ def build_detail(cfg, rows, rich):
         tp_html = f'<div class="glass">{tp}</div>' if tp else ''
         fb = form_block(cfg)
         fb_html = f'<div class="glass">{fb}</div>' if fb else ''
-        grades = grade_bets(cfg, rows, rich, grid)
+        grades = grade_bets(cfg, rows, rich, grid, up=up)
         mu_html_live = _build_mu_html(t25.get('over'), t25.get('under'), up, lh, la, cfg['cn_h'], cfg['cn_a'])
         rec_html = rec_card_block(grades, cfg['slug'], mu_html=mu_html_live)
         inner = (f'{match_header(rows, cfg)}'
@@ -2343,12 +2368,29 @@ def build_past_detail(p, items_map=None):
     sc1_pct = round(grid.get(sc1.replace(':','-'), 0)*100, 1)
     sc2_pct = round(grid.get(sc2.replace(':','-'), 0)*100, 1)
 
-    tot_u = p.get('tot_u', 0)
-    goals_dir = 'over' if (tot_u and tot_u > 2.1) else 'under'
-    goals_pick = '大球 ≥3' if goals_dir == 'over' else '小球 ≤2'
+    # 进球数：μ 直接判断
+    mu_val_p = solve_mu(under_prob) if under_prob else None
     ov_prob = sum(pv for s, pv in grid.items() if sum(map(int, s.split('-'))) > 2)
-    goals_od = approx_od(ov_prob if goals_dir=='over' else 1-ov_prob)
-    goals_pct = round((ov_prob if goals_dir=='over' else 1-ov_prob)*100)
+    if mu_val_p and mu_val_p > 3.5:
+        goals_pick, goals_dir = '大球 ≥3', 'over'
+    elif mu_val_p and mu_val_p > 3.0:
+        goals_pick, goals_dir = '大球 ≥3', 'over'
+    elif mu_val_p and mu_val_p < 2.2:
+        goals_pick, goals_dir = '小球 ≤2', 'under'
+    else:
+        goals_pick, goals_dir = f'μ不确定区间', ''
+    goals_prob = ov_prob if goals_dir == 'over' else (1-ov_prob if goals_dir == 'under' else 0)
+    goals_od = approx_od(goals_prob) if goals_prob else 0
+    goals_pct = round(goals_prob*100) if goals_prob else 0
+
+    # 净胜球分布
+    margin_prob_p = {}
+    for sc, prob in grid.items():
+        i, j = map(int, sc.split('-'))
+        m = i - j
+        margin_prob_p[m] = margin_prob_p.get(m, 0) + prob
+    def fmt_mp(m): return f'{cnh}赢{m}球' if m>0 else (f'{cna}赢{-m}球' if m<0 else '平局')
+    top2_m = sorted(margin_prob_p, key=lambda m: -margin_prob_p[m])[:2]
 
     def meta_str(od, mkt, my): return f'赔率：{od}<br>市场预估{mkt}%<br>模型预估{my}%' if od else '无赔率记录'
     grades_past = {
@@ -2363,11 +2405,18 @@ def build_past_detail(p, items_map=None):
                   'meta': meta_str(sc2_od, round(sc2_pct), sc2_pct), 'bet_label': f'比分 {sc2}', 'match': f'{cnh} vs {cna}'},
         'goals': {'grade': 'O', 'pick': goals_pick, 'pick_dir': goals_dir,
                   'odds': goals_od, 'mkt_pct': goals_pct, 'my_pct': goals_pct,
-                  'meta': meta_str(goals_od, goals_pct, goals_pct), 'bet_label': goals_pick, 'match': f'{cnh} vs {cna}'},
+                  'meta': f'μ={round(mu_val_p,2)}<br>' + meta_str(goals_od, goals_pct, goals_pct) if mu_val_p else '无μ数据',
+                  'bet_label': goals_pick, 'match': f'{cnh} vs {cna}'},
     }
+    for i, m in enumerate(top2_m):
+        pct_m = round(margin_prob_p[m]*100)
+        grades_past[f'margin{i+1}'] = {
+            'grade': 'O', 'pick': fmt_mp(m), 'margin_val': m, 'my_pct': pct_m,
+            'meta': f'概率：{pct_m}%', 'bet_label': fmt_mp(m), 'match': f'{cnh} vs {cna}',
+        }
     # goals 命中
     goals_hit = None
-    if tot_u:
+    if goals_dir:
         goals_hit = (goals_dir == 'over' and actual_tot > 2) or (goals_dir == 'under' and actual_tot <= 2)
     # 大众推荐
     slug = FID2SLUG.get(int(fid), '')
@@ -2375,11 +2424,14 @@ def build_past_detail(p, items_map=None):
     crowd_wdl_g, crowd_sc_list = _crowd_picks(slug, grid, f'{cnh} vs {cna}', cnh, cna, score_odds=score_odds)
     if crowd_wdl_g: grades_past['crowd_wdl'] = crowd_wdl_g
     for i, cp in enumerate(crowd_sc_list): grades_past[f'crowd_score{i+1}'] = cp
+    actual_margin = gh - ga
     past_hits = {
         'wdl':      p.get('wdl_hit'),
         'score1':   (actual_sc == sc1.replace(':','-')) if sc1 else None,
         'score2':   (actual_sc == sc2.replace(':','-')) if sc2 else None,
         'goals':    goals_hit,
+        'margin1':  (actual_margin == top2_m[0]) if top2_m else None,
+        'margin2':  (actual_margin in top2_m) if top2_m else None,
     }
     if crowd_wdl_g:
         past_hits['crowd_wdl'] = (actual_wdl == crowd_wdl_g['outcome'])
