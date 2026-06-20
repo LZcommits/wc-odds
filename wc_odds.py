@@ -2,6 +2,30 @@
 # 多场采样 + 手机 H5(Midnight Quantum 暗色玻璃拟态设计)
 import json, os, sys, math, datetime, urllib.request, html as _html
 
+def _gen_og_image(out_path):
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+        W, H = 600, 315
+        img = Image.new('RGB', (W, H), '#051424')
+        draw = ImageDraw.Draw(img)
+        for i in range(H):
+            r = int(5+(i/H)*8); g = int(20+(i/H)*10); b = int(36+(i/H)*20)
+            draw.line([(0,i),(W,i)], fill=(r,g,b))
+        draw.rectangle([0,0,3,H], fill='#CCFF00')
+        fp = '/System/Library/Fonts/STHeiti Medium.ttc'
+        fl = ImageFont.truetype(fp,40); fm = ImageFont.truetype(fp,17); fs = ImageFont.truetype(fp,13)
+        draw.text((32,55),'世界杯推演分析',font=fl,fill='#CCFF00')
+        draw.text((32,108),'2026 FIFA World Cup · AI Odds Analysis',font=fm,fill='#7899bb')
+        kws=['赔率价值','技术面校正','锐庄去水位']; x=32
+        for kw in kws:
+            bb=draw.textbbox((0,0),kw,font=fs); tw=bb[2]-bb[0]
+            draw.rounded_rectangle([x-4,152,x+tw+12,178],radius=4,fill='#0d1c2d',outline='#1e3a5a')
+            draw.text((x+4,155),kw,font=fs,fill='#d4e4fa'); x+=tw+28
+        draw.text((32,268),'lzcommits.github.io/wc-odds',font=fs,fill='#3a5a7a')
+        img.save(out_path,'PNG',optimize=True)
+    except Exception as e:
+        print(f'[og_image] 跳过: {e}')
+
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(ROOT, 'data'); DOCS = os.path.join(ROOT, 'docs')
 os.makedirs(DATA_DIR, exist_ok=True); os.makedirs(DOCS, exist_ok=True)
@@ -1370,10 +1394,21 @@ def build_past():
 def L(cfg): return {'home': cfg['cn_h'], 'draw': '平局', 'away': cfg['cn_a']}
 
 # ---------- UI 组件 ----------
-def head(title, raw_title=False):
+BASE_URL = 'https://lzcommits.github.io/wc-odds'
+
+def head(title, raw_title=False, og_desc=None, og_img=None, og_url=None):
     t = title if raw_title else f'{title} · 世界杯推演分析'
+    desc = og_desc or '2026 FIFA 世界杯 AI推演 · 赔率价值 · 技术面校正 · 锐庄去水位'
+    img  = og_img  or f'{BASE_URL}/og.png'
+    url  = og_url  or f'{BASE_URL}/'
+    og = (f'<meta property="og:type" content="website">'
+          f'<meta property="og:title" content="{t}">'
+          f'<meta property="og:description" content="{desc}">'
+          f'<meta property="og:image" content="{img}">'
+          f'<meta property="og:url" content="{url}">'
+          f'<meta name="description" content="{desc}">')
     return ('<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-            f'<title>{t}</title>'
+            f'<title>{t}</title>{og}'
             '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
             '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">'
             '<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet">'
@@ -2429,7 +2464,9 @@ def build_detail(cfg, rows, rich):
             f'<div style="height:12px"></div>{inner}'
             f'<div class="foot">{_detail_ts(rows)}</div></main>{DEEP_INFO_MODAL}{script}')
 
-    open(os.path.join(DOCS, cfg['slug']+'.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title,raw_title=True)}</head><body>{body}</body></html>')
+    og_desc = f'{cfg["cn_h"]} vs {cfg["cn_a"]} · AI赔率推演 · 比分/胜平负/大小球预测'
+    og_url  = f'{BASE_URL}/{cfg["slug"]}.html'
+    open(os.path.join(DOCS, cfg['slug']+'.html'), 'w').write(f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title,raw_title=True,og_desc=og_desc,og_url=og_url)}</head><body>{body}</body></html>')
 
 def sec_h(t, c=''):
     return f'<div class="sec-h"><span class="t">{t}</span><span class="c">{c}</span></div>'
@@ -2698,8 +2735,10 @@ def build_past_detail(p, items_map=None):
             f'<a class="back" href="list.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
             f'<div style="height:12px"></div>{inner}'
             f'<div class="foot">{ds}（北京）</div></main>{DEEP_INFO_MODAL}')
+    og_desc_p = f'{cnh} vs {cna} {gh}-{ga} · AI复盘分析 · 赔率回顾'
+    og_url_p  = f'{BASE_URL}/past_{fid}.html'
     open(os.path.join(DOCS, f'past_{fid}.html'), 'w').write(
-        f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title,raw_title=True)}</head><body>{body}</body></html>')
+        f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title,raw_title=True,og_desc=og_desc_p,og_url=og_url_p)}</head><body>{body}</body></html>')
 
 FID2SLUG = {v: k for k, v in AFID.items()}
 def fetch_upcoming(hours=72, limit=6):
@@ -3094,6 +3133,7 @@ def build_index(items):
     open(os.path.join(DOCS, 'list.html'), 'w').write(
         f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head("世界杯赛程",raw_title=True)}</head><body>{list_body}</body></html>')
 
+_gen_og_image(os.path.join(DOCS, 'og.png'))
 items = []
 for cfg in MATCHES:
     rich = process(cfg); rows = load_rows(cfg['slug'])
