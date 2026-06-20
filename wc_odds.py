@@ -1044,14 +1044,14 @@ a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
 .stat-lbl{font-size:10px;color:var(--sec);margin-top:3px;letter-spacing:.03em}
 .stat-sub{font-size:10px;color:var(--sec);opacity:.55;text-align:center;margin-top:2px;font-family:'JetBrains Mono',monospace}
 /* ── 首页 Hero ── */
-.home-hero{position:relative;border-radius:16px;overflow:hidden;margin-bottom:20px;padding:28px 20px 24px;background:linear-gradient(135deg,#020c1b 0%,#051d38 55%,#020c1b 100%);border:1px solid rgba(204,255,0,.18)}
-.home-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(204,255,0,.6),transparent)}
+.home-hero{position:relative;margin-bottom:20px;padding:28px 0 24px}
+.home-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(204,255,0,.4),transparent)}
 .hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;color:var(--lime);opacity:.6;text-transform:uppercase;margin-bottom:12px}
 .hero-year{font-size:72px;font-weight:900;line-height:.9;letter-spacing:-.02em;color:#fff}
 .hero-wc{font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--lime);text-transform:uppercase;margin:8px 0 4px}
 .hero-tagline{font-size:11px;color:var(--sec);opacity:.55;letter-spacing:.04em}
-.hero-stat{flex:1;min-width:80px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 10px 8px}
-.hstat-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--lime);line-height:1;margin-bottom:5px}
+.hero-stat{flex:1;min-width:80px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px 12px 12px}
+.hstat-val{font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;color:var(--lime);line-height:1;margin-bottom:8px}
 .hstat-lbl{font-size:9px;color:var(--sec);opacity:.65;line-height:1.5;letter-spacing:.03em}
 .hstat-sub{font-size:9px;color:var(--sec);opacity:.4;font-family:'JetBrains Mono',monospace}
 .hrow-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--lime);opacity:.6;margin-bottom:7px}
