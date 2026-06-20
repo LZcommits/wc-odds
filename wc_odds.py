@@ -225,6 +225,70 @@ MATCHES = [
    'note':'日本2022击败德国和西班牙,实力远超市场认可;突尼斯防守偏弱进攻更弱;价值押日本胜@1.53。'}},
 ]
 COL = {'home':'#CCFF00', 'draw':'#8e9379', 'away':'#FF0055'}  # 移盘曲线用色
+
+# 技术面统计：从懂球帝比赛页面提取（最新一轮数据）
+# eff = 绝佳机会/射门×100（进攻效率%）；atk = 射门×0.5+禁区内×2+绝佳×3
+TEAM_STATS = {
+    '西班牙':   {'shots':27,'shots_box':16,'big':2,'eff': 7.4,'atk':51.5,'def_exp':10.0,'poss':74},
+    '佛得角':   {'shots': 6,'shots_box': 2,'big':1,'eff':16.7,'atk':10.0,'def_exp':51.5,'poss':26},
+    '比利时':   {'shots':15,'shots_box': 9,'big':2,'eff':13.3,'atk':31.5,'def_exp':33.0,'poss':54},
+    '埃及':     {'shots':14,'shots_box':10,'big':2,'eff':14.3,'atk':33.0,'def_exp':31.5,'poss':46},
+    '沙特':     {'shots': 7,'shots_box': 4,'big':1,'eff':14.3,'atk':14.5,'def_exp':51.5,'poss':33},
+    '乌拉圭':   {'shots':27,'shots_box':16,'big':2,'eff': 7.4,'atk':51.5,'def_exp':14.5,'poss':67},
+    '法国':     {'shots':11,'shots_box': 7,'big':4,'eff':36.4,'atk':31.5,'def_exp':17.0,'poss':53},
+    '塞内加尔': {'shots': 6,'shots_box': 4,'big':2,'eff':33.3,'atk':17.0,'def_exp':31.5,'poss':47},
+    '阿根廷':   {'shots':10,'shots_box': 4,'big':1,'eff':10.0,'atk':16.0,'def_exp': 9.5,'poss':48},
+    '阿尔及利亚':{'shots':7,'shots_box': 3,'big':0,'eff': 0.0,'atk': 9.5,'def_exp':16.0,'poss':52},
+    '伊拉克':   {'shots':11,'shots_box': 8,'big':1,'eff': 9.1,'atk':24.5,'def_exp':43.0,'poss':39},
+    '挪威':     {'shots':12,'shots_box':11,'big':5,'eff':41.7,'atk':43.0,'def_exp':24.5,'poss':61},
+    '奥地利':   {'shots':11,'shots_box': 6,'big':4,'eff':36.4,'atk':29.5,'def_exp':19.5,'poss':63},
+    '约旦':     {'shots':11,'shots_box': 7,'big':0,'eff': 0.0,'atk':19.5,'def_exp':29.5,'poss':37},
+    '葡萄牙':   {'shots': 7,'shots_box': 5,'big':1,'eff':14.3,'atk':16.5,'def_exp':11.0,'poss':75},
+    '刚果(金)': {'shots': 8,'shots_box': 2,'big':1,'eff':12.5,'atk':11.0,'def_exp':16.5,'poss':25},
+    '英格兰':   {'shots':22,'shots_box':20,'big':7,'eff':31.8,'atk':72.0,'def_exp':19.0,'poss':52},
+    '克罗地亚': {'shots':10,'shots_box': 4,'big':2,'eff':20.0,'atk':19.0,'def_exp':72.0,'poss':48},
+    '加纳':     {'shots': 8,'shots_box': 7,'big':1,'eff':12.5,'atk':21.0,'def_exp':23.5,'poss':38},
+    '巴拿马':   {'shots':11,'shots_box': 6,'big':2,'eff':18.2,'atk':23.5,'def_exp':21.0,'poss':62},
+    '乌兹别克': {'shots': 8,'shots_box': 4,'big':1,'eff':12.5,'atk':15.0,'def_exp':39.5,'poss':39},
+    '哥伦比亚': {'shots':15,'shots_box':10,'big':4,'eff':26.7,'atk':39.5,'def_exp':15.0,'poss':61},
+    # R2 更新（使用最新一场数据）
+    '美国':     {'shots':10,'shots_box': 8,'big':2,'eff':20.0,'atk':27.0,'def_exp': 8.5,'poss':62},
+    '澳大利亚': {'shots': 5,'shots_box': 3,'big':0,'eff': 0.0,'atk': 8.5,'def_exp':27.0,'poss':38},
+    '苏格兰':   {'shots': 9,'shots_box': 8,'big':2,'eff':22.2,'atk':26.5,'def_exp':27.0,'poss':46},
+    '摩洛哥':   {'shots':14,'shots_box': 7,'big':2,'eff':14.3,'atk':27.0,'def_exp':26.5,'poss':49},
+    '巴西':     {'shots': 8,'shots_box': 8,'big':5,'eff':62.5,'atk':35.0,'def_exp':11.5,'poss':57},
+    '海地':     {'shots': 7,'shots_box': 4,'big':0,'eff': 0.0,'atk':11.5,'def_exp':35.0,'poss':43},
+    '土耳其':   {'shots':32,'shots_box':16,'big':3,'eff': 9.4,'atk':57.0,'def_exp': 9.5,'poss':79},
+    '巴拉圭':   {'shots': 7,'shots_box': 3,'big':0,'eff': 0.0,'atk': 9.5,'def_exp':57.0,'poss':21},
+    '荷兰':     {'shots':10,'shots_box':10,'big':0,'eff': 0.0,'atk':25.0,'def_exp':17.0,'poss':60},
+    '瑞典':     {'shots':13,'shots_box': 9,'big':4,'eff':30.8,'atk':36.5,'def_exp': 7.0,'poss':49},
+    '德国':     {'shots':26,'shots_box':21,'big':6,'eff':23.1,'atk':73.0,'def_exp':12.0,'poss':65},
+    '科特迪瓦': {'shots':15,'shots_box': 8,'big':2,'eff':13.3,'atk':29.5,'def_exp':19.0,'poss':48},
+    '厄瓜多尔': {'shots':12,'shots_box': 5,'big':1,'eff': 8.3,'atk':19.0,'def_exp':29.5,'poss':52},
+    '库拉索':   {'shots': 8,'shots_box': 4,'big':0,'eff': 0.0,'atk':12.0,'def_exp':73.0,'poss':35},
+    '突尼斯':   {'shots': 6,'shots_box': 2,'big':0,'eff': 0.0,'atk': 7.0,'def_exp':36.5,'poss':51},
+    '日本':     {'shots':10,'shots_box': 6,'big':0,'eff': 0.0,'atk':17.0,'def_exp':25.0,'poss':40},
+    '加拿大':   {'shots':32,'shots_box':21,'big':6,'eff':18.8,'atk':76.0,'def_exp': 3.0,'poss':79},
+    '卡塔尔':   {'shots': 2,'shots_box': 1,'big':0,'eff': 0.0,'atk': 3.0,'def_exp':76.0,'poss':21},
+    '瑞士':     {'shots':13,'shots_box': 9,'big':4,'eff':30.8,'atk':36.5,'def_exp': 8.5,'poss':62},
+    '波黑':     {'shots': 5,'shots_box': 3,'big':0,'eff': 0.0,'atk': 8.5,'def_exp':36.5,'poss':38},
+    '墨西哥':   {'shots': 8,'shots_box': 5,'big':2,'eff':25.0,'atk':20.0,'def_exp':25.5,'poss':42},
+    '韩国':     {'shots': 9,'shots_box': 6,'big':3,'eff':33.3,'atk':25.5,'def_exp':20.0,'poss':58},
+    '捷克':     {'shots':14,'shots_box':11,'big':3,'eff':21.4,'atk':38.0,'def_exp':23.5,'poss':38},
+    '南非':     {'shots':17,'shots_box': 6,'big':1,'eff': 5.9,'atk':23.5,'def_exp':38.0,'poss':62},
+}
+
+def _tech_mult(cn_team):
+    """返回 (λ乘数, 信号标签) 基于技术面效率数据。"""
+    ts = TEAM_STATS.get(cn_team)
+    if not ts: return 1.0, ''
+    eff = ts['eff']; shots = ts['shots']
+    if eff < 8.0 and shots >= 10:   return 0.78, f'⚠效率红牌{eff:.0f}%'
+    if eff < 12.0 and shots >= 8:   return 0.90, f'效率偏低{eff:.0f}%'
+    if eff >= 35.0:                  return 1.18, f'高效率{eff:.0f}%'
+    if eff >= 22.0:                  return 1.08, ''
+    return 1.0, ''
+
 # 关键球员：俱乐部、身价、特点+近期状态。side='h'主队/'a'客队
 KEY_PLAYERS = {
  'spain_capeverde': [
@@ -1948,6 +2012,19 @@ def grade_bets(cfg, rows, rich, grid, up=None):
     if not mu_val:
         mu_val = sum((int(s.split('-')[0])+int(s.split('-')[1]))*v for s,v in grid.items())
 
+    # ── 技术面 μ 修正 ──────────────────────────────────────
+    mh, sig_h = _tech_mult(cn_h)
+    ma, sig_a = _tech_mult(cn_a)
+    if mh != 1.0 or ma != 1.0:
+        # 按主客贡献分离 λ，分别乘以乘数后合并
+        lh_raw, la_raw = split_lambda(mu_val, my['home'], my['away'])
+        mu_val = round(lh_raw * mh + la_raw * ma, 2)
+    tech_note = ' · '.join(filter(None, [
+        (f'{cn_h} {sig_h}') if sig_h else '',
+        (f'{cn_a} {sig_a}') if sig_a else '',
+    ]))
+    tech_note_html = f'<br><span style="color:var(--lime);font-size:10px">技术面：{tech_note}</span>' if tech_note else ''
+
     # ── 1. 赔率推测胜平负（含平局识别）──────────────────────────────
     if rows:
         p = rows[-1].get('pin_h2h')
@@ -1977,7 +2054,7 @@ def grade_bets(cfg, rows, rich, grid, up=None):
             result['wdl'] = {
                 'grade': grade, 'pick': label[best_k], 'outcome': best_k,
                 'odds': od, 'mkt_pct': mkt_pct, 'my_pct': my_pct,
-                'meta': f'赔率：{od}<br>市场预估{mkt_pct}%<br>模型预估{my_pct}%{drift_warn}{draw_note}',
+                'meta': f'赔率：{od}<br>市场预估{mkt_pct}%<br>模型预估{my_pct}%{drift_warn}{draw_note}{tech_note_html}',
                 'bet_label': label[best_k], 'match': mn, 'ev': round(ev, 2),
             }
 
@@ -2031,7 +2108,7 @@ def grade_bets(cfg, rows, rich, grid, up=None):
     result['goals'] = {
         'grade': grade, 'pick': pick, 'pick_dir': pick_dir,
         'odds': od_show, 'mkt_pct': mkt_pct, 'my_pct': my_pct,
-        'meta': f'μ={round(mu_val,2)}<br>赔率：{od_show}<br>市场预估{mkt_pct}%<br>模型预估{my_pct}%' if od_show else f'μ={round(mu_val,2)}',
+        'meta': (f'μ={round(mu_val,2)}<br>赔率：{od_show}<br>市场预估{mkt_pct}%<br>模型预估{my_pct}%{tech_note_html}' if od_show else f'μ={round(mu_val,2)}{tech_note_html}'),
         'bet_label': pick, 'match': mn,
     }
 
@@ -2138,39 +2215,12 @@ def rec_card_block(grades, slug, is_past=False, past_hits=None, mu_html=''):
                f'<div class="rec-card-head">{sec_head("bolt","AI推荐")}</div>'
                f'{ai_rows}{mu_html}</div>')
 
-    # ── 深度推荐卡（有数据才显示）─────────────────────
-    deep_rows = make_row('crowd_wdl', '胜平负')
-    for i in range(1, 4):
-        deep_rows += make_row(f'crowd_score{i}', f'比分{i}')
-    if deep_rows:
-        info_btn = '<button class="deep-info-btn" onclick="showDeepInfo()"><span class="material-symbols-outlined">info</span></button>'
-        deep_card = (f'<div class="rec-card deep">'
-                     f'<div class="rec-card-head">{sec_head("groups","深度推荐")}{info_btn}</div>'
-                     f'{deep_rows}</div>')
-    else:
-        deep_card = ''
-
-    return ai_card + deep_card
+    return ai_card
 
 
 PARLAY_JS = ''  # 串关弹窗已移除
 
-DEEP_INFO_MODAL = (
-    '<div id="deep-info-modal" class="deep-modal-overlay" onclick="if(event.target===this)hideDeepInfo()">'
-    '<div class="deep-modal">'
-    '<h3>深度推荐 · 价差比说明</h3>'
-    '<table>'
-    '<tr><td>&lt; 1.5</td><td>大众和市场方向一致，无增量信息，忽略</td></tr>'
-    '<tr><td>1.5 – 2.0</td><td>大众比市场"贵"50–100%，有偏离，观察为主，不单独行动</td></tr>'
-    '<tr><td>≥ 2.0</td><td>大众与市场出现系统性背离，有参考价值</td></tr>'
-    '<tr><td>≥ 3.0</td><td>强信号——市场定价明显低估这个比分，值得认真对待</td></tr>'
-    '</table>'
-    '<div class="dm-formula"><b>价差比</b> = (票数 / 有效总票) ÷ (1 / 赔率)</div>'
-    '<span class="dm-close" onclick="hideDeepInfo()">关闭</span>'
-    '</div></div>'
-    '<script>function showDeepInfo(){document.getElementById("deep-info-modal").style.display="flex"}'
-    'function hideDeepInfo(){document.getElementById("deep-info-modal").style.display="none"}</script>'
-)
+DEEP_INFO_MODAL = ''
 
 def goals_block(rich, my, grid):
     """进球推荐：大小球 2.5 + BTTS + xG 预期。"""
@@ -2802,7 +2852,6 @@ def build_index(items):
                 'text-decoration:none">查看完整赛程 →</a>')
     home_body = (f'<main><div style="height:16px"></div>'
                  f'{ai_stats_block(st)}'
-                 f'{crowd_stats_block(st)}'
                  f'{list_btn}'
                  f'<div class="foot">{updated_str}</div></main>')
     open(os.path.join(DOCS, 'index.html'), 'w').write(
