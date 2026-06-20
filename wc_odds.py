@@ -2131,7 +2131,7 @@ def grade_bets(cfg, rows, rich, grid, up=None):
     elif mu_val < 2.2:
         pick, pick_dir, grade = '小球 ≤2', 'under', 'X'
     else:
-        pick, pick_dir, grade = f'约{round(mu_val)}球', '', 'X'
+        pick, pick_dir, grade = f'<span style="font-size:10px;opacity:.6;font-weight:400">≈</span>{round(mu_val)}<span style="font-size:10px;opacity:.6;font-weight:400">球</span>', '', 'X'
     prob = ov_prob if pick_dir == 'over' else (1-ov_prob if pick_dir == 'under' else 0)
     od_show = (o_od if pick_dir == 'over' else u_od) if (o_od and u_od) else 0
     mkt_pct = round(100/od_show) if od_show else 0
@@ -2149,7 +2149,7 @@ def grade_bets(cfg, rows, rich, grid, up=None):
         i, j = map(int, sc.split('-'))
         m = i - j
         margin_prob[m] = margin_prob.get(m, 0) + prob
-    def fmt_m(m): return f'{cn_h}赢{m}球' if m>0 else (f'{cn_a}赢{-m}球' if m<0 else '平局')
+    def fmt_m(m): return f'+{m}' if m>0 else (f'-{-m}' if m<0 else '±0')
     top2 = sorted(margin_prob, key=lambda m: -margin_prob[m])[:2]
     for i, m in enumerate(top2):
         pct = round(margin_prob[m]*100)
@@ -2253,6 +2253,76 @@ PARLAY_JS = ''  # 串关弹窗已移除
 
 DEEP_INFO_MODAL = ''
 
+
+def tech_analysis_block(cn_h, cn_a):
+    """技术面分析模块：展示两队最近一场的技术统计。"""
+    th = TEAM_STATS.get(cn_h); ta = TEAM_STATS.get(cn_a)
+    if not th and not ta: return ''
+
+    def _bar(val, max_val, color='var(--lime)'):
+        pct = min(100, round(val / max_val * 100)) if max_val else 0
+        return (f'<div style="height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:3px">'
+                f'<div style="height:4px;width:{pct}%;background:{color};border-radius:2px"></div></div>')
+
+    def _eff_color(eff):
+        if eff < 8: return 'var(--crim)'
+        if eff >= 30: return 'var(--lime)'
+        return 'var(--on)'
+
+    def _team_col(cn, ts, align='left'):
+        if not ts:
+            return f'<div style="flex:1;text-align:{align}"><div style="color:var(--sec);font-size:11px">{cn}</div><div style="font-size:10px;color:var(--sec);opacity:.5;margin-top:6px">暂无数据</div></div>'
+        eff_c = _eff_color(ts['eff'])
+        eff_warn = ' ⚠' if ts['eff'] < 8 and ts['shots'] >= 10 else (' ↑' if ts['eff'] >= 30 else '')
+        return (
+            f'<div style="flex:1">'
+            f'<div style="font-size:12px;font-weight:700;color:var(--on);margin-bottom:8px;text-align:{align}">{cn}</div>'
+            f'<div style="display:flex;flex-direction:column;gap:6px">'
+            # 射门
+            f'<div>'
+            f'<div style="display:flex;justify-content:space-between;font-size:10px">'
+            f'<span style="color:var(--sec)">射门</span>'
+            f'<span style="font-family:\'JetBrains Mono\',monospace;font-weight:700">{ts["shots"]}</span></div>'
+            + _bar(ts['shots'], 35) +
+            f'</div>'
+            # 禁区内
+            f'<div>'
+            f'<div style="display:flex;justify-content:space-between;font-size:10px">'
+            f'<span style="color:var(--sec)">禁区内</span>'
+            f'<span style="font-family:\'JetBrains Mono\',monospace;font-weight:700">{ts["shots_box"]}</span></div>'
+            + _bar(ts['shots_box'], 25) +
+            f'</div>'
+            # 绝佳机会
+            f'<div>'
+            f'<div style="display:flex;justify-content:space-between;font-size:10px">'
+            f'<span style="color:var(--sec)">绝佳机会</span>'
+            f'<span style="font-family:\'JetBrains Mono\',monospace;font-weight:700">{ts["big"]}</span></div>'
+            + _bar(ts['big'], 8, 'var(--lime)') +
+            f'</div>'
+            # 进攻效率
+            f'<div style="margin-top:4px;padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px;border:1px solid rgba(255,255,255,.07)">'
+            f'<div style="font-size:9px;color:var(--sec);margin-bottom:2px">进攻效率</div>'
+            f'<div style="font-family:\'JetBrains Mono\',monospace;font-size:18px;font-weight:700;color:{eff_c}">'
+            f'{ts["eff"]:.0f}%<span style="font-size:10px;font-weight:400;color:{eff_c};margin-left:2px">{eff_warn}</span>'
+            f'</div>'
+            f'<div style="font-size:9px;color:var(--sec);opacity:.5">绝佳机会/射门</div>'
+            f'</div>'
+            f'</div></div>'
+        )
+
+    cols = (f'<div style="display:flex;gap:12px">'
+            + _team_col(cn_h, th)
+            + f'<div style="width:1px;background:rgba(255,255,255,.08);margin:0 2px"></div>'
+            + _team_col(cn_a, ta)
+            + f'</div>')
+
+    note = '<div style="font-size:9px;color:var(--sec);opacity:.4;margin-top:10px;line-height:1.5">数据来源：最近一场比赛 · 效率 &lt;8% 且射门≥10 为红牌信号</div>'
+    return (f'<div class="glass">'
+            f'{sec_head("monitoring","技术分析")}'
+            f'{cols}{note}'
+            f'</div>')
+
+
 def goals_block(rich, my, grid):
     """进球推荐：大小球 2.5 + BTTS + xG 预期。"""
     t25 = rich.get('tot') or {}
@@ -2309,8 +2379,10 @@ def build_detail(cfg, rows, rich):
         grades = grade_bets(cfg, rows, rich, grid, up=up)
         mu_html_live = _build_mu_html(t25.get('over'), t25.get('under'), up, lh, la, cfg['cn_h'], cfg['cn_a'])
         rec_html = rec_card_block(grades, cfg['slug'], mu_html=mu_html_live)
+        tech_html = tech_analysis_block(cfg['cn_h'], cfg['cn_a'])
         inner = (f'{match_header(rows, cfg)}'
                  f'{rec_html}'
+                 f'{tech_html}'
                  f'{tp_html}'
                  f'{sec_head("analytics","对阵分析")}{matchup_analysis(cfg)}'
                  f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
@@ -2575,9 +2647,12 @@ def build_past_detail(p, items_map=None):
         fb = form_block(cfg)
         if fb: fb_html = f'<div class="glass">{fb}</div>'
     odds_review = _odds_review_block(p, actual_sc, picks, grid)
+    cn_h_p = cn_of(p['h']); cn_a_p = cn_of(p['a'])
+    tech_html_p = tech_analysis_block(cn_h_p, cn_a_p)
     inner = (f'{past_header}'
              f'{odds_review}'
              f'{rec_html}'
+             f'{tech_html_p}'
              f'{tp_html}'
              f'{matchup_html}'
              f'{reasoning_html}'
