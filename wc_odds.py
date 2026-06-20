@@ -229,53 +229,54 @@ COL = {'home':'#CCFF00', 'draw':'#8e9379', 'away':'#FF0055'}  # 移盘曲线用�
 # 技术面统计：从懂球帝比赛页面提取（最新一轮数据）
 # eff = 绝佳机会/射门×100（进攻效率%）；atk = 射门×0.5+禁区内×2+绝佳×3
 TEAM_STATS = {
-    '西班牙':   {'shots':27,'shots_box':16,'big':2,'eff': 7.4,'atk':51.5,'def_exp':10.0,'poss':74},
-    '佛得角':   {'shots': 6,'shots_box': 2,'big':1,'eff':16.7,'atk':10.0,'def_exp':51.5,'poss':26},
-    '比利时':   {'shots':15,'shots_box': 9,'big':2,'eff':13.3,'atk':31.5,'def_exp':33.0,'poss':54},
-    '埃及':     {'shots':14,'shots_box':10,'big':2,'eff':14.3,'atk':33.0,'def_exp':31.5,'poss':46},
-    '沙特':     {'shots': 7,'shots_box': 4,'big':1,'eff':14.3,'atk':14.5,'def_exp':51.5,'poss':33},
-    '乌拉圭':   {'shots':27,'shots_box':16,'big':2,'eff': 7.4,'atk':51.5,'def_exp':14.5,'poss':67},
-    '法国':     {'shots':11,'shots_box': 7,'big':4,'eff':36.4,'atk':31.5,'def_exp':17.0,'poss':53},
-    '塞内加尔': {'shots': 6,'shots_box': 4,'big':2,'eff':33.3,'atk':17.0,'def_exp':31.5,'poss':47},
-    '阿根廷':   {'shots':10,'shots_box': 4,'big':1,'eff':10.0,'atk':16.0,'def_exp': 9.5,'poss':48},
-    '阿尔及利亚':{'shots':7,'shots_box': 3,'big':0,'eff': 0.0,'atk': 9.5,'def_exp':16.0,'poss':52},
-    '伊拉克':   {'shots':11,'shots_box': 8,'big':1,'eff': 9.1,'atk':24.5,'def_exp':43.0,'poss':39},
-    '挪威':     {'shots':12,'shots_box':11,'big':5,'eff':41.7,'atk':43.0,'def_exp':24.5,'poss':61},
-    '奥地利':   {'shots':11,'shots_box': 6,'big':4,'eff':36.4,'atk':29.5,'def_exp':19.5,'poss':63},
-    '约旦':     {'shots':11,'shots_box': 7,'big':0,'eff': 0.0,'atk':19.5,'def_exp':29.5,'poss':37},
-    '葡萄牙':   {'shots': 7,'shots_box': 5,'big':1,'eff':14.3,'atk':16.5,'def_exp':11.0,'poss':75},
-    '刚果(金)': {'shots': 8,'shots_box': 2,'big':1,'eff':12.5,'atk':11.0,'def_exp':16.5,'poss':25},
-    '英格兰':   {'shots':22,'shots_box':20,'big':7,'eff':31.8,'atk':72.0,'def_exp':19.0,'poss':52},
-    '克罗地亚': {'shots':10,'shots_box': 4,'big':2,'eff':20.0,'atk':19.0,'def_exp':72.0,'poss':48},
-    '加纳':     {'shots': 8,'shots_box': 7,'big':1,'eff':12.5,'atk':21.0,'def_exp':23.5,'poss':38},
-    '巴拿马':   {'shots':11,'shots_box': 6,'big':2,'eff':18.2,'atk':23.5,'def_exp':21.0,'poss':62},
-    '乌兹别克': {'shots': 8,'shots_box': 4,'big':1,'eff':12.5,'atk':15.0,'def_exp':39.5,'poss':39},
-    '哥伦比亚': {'shots':15,'shots_box':10,'big':4,'eff':26.7,'atk':39.5,'def_exp':15.0,'poss':61},
-    # R2 更新（使用最新一场数据）
-    '美国':     {'shots':10,'shots_box': 8,'big':2,'eff':20.0,'atk':27.0,'def_exp': 8.5,'poss':62},
-    '澳大利亚': {'shots': 5,'shots_box': 3,'big':0,'eff': 0.0,'atk': 8.5,'def_exp':27.0,'poss':38},
-    '苏格兰':   {'shots': 9,'shots_box': 8,'big':2,'eff':22.2,'atk':26.5,'def_exp':27.0,'poss':46},
-    '摩洛哥':   {'shots':14,'shots_box': 7,'big':2,'eff':14.3,'atk':27.0,'def_exp':26.5,'poss':49},
-    '巴西':     {'shots': 8,'shots_box': 8,'big':5,'eff':62.5,'atk':35.0,'def_exp':11.5,'poss':57},
-    '海地':     {'shots': 7,'shots_box': 4,'big':0,'eff': 0.0,'atk':11.5,'def_exp':35.0,'poss':43},
-    '土耳其':   {'shots':32,'shots_box':16,'big':3,'eff': 9.4,'atk':57.0,'def_exp': 9.5,'poss':79},
-    '巴拉圭':   {'shots': 7,'shots_box': 3,'big':0,'eff': 0.0,'atk': 9.5,'def_exp':57.0,'poss':21},
-    '荷兰':     {'shots':10,'shots_box':10,'big':0,'eff': 0.0,'atk':25.0,'def_exp':17.0,'poss':60},
-    '瑞典':     {'shots':13,'shots_box': 9,'big':4,'eff':30.8,'atk':36.5,'def_exp': 7.0,'poss':49},
-    '德国':     {'shots':26,'shots_box':21,'big':6,'eff':23.1,'atk':73.0,'def_exp':12.0,'poss':65},
-    '科特迪瓦': {'shots':15,'shots_box': 8,'big':2,'eff':13.3,'atk':29.5,'def_exp':19.0,'poss':48},
-    '厄瓜多尔': {'shots':12,'shots_box': 5,'big':1,'eff': 8.3,'atk':19.0,'def_exp':29.5,'poss':52},
-    '库拉索':   {'shots': 8,'shots_box': 4,'big':0,'eff': 0.0,'atk':12.0,'def_exp':73.0,'poss':35},
-    '突尼斯':   {'shots': 6,'shots_box': 2,'big':0,'eff': 0.0,'atk': 7.0,'def_exp':36.5,'poss':51},
-    '日本':     {'shots':10,'shots_box': 6,'big':0,'eff': 0.0,'atk':17.0,'def_exp':25.0,'poss':40},
-    '加拿大':   {'shots':32,'shots_box':21,'big':6,'eff':18.8,'atk':76.0,'def_exp': 3.0,'poss':79},
-    '卡塔尔':   {'shots': 2,'shots_box': 1,'big':0,'eff': 0.0,'atk': 3.0,'def_exp':76.0,'poss':21},
-    '瑞士':     {'shots':13,'shots_box': 9,'big':4,'eff':30.8,'atk':36.5,'def_exp': 8.5,'poss':62},
-    '波黑':     {'shots': 5,'shots_box': 3,'big':0,'eff': 0.0,'atk': 8.5,'def_exp':36.5,'poss':38},
-    '墨西哥':   {'shots': 8,'shots_box': 5,'big':2,'eff':25.0,'atk':20.0,'def_exp':25.5,'poss':42},
-    '韩国':     {'shots': 9,'shots_box': 6,'big':3,'eff':33.3,'atk':25.5,'def_exp':20.0,'poss':58},
-    '捷克':     {'shots':14,'shots_box':11,'big':3,'eff':21.4,'atk':38.0,'def_exp':23.5,'poss':38},
-    '南非':     {'shots':17,'shots_box': 6,'big':1,'eff': 5.9,'atk':23.5,'def_exp':38.0,'poss':62},
+    # R1 数据
+    '西班牙':    {'shots':27,'shots_box':16,'big':2,'eff': 7.4,'atk':51.5,'def_exp':10.0,'poss':74,'vs':'佛得角','round':'R1'},
+    '佛得角':    {'shots': 6,'shots_box': 2,'big':1,'eff':16.7,'atk':10.0,'def_exp':51.5,'poss':26,'vs':'西班牙','round':'R1'},
+    '比利时':    {'shots':15,'shots_box': 9,'big':2,'eff':13.3,'atk':31.5,'def_exp':33.0,'poss':54,'vs':'埃及','round':'R1'},
+    '埃及':      {'shots':14,'shots_box':10,'big':2,'eff':14.3,'atk':33.0,'def_exp':31.5,'poss':46,'vs':'比利时','round':'R1'},
+    '沙特':      {'shots': 7,'shots_box': 4,'big':1,'eff':14.3,'atk':14.5,'def_exp':51.5,'poss':33,'vs':'乌拉圭','round':'R1'},
+    '乌拉圭':    {'shots':27,'shots_box':16,'big':2,'eff': 7.4,'atk':51.5,'def_exp':14.5,'poss':67,'vs':'沙特','round':'R1'},
+    '法国':      {'shots':11,'shots_box': 7,'big':4,'eff':36.4,'atk':31.5,'def_exp':17.0,'poss':53,'vs':'塞内加尔','round':'R1'},
+    '塞内加尔':  {'shots': 6,'shots_box': 4,'big':2,'eff':33.3,'atk':17.0,'def_exp':31.5,'poss':47,'vs':'法国','round':'R1'},
+    '阿根廷':    {'shots':10,'shots_box': 4,'big':1,'eff':10.0,'atk':16.0,'def_exp': 9.5,'poss':48,'vs':'阿尔及利亚','round':'R1'},
+    '阿尔及利亚':{'shots': 7,'shots_box': 3,'big':0,'eff': 0.0,'atk': 9.5,'def_exp':16.0,'poss':52,'vs':'阿根廷','round':'R1'},
+    '伊拉克':    {'shots':11,'shots_box': 8,'big':1,'eff': 9.1,'atk':24.5,'def_exp':43.0,'poss':39,'vs':'挪威','round':'R1'},
+    '挪威':      {'shots':12,'shots_box':11,'big':5,'eff':41.7,'atk':43.0,'def_exp':24.5,'poss':61,'vs':'伊拉克','round':'R1'},
+    '奥地利':    {'shots':11,'shots_box': 6,'big':4,'eff':36.4,'atk':29.5,'def_exp':19.5,'poss':63,'vs':'约旦','round':'R1'},
+    '约旦':      {'shots':11,'shots_box': 7,'big':0,'eff': 0.0,'atk':19.5,'def_exp':29.5,'poss':37,'vs':'奥地利','round':'R1'},
+    '葡萄牙':    {'shots': 7,'shots_box': 5,'big':1,'eff':14.3,'atk':16.5,'def_exp':11.0,'poss':75,'vs':'刚果(金)','round':'R1'},
+    '刚果(金)':  {'shots': 8,'shots_box': 2,'big':1,'eff':12.5,'atk':11.0,'def_exp':16.5,'poss':25,'vs':'葡萄牙','round':'R1'},
+    '英格兰':    {'shots':22,'shots_box':20,'big':7,'eff':31.8,'atk':72.0,'def_exp':19.0,'poss':52,'vs':'克罗地亚','round':'R1'},
+    '克罗地亚':  {'shots':10,'shots_box': 4,'big':2,'eff':20.0,'atk':19.0,'def_exp':72.0,'poss':48,'vs':'英格兰','round':'R1'},
+    '加纳':      {'shots': 8,'shots_box': 7,'big':1,'eff':12.5,'atk':21.0,'def_exp':23.5,'poss':38,'vs':'巴拿马','round':'R1'},
+    '巴拿马':    {'shots':11,'shots_box': 6,'big':2,'eff':18.2,'atk':23.5,'def_exp':21.0,'poss':62,'vs':'加纳','round':'R1'},
+    '乌兹别克':  {'shots': 8,'shots_box': 4,'big':1,'eff':12.5,'atk':15.0,'def_exp':39.5,'poss':39,'vs':'哥伦比亚','round':'R1'},
+    '哥伦比亚':  {'shots':15,'shots_box':10,'big':4,'eff':26.7,'atk':39.5,'def_exp':15.0,'poss':61,'vs':'乌兹别克','round':'R1'},
+    '荷兰':      {'shots':10,'shots_box':10,'big':0,'eff': 0.0,'atk':25.0,'def_exp':17.0,'poss':60,'vs':'日本','round':'R1'},
+    '日本':      {'shots':10,'shots_box': 6,'big':0,'eff': 0.0,'atk':17.0,'def_exp':25.0,'poss':40,'vs':'荷兰','round':'R1'},
+    '瑞典':      {'shots':13,'shots_box': 9,'big':4,'eff':30.8,'atk':36.5,'def_exp': 7.0,'poss':49,'vs':'突尼斯','round':'R1'},
+    '突尼斯':    {'shots': 6,'shots_box': 2,'big':0,'eff': 0.0,'atk': 7.0,'def_exp':36.5,'poss':51,'vs':'瑞典','round':'R1'},
+    '德国':      {'shots':26,'shots_box':21,'big':6,'eff':23.1,'atk':73.0,'def_exp':12.0,'poss':65,'vs':'库拉索','round':'R1'},
+    '库拉索':    {'shots': 8,'shots_box': 4,'big':0,'eff': 0.0,'atk':12.0,'def_exp':73.0,'poss':35,'vs':'德国','round':'R1'},
+    '科特迪瓦':  {'shots':15,'shots_box': 8,'big':2,'eff':13.3,'atk':29.5,'def_exp':19.0,'poss':48,'vs':'厄瓜多尔','round':'R1'},
+    '厄瓜多尔':  {'shots':12,'shots_box': 5,'big':1,'eff': 8.3,'atk':19.0,'def_exp':29.5,'poss':52,'vs':'科特迪瓦','round':'R1'},
+    # R2 数据（使用最新一场）
+    '美国':      {'shots':10,'shots_box': 8,'big':2,'eff':20.0,'atk':27.0,'def_exp': 8.5,'poss':62,'vs':'澳大利亚','round':'R2'},
+    '澳大利亚':  {'shots': 5,'shots_box': 3,'big':0,'eff': 0.0,'atk': 8.5,'def_exp':27.0,'poss':38,'vs':'美国','round':'R2'},
+    '苏格兰':    {'shots': 9,'shots_box': 8,'big':2,'eff':22.2,'atk':26.5,'def_exp':27.0,'poss':46,'vs':'摩洛哥','round':'R2'},
+    '摩洛哥':    {'shots':14,'shots_box': 7,'big':2,'eff':14.3,'atk':27.0,'def_exp':26.5,'poss':49,'vs':'苏格兰','round':'R2'},
+    '巴西':      {'shots': 8,'shots_box': 8,'big':5,'eff':62.5,'atk':35.0,'def_exp':11.5,'poss':57,'vs':'海地','round':'R2'},
+    '海地':      {'shots': 7,'shots_box': 4,'big':0,'eff': 0.0,'atk':11.5,'def_exp':35.0,'poss':43,'vs':'巴西','round':'R2'},
+    '土耳其':    {'shots':32,'shots_box':16,'big':3,'eff': 9.4,'atk':57.0,'def_exp': 9.5,'poss':79,'vs':'巴拉圭','round':'R2'},
+    '巴拉圭':    {'shots': 7,'shots_box': 3,'big':0,'eff': 0.0,'atk': 9.5,'def_exp':57.0,'poss':21,'vs':'土耳其','round':'R2'},
+    '加拿大':    {'shots':32,'shots_box':21,'big':6,'eff':18.8,'atk':76.0,'def_exp': 3.0,'poss':79,'vs':'卡塔尔','round':'R2'},
+    '卡塔尔':    {'shots': 2,'shots_box': 1,'big':0,'eff': 0.0,'atk': 3.0,'def_exp':76.0,'poss':21,'vs':'加拿大','round':'R2'},
+    '瑞士':      {'shots':13,'shots_box': 9,'big':4,'eff':30.8,'atk':36.5,'def_exp': 8.5,'poss':62,'vs':'波黑','round':'R2'},
+    '波黑':      {'shots': 5,'shots_box': 3,'big':0,'eff': 0.0,'atk': 8.5,'def_exp':36.5,'poss':38,'vs':'瑞士','round':'R2'},
+    '墨西哥':    {'shots': 8,'shots_box': 5,'big':2,'eff':25.0,'atk':20.0,'def_exp':25.5,'poss':42,'vs':'韩国','round':'R2'},
+    '韩国':      {'shots': 9,'shots_box': 6,'big':3,'eff':33.3,'atk':25.5,'def_exp':20.0,'poss':58,'vs':'墨西哥','round':'R2'},
+    '捷克':      {'shots':14,'shots_box':11,'big':3,'eff':21.4,'atk':38.0,'def_exp':23.5,'poss':38,'vs':'南非','round':'R2'},
+    '南非':      {'shots':17,'shots_box': 6,'big':1,'eff': 5.9,'atk':23.5,'def_exp':38.0,'poss':62,'vs':'捷克','round':'R2'},
 }
 
 def _tech_mult(cn_team):
@@ -2255,71 +2256,107 @@ DEEP_INFO_MODAL = ''
 
 
 def tech_analysis_block(cn_h, cn_a):
-    """技术面分析模块：展示两队最近一场的技术统计。"""
+    """技术面分析模块：镜像对比 + 对手标注 + 直接解读。"""
     th = TEAM_STATS.get(cn_h); ta = TEAM_STATS.get(cn_a)
     if not th and not ta: return ''
 
-    def _bar(val, max_val, color='var(--lime)'):
-        pct = min(100, round(val / max_val * 100)) if max_val else 0
-        return (f'<div style="height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:3px">'
-                f'<div style="height:4px;width:{pct}%;background:{color};border-radius:2px"></div></div>')
-
     def _eff_color(eff):
-        if eff < 8: return 'var(--crim)'
+        if eff < 8: return '#FF3355'
         if eff >= 30: return 'var(--lime)'
         return 'var(--on)'
 
-    def _team_col(cn, ts, align='left'):
-        if not ts:
-            return f'<div style="flex:1;text-align:{align}"><div style="color:var(--sec);font-size:11px">{cn}</div><div style="font-size:10px;color:var(--sec);opacity:.5;margin-top:6px">暂无数据</div></div>'
-        eff_c = _eff_color(ts['eff'])
-        eff_warn = ' ⚠' if ts['eff'] < 8 and ts['shots'] >= 10 else (' ↑' if ts['eff'] >= 30 else '')
+    def _tag(eff, shots, big, poss):
+        """生成直接了当的进攻特征解读。"""
+        parts = []
+        if poss >= 65: parts.append('控球主导')
+        elif poss <= 35: parts.append('被动防守')
+        if shots >= 22: parts.append('大量射门')
+        elif shots <= 7: parts.append('射门匮乏')
+        if eff < 8 and shots >= 10: parts.append('有效射门极少')
+        elif big == 0 and shots >= 8: parts.append('未创绝佳机会')
+        elif eff >= 35: parts.append('把握机会能力强')
+        elif eff >= 22: parts.append('机会质量不错')
+        return ' · '.join(parts) if parts else '进攻较为均衡'
+
+    def _verdict(eff, shots, big):
+        if eff < 8 and shots >= 10: return '⚠ 进攻虚高', '#FF3355'
+        if eff >= 35: return '↑ 高效进攻', 'var(--lime)'
+        if big == 0 and shots >= 8: return '进攻缺乏质量', 'var(--sec)'
+        if eff >= 22: return '进攻稳健', 'var(--on)'
+        return '进攻一般', 'var(--sec)'
+
+    def _mirror_row(label, lv, rv, ref):
+        ref = ref or 1
+        lp = round(lv / ref * 100); rp = round(rv / ref * 100)
+        lp = min(lp, 100); rp = min(rp, 100)
+        lc = 'rgba(204,255,0,.55)' if lv >= rv else 'rgba(204,255,0,.25)'
+        rc = 'rgba(100,160,255,.55)' if rv > lv else 'rgba(100,160,255,.25)'
         return (
+            f'<div style="margin-bottom:8px">'
+            f'<div style="display:flex;align-items:center;gap:6px">'
+            f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:12px;font-weight:700;width:22px;text-align:right">{lv}</span>'
+            f'<div style="flex:1;display:flex;gap:2px;height:5px">'
+            f'<div style="flex:1;display:flex;justify-content:flex-end">'
+            f'<div style="height:5px;width:{lp}%;background:{lc};border-radius:2px"></div></div>'
+            f'<div style="width:1px;background:rgba(255,255,255,.15);flex-shrink:0"></div>'
             f'<div style="flex:1">'
-            f'<div style="font-size:12px;font-weight:700;color:var(--on);margin-bottom:8px;text-align:{align}">{cn}</div>'
-            f'<div style="display:flex;flex-direction:column;gap:6px">'
-            # 射门
-            f'<div>'
-            f'<div style="display:flex;justify-content:space-between;font-size:10px">'
-            f'<span style="color:var(--sec)">射门</span>'
-            f'<span style="font-family:\'JetBrains Mono\',monospace;font-weight:700">{ts["shots"]}</span></div>'
-            + _bar(ts['shots'], 35) +
+            f'<div style="height:5px;width:{rp}%;background:{rc};border-radius:2px"></div></div>'
             f'</div>'
-            # 禁区内
-            f'<div>'
-            f'<div style="display:flex;justify-content:space-between;font-size:10px">'
-            f'<span style="color:var(--sec)">禁区内</span>'
-            f'<span style="font-family:\'JetBrains Mono\',monospace;font-weight:700">{ts["shots_box"]}</span></div>'
-            + _bar(ts['shots_box'], 25) +
+            f'<span style="font-family:\'JetBrains Mono\',monospace;font-size:12px;font-weight:700;width:22px">{rv}</span>'
             f'</div>'
-            # 绝佳机会
-            f'<div>'
-            f'<div style="display:flex;justify-content:space-between;font-size:10px">'
-            f'<span style="color:var(--sec)">绝佳机会</span>'
-            f'<span style="font-family:\'JetBrains Mono\',monospace;font-weight:700">{ts["big"]}</span></div>'
-            + _bar(ts['big'], 8, 'var(--lime)') +
+            f'<div style="text-align:center;font-size:9px;color:var(--sec);opacity:.45;margin-top:2px">{label}</div>'
             f'</div>'
-            # 进攻效率
-            f'<div style="margin-top:4px;padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px;border:1px solid rgba(255,255,255,.07)">'
-            f'<div style="font-size:9px;color:var(--sec);margin-bottom:2px">进攻效率</div>'
-            f'<div style="font-family:\'JetBrains Mono\',monospace;font-size:18px;font-weight:700;color:{eff_c}">'
-            f'{ts["eff"]:.0f}%<span style="font-size:10px;font-weight:400;color:{eff_c};margin-left:2px">{eff_warn}</span>'
-            f'</div>'
-            f'<div style="font-size:9px;color:var(--sec);opacity:.5">绝佳机会/射门</div>'
-            f'</div>'
-            f'</div></div>'
         )
 
-    cols = (f'<div style="display:flex;gap:12px">'
-            + _team_col(cn_h, th)
-            + f'<div style="width:1px;background:rgba(255,255,255,.08);margin:0 2px"></div>'
-            + _team_col(cn_a, ta)
-            + f'</div>')
+    lv_s = th['shots'] if th else 0;  rv_s = ta['shots'] if ta else 0
+    lv_b = th['shots_box'] if th else 0; rv_b = ta['shots_box'] if ta else 0
+    lv_g = th['big'] if th else 0;    rv_g = ta['big'] if ta else 0
+    ref_s = max(lv_s, rv_s, 1); ref_b = max(lv_b, rv_b, 1); ref_g = max(lv_g, rv_g, 1)
 
-    note = '<div style="font-size:9px;color:var(--sec);opacity:.4;margin-top:10px;line-height:1.5">数据来源：最近一场比赛 · 效率 &lt;8% 且射门≥10 为红牌信号</div>'
+    mirror = (
+        _mirror_row('射门', lv_s, rv_s, ref_s)
+        + _mirror_row('禁区内射门', lv_b, rv_b, ref_b)
+        + _mirror_row('绝佳机会', lv_g, rv_g, ref_g)
+    )
+
+    def _eff_cell(cn, ts):
+        if not ts: return f'<div style="flex:1;text-align:center;color:var(--sec);font-size:10px">{cn}<br>暂无数据</div>'
+        eff = ts['eff']; shots = ts['shots']; big = ts['big']; poss = ts.get('poss',50)
+        ec = _eff_color(eff)
+        tag = _tag(eff, shots, big, poss)
+        vtext, vc = _verdict(eff, shots, big)
+        vs_label = ts.get('vs',''); rnd = ts.get('round','')
+        src = f'vs {vs_label} ({rnd})' if vs_label else ''
+        return (
+            f'<div style="flex:1;text-align:center">'
+            f'<div style="font-size:11px;font-weight:700;color:var(--on);margin-bottom:2px">{cn}</div>'
+            f'<div style="font-size:9px;color:var(--sec);opacity:.4;margin-bottom:6px">{src}</div>'
+            f'<div style="font-family:\'JetBrains Mono\',monospace;font-size:22px;font-weight:700;color:{ec};line-height:1">{eff:.0f}%</div>'
+            f'<div style="font-size:9px;color:var(--sec);opacity:.5;margin-bottom:6px">进攻效率</div>'
+            f'<div style="font-size:10px;color:var(--sec);line-height:1.5">{tag}</div>'
+            f'<div style="font-size:10px;font-weight:700;color:{vc};margin-top:4px">{vtext}</div>'
+            f'</div>'
+        )
+
+    eff_row = (
+        f'<div style="display:flex;gap:8px;margin-top:12px;padding:12px 0 4px;border-top:1px solid rgba(255,255,255,.07)">'
+        + _eff_cell(cn_h, th)
+        + f'<div style="width:1px;background:rgba(255,255,255,.08)"></div>'
+        + _eff_cell(cn_a, ta)
+        + f'</div>'
+    )
+
+    team_hdr = (
+        f'<div style="display:flex;margin-bottom:10px">'
+        f'<div style="flex:1;font-size:11px;font-weight:700;color:rgba(204,255,0,.8)">{cn_h}</div>'
+        f'<div style="width:55px;text-align:center;font-size:9px;color:var(--sec);opacity:.4">对比</div>'
+        f'<div style="flex:1;text-align:right;font-size:11px;font-weight:700;color:rgba(100,160,255,.8)">{cn_a}</div>'
+        f'</div>'
+    )
+
     return (f'<div class="glass">'
             f'{sec_head("monitoring","技术分析")}'
-            f'{cols}{note}'
+            f'{team_hdr}{mirror}{eff_row}'
             f'</div>')
 
 
