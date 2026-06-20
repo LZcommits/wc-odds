@@ -1054,6 +1054,7 @@ a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
 .hstat-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--lime);line-height:1;margin-bottom:5px}
 .hstat-lbl{font-size:9px;color:var(--sec);opacity:.65;line-height:1.5;letter-spacing:.03em}
 .hstat-sub{font-size:9px;color:var(--sec);opacity:.4;font-family:'JetBrains Mono',monospace}
+.hrow-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--lime);opacity:.6;margin-bottom:7px}
 /* ── 分轮命中率 ── */
 .round-compare{display:grid;grid-template-columns:1fr 1px 1fr;gap:0;background:rgba(13,28,45,.7);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:14px}
 .rc-col{padding:18px 16px;text-align:center}
@@ -2897,23 +2898,34 @@ def build_index(items):
 
     # ── 首页 index.html ────────────────────────────────────────
     n_all = st.get('n', 0)
-    wh_all = st.get('wdl_hits', 0); sh_all = st.get('sc_hits', 0)
-    th_all = st.get('tot_hits', 0); tn_all = st.get('tot_n', 0)
-    wdl_pct_str = _pct(wh_all, n_all)
+    r1s = st.get('r1', {}); r2s = st.get('r2', {})
 
-    # Hero：命中率为主视觉
+    def _stat_cell(val, lbl, sub):
+        return (f'<div class="hero-stat">'
+                f'<div class="hstat-val">{val}</div>'
+                f'<div class="hstat-lbl">{lbl}<br><span class="hstat-sub">{sub}</span></div>'
+                f'</div>')
+
+    def _row(rs, row_label):
+        n = rs.get('n', 0)
+        wh = rs.get('wdl_hits', 0); sh = rs.get('sc_hits', 0)
+        th = rs.get('tot_hits', 0); tn = rs.get('tot_n', 0)
+        if not n:
+            return ''
+        return (f'<div class="hrow-label">{row_label} · {n}场</div>'
+                f'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">'
+                + _stat_cell(_pct(sh, n), '比分命中率', f'{sh}/{n}场')
+                + _stat_cell(_pct(th, tn), '大小球命中率', f'{th}/{tn}场')
+                + _stat_cell(_pct(wh, n), '胜平负命中率', f'{wh}/{n}场')
+                + '</div>')
+
     hero = (
         '<div class="home-hero">'
         '<div class="hero-eyebrow">2026 FIFA WORLD CUP · AI 推演</div>'
-        f'<div class="hero-year">{wdl_pct_str}</div>'
-        '<div class="hero-wc">胜平负命中率</div>'
-        f'<div class="hero-tagline">已推演 {n_all} 场 · 赔率价值 · 技术面校正 · 锐庄去水位</div>'
-        '<div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">'
-        f'<div class="hero-stat"><div class="hstat-val">{_pct(sh_all, n_all)}</div><div class="hstat-lbl">比分命中率<br><span class="hstat-sub">{sh_all}/{n_all}场</span></div></div>'
-        f'<div class="hero-stat"><div class="hstat-val">{_pct(th_all, tn_all)}</div><div class="hstat-lbl">大小球命中率<br><span class="hstat-sub">{th_all}/{tn_all}场</span></div></div>'
-        f'<div class="hero-stat"><div class="hstat-val">{wh_all}/{n_all}</div><div class="hstat-lbl">胜平负场次<br><span class="hstat-sub">已结束场次</span></div></div>'
-        '</div>'
-        '</div>'
+        f'<div class="hero-tagline" style="margin-bottom:20px">已推演 {n_all} 场 · 赔率价值 · 技术面校正 · 锐庄去水位</div>'
+        + _row(r1s, '第一轮')
+        + _row(r2s, '第二轮')
+        + '</div>'
     )
 
     list_btn = ('<a href="list.html#cur" style="display:block;text-align:center;'
