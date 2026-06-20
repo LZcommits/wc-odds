@@ -2245,13 +2245,34 @@ def _odds_review_block(p, actual_sc, model_picks, grid):
             f'</div>')
 
 def build_past_detail(p, items_map=None):
-    if not p.get('devig'): return
     fid = p['fid']; cnh = cn_of(p['h']); cna = cn_of(p['a']); fh = flag_of(p['h']); fa = flag_of(p['a'])
-    gh, ga = p['gh'], p['ga']; d = p['devig']
+    gh, ga = p['gh'], p['ga']
+    try:
+        bj0 = datetime.datetime.fromisoformat(p['date']).astimezone(BJ)
+        ds0 = f'{bj0.month}/{bj0.day} {bj0.hour:02d}:{bj0.minute:02d}'
+    except Exception: ds0 = p['date'][:10]
+    # 无赔率数据：仅显示赛果页
+    if not p.get('devig'):
+        title = f'{cnh} VS {cna}'
+        rescn = f'{cnh} 胜' if gh > ga else (f'{cna} 胜' if ga > gh else '平局')
+        no_odds_body = (f'<main>'
+            f'<a class="back" href="list.html"><span class="material-symbols-outlined">chevron_left</span>返回目录</a>'
+            f'<div style="height:12px"></div>'
+            f'<div class="glass" style="text-align:center;padding:32px 16px">'
+            f'<div style="font-size:13px;color:var(--sec);margin-bottom:16px">{ds0}（北京）· 已结束</div>'
+            f'<div style="font-size:18px;font-weight:700;margin-bottom:8px">{fh} {cnh} <span style="color:var(--lime);font-size:32px;font-weight:900">{gh} - {ga}</span> {cna} {fa}</div>'
+            f'<div style="font-size:14px;color:var(--sec);margin-top:8px">{rescn}</div>'
+            f'<div style="margin-top:24px;font-size:12px;color:var(--sec);opacity:.5">此场比赛赛前未采集到赔率数据，无法进行深度分析</div>'
+            f'</div>'
+            f'<div class="foot">{ds0}（北京）</div></main>')
+        open(os.path.join(DOCS, f'past_{fid}.html'), 'w').write(
+            f'<!DOCTYPE html><html lang="zh" class="dark"><head>{head(title,raw_title=True)}</head><body>{no_odds_body}</body></html>')
+        return
+    d = p['devig']
     try:
         bj = datetime.datetime.fromisoformat(p['date']).astimezone(BJ)
         ds = f'{bj.month}/{bj.day} {bj.hour:02d}:{bj.minute:02d}'
-    except Exception: ds = p['date'][:10]
+    except Exception: ds = ds0
     lh, la, grid = poisson_calc(d['home'], d['away'], None)
     actual_sc = f'{gh}-{ga}'
     actual_wdl = 'home' if gh > ga else ('away' if ga > gh else 'draw')
@@ -2457,6 +2478,10 @@ def line_row(f, pmap, cur_fid, prob_map):
             lbl_style = 'color:var(--lime);font-weight:800' if hit else 'color:var(--sec);opacity:.6'
             return (f'<a class="tl-row done{cc}"{ida} href="past_{fid}.html"><span class="tl-tm">{tm}</span>'
                     f'{teams}<span class="tl-pl" style="{lbl_style}">{lbl}</span></a>')
+        # 无赔率数据但有赛果:仍可点进查看赛果页
+        if p and p.get('gh') is not None:
+            return (f'<a class="tl-row done{cc}"{ida} href="past_{fid}.html"><span class="tl-tm">{tm}</span>'
+                    f'{teams}<span class="tl-pl" style="color:var(--sec);opacity:.5">无赔率</span></a>')
         return f'<div class="tl-row done{cc}"{ida}><span class="tl-tm">{tm}</span>{teams}<span class="tl-pl" style="color:var(--sec)">完场</span></div>'
     # 未进行 / 进行中:大气卡(增加高度,留分析占位)
     live = st not in ('NS',)
