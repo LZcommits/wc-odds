@@ -1963,6 +1963,12 @@ def grade_bets(cfg, rows, rich, grid):
 
     # ── 3. 赔率推测比分（满足规则，最多3个）────────────────────────
     so = (rich.get('score_odds') or {}).get('odds', {})
+    # 兜底：比赛已开赛但 rich 无赔率时，用 JSONL 最近一次采样的 pin_scores
+    if not so and rows:
+        for row in reversed(rows):
+            sc = row.get('pin_scores') or {}
+            if sc.get('odds'):
+                so = sc['odds']; break
     cands = []
     for sc, prob in sorted(grid.items(), key=lambda x: -x[1]):
         od = so.get(sc)
@@ -2171,6 +2177,73 @@ def past_card(p):
             f'<div class="pmeta"><span class="pchip">{ds}</span>{sc_tag}'
             f'<span class="pval">荐:<b>{p.get("wdl_txt","")}</b></span><span class="pmore">推演 ›</span></div></a>')
 
+def _odds_review_block(p, actual_sc, model_picks, grid):
+    """赔率复盘：实际比分 vs 赛前市场定价，找规律用。"""
+    scd = p.get('score_odds') or {}
+    if not scd: return ''
+    # 按隐含概率降序(赔率升序)排列全部比分
+    ranked = sorted(scd.items(), key=lambda x: x[1])
+    total = len(ranked)
+    actual_od = scd.get(actual_sc)
+    rank = next((i+1 for i,(sc,_) in enumerate(ranked) if sc == actual_sc), None)
+    actual_pct = round(100/actual_od, 1) if actual_od else 0
+
+    # 市场热度标签
+    if rank is None:
+        hot_tag = f'超出市场预期（{total}个比分赔率中未出现）'
+        tag_color = '#ff6b6b'
+    elif rank <= 3:
+        hot_tag = f'市场前三热门（第 {rank}/{total}）'
+        tag_color = 'var(--lime)'
+    elif rank <= 8:
+        hot_tag = f'市场中热门（第 {rank}/{total}）'
+        tag_color = '#f0c040'
+    else:
+        hot_tag = f'市场冷门（第 {rank}/{total}）'
+        tag_color = '#64b4ff'
+
+    # 模型是否命中
+    model_hit = any(actual_sc == sc.replace(':','-') for sc in model_picks)
+
+    # Top 5 市场最热门比分
+    def od_row(sc, od, is_actual=False):
+        pct = round(100/od, 1)
+        hit = sc == actual_sc
+        bg = 'background:rgba(204,255,0,.07);' if hit else ''
+        sc_fmt = sc.replace('-', ':')
+        mark = ' ← 实际' if hit else ''
+        return (f'<div style="display:grid;grid-template-columns:60px 60px 1fr 60px;'
+                f'align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);{bg}">'
+                f'<span style="font-weight:700;color:{"var(--lime)" if hit else "var(--on)"}">{sc_fmt}</span>'
+                f'<span style="font-family:\'JetBrains Mono\',monospace;color:var(--sec)">@{od}</span>'
+                f'<span style="font-size:9px;color:var(--sec)">{pct}% 隐含概率</span>'
+                f'<span style="font-size:9px;color:#f0c040">{mark}</span>'
+                f'</div>')
+
+    top5_html = ''.join(od_row(sc, od) for sc, od in ranked[:5])
+    # 如果实际比分不在前5，单独显示
+    extra = ''
+    if actual_od and rank and rank > 5:
+        extra = (f'<div style="border-top:1px dashed rgba(255,255,255,.1);margin-top:4px;padding-top:4px">'
+                 f'{od_row(actual_sc, actual_od)}</div>')
+
+    model_note = ('✓ 模型选到了这个比分' if model_hit
+                  else f'模型未选到（推荐：{", ".join(sc for sc in model_picks if sc)}）')
+    model_color = 'var(--lime)' if model_hit else 'var(--sec)'
+
+    return (f'<div class="glass" style="margin-bottom:12px">'
+            f'{sec_head("query_stats","赔率复盘")}'
+            f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">'
+            f'<span style="font-size:22px;font-weight:900;color:var(--on)">{actual_sc.replace("-",":")}</span>'
+            f'<span style="font-size:11px;padding:2px 8px;border-radius:4px;border:1px solid;'
+            f'border-color:{tag_color};color:{tag_color}">{hot_tag}</span>'
+            f'{"<span style=\"font-size:11px;color:#f0c040\">@" + str(actual_od) + " 赔率 · " + str(actual_pct) + "% 隐含概率</span>" if actual_od else ""}'
+            f'</div>'
+            f'<div style="font-size:10px;color:var(--sec);margin-bottom:8px">市场最热门比分 Top 5（赛前）</div>'
+            f'{top5_html}{extra}'
+            f'<div style="margin-top:10px;font-size:11px;color:{model_color}">{model_note}</div>'
+            f'</div>')
+
 def build_past_detail(p, items_map=None):
     if not p.get('devig'): return
     fid = p['fid']; cnh = cn_of(p['h']); cna = cn_of(p['a']); fh = flag_of(p['h']); fa = flag_of(p['a'])
@@ -2280,8 +2353,10 @@ def build_past_detail(p, items_map=None):
         reasoning_html = f'<div class="glass">{sec_head("account_tree","推理逻辑链")}{reasoning_timeline(cfg)}</div>'
         fb = form_block(cfg)
         if fb: fb_html = f'<div class="glass">{fb}</div>'
+    odds_review = _odds_review_block(p, actual_sc, picks, grid)
     inner = (f'{past_header}'
              f'{rec_html}'
+             f'{odds_review}'
              f'{tp_html}'
              f'{matchup_html}'
              f'{reasoning_html}'
@@ -2459,14 +2534,13 @@ def ai_stats_block(st):
             f'<div class="stats-grid">{cells}</div></div>')
 
 def crowd_stats_block(st):
-    """深度推演战绩卡（胜平负/比分）。"""
+    """深度推演战绩卡（仅胜平负）。"""
     if not st or not st.get('crowd_n'): return ''
     cn = st['crowd_n']
-    cells = (_cell(_pct(st['crowd_wdl_hits'],cn), '胜平负命中', f'{st["crowd_wdl_hits"]}/{cn}场')
-           + _cell(_pct(st['crowd_sc_hits'],cn),  '比分命中',   f'{st["crowd_sc_hits"]}/{cn}场'))
+    cells = _cell(_pct(st['crowd_wdl_hits'],cn), '胜平负命中', f'{st["crowd_wdl_hits"]}/{cn}场')
     return (f'<div class="glass" style="margin-bottom:14px">'
             f'{sec_head("groups","深度推演战绩")}'
-            f'<div class="stats-grid" style="grid-template-columns:1fr 1fr">{cells}</div></div>')
+            f'<div class="stats-grid" style="grid-template-columns:1fr">{cells}</div></div>')
 
 
 def build_recommended_parlay(items):
