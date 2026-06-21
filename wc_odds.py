@@ -247,6 +247,115 @@ MATCHES = [
          '伊东纯也右路冲击 vs 突尼斯左路:双翼夹击战术'],
    'oh':14,'oa':63,'osrc':'去水位','otag':'日本价值','val':'日本胜 / 日本受让',
    'note':'日本2022击败德国和西班牙,实力远超市场认可;突尼斯防守偏弱进攻更弱;价值押日本胜@1.53。'}},
+ # ── R2 剩余 12 场 ──────────────────────────────────────────────────
+ {'slug':'spain_saudi','home':'Spain','away':'Saudi Arabia','cn_h':'西班牙','cn_a':'沙特',
+  'ko':ko(2026,6,21,16),'tier':'①悬殊 · R1意外平局后必胜局','my':{'home':0.869,'draw':0.095,'away':0.036},
+  'st':{'h2h':'两队近年世界杯有交手,2022年沙特1-2负西班牙。西班牙R1意外0-0平佛得角,本场必须全力争胜。',
+   'fh':'4-3-3(亚马尔/莫拉塔/B席)','fa':'4-2-3-1(道萨里/萨勒姆)',
+   'xh':'西班牙控球体系,亚马尔+莫拉塔锋线。R1 27射门但仅2绝佳机会,效率差是主要问题。本场面对更弱对手需提效。',
+   'xa':'沙特防守纪律强,2022神话难复制。R1仅7射门,反击依赖道萨里速度。',
+   'mu':['亚马尔速度突破 vs 沙特右路防线:西班牙最大威胁','西班牙高位压迫 vs 沙特门将出球:制造失误机会','道萨里反击 vs 西班牙后卫线:沙特唯一机会窗'],
+   'oh':90,'oa':9,'osrc':'去水位','otag':'西班牙大热','val':'西班牙让球受 / 大球≥3',
+   'note':'西班牙R1失误已过,对手强度断崖式下降。27射门体系下沙特难守,大球价值更高于让球。'}},
+ {'slug':'belgium_iran','home':'Belgium','away':'Iran','cn_h':'比利时','cn_a':'伊朗',
+  'ko':ko(2026,6,21,19),'tier':'②中热门 · 伊朗不容小觑','my':{'home':0.67,'draw':0.211,'away':0.119},
+  'st':{'h2h':'历史交锋稀少,实力差距较大。伊朗R1 2-2平新西兰,展示了一定反击能力。',
+   'fh':'3-4-3(德布劳内/卢卡库)','fa':'4-5-1(低位防守反击)',
+   'xh':'德布劳内核心传导,卢卡库禁区支点。R1 1-1平埃及未完全发挥实力,本场有望爆发。',
+   'xa':'伊朗防守纪律严明,配合快速反击。R1逼平新西兰是本届最大惊喜之一。',
+   'mu':['卢卡库空中球 vs 伊朗中卫:比利时最直接手段','德布劳内长传渗透 vs 伊朗防线:技术质量差','伊朗反击 vs 比利时右路空当:客队主要威胁'],
+   'oh':67,'oa':21,'osrc':'去水位','otag':'比利时中热','val':'比利时胜 / 大球≥2',
+   'note':'比利时R1表现不稳,但整体实力仍明显占优。伊朗防守强韧,比分不会大比分。推荐比利时小胜或1球优势。'}},
+ {'slug':'uruguay_capeverde','home':'Uruguay','away':'Cape Verde Islands','cn_h':'乌拉圭','cn_a':'佛得角',
+  'ko':ko(2026,6,21,22),'tier':'②中热门 · 乌拉圭物理流破密集','my':{'home':0.658,'draw':0.231,'away':0.111},
+  'st':{'h2h':'无历史交锋。乌拉圭R1 27射门轰沙特却只1-1,佛得角0-0逼平西班牙。',
+   'fh':'4-4-2(努涅斯/巴伦西亚)','fa':'4-5-1(低位密集防守)',
+   'xh':'乌拉圭物理对抗极强,努涅斯速度+巴伦西亚强壮,但转化率极低是软肋(R1 27射门2绝佳机会)。',
+   'xa':'佛得角防守组织出色,R1成功克制西班牙整场控球。反击依赖个人能力而非体系。',
+   'mu':['乌拉圭高空球 vs 佛得角矮小后卫:定位球优势','努涅斯速度冲击 vs 佛得角防线深度:最大变数','佛得角反击 vs 乌拉圭前压后空:客队机会点'],
+   'oh':66,'oa':23,'osrc':'去水位','otag':'乌拉圭中热','val':'乌拉圭胜 / 小球≤2',
+   'note':'乌拉圭进攻量大但效率极低,佛得角防守体系针对性强。预计乌拉圭1-0或2-0,小球反而更合理。'}},
+ {'slug':'newzealand_egypt','home':'New Zealand','away':'Egypt','cn_h':'新西兰','cn_a':'埃及',
+  'ko':ko(2026,6,22,1),'tier':'①临界② · 萨拉赫主宰','my':{'home':0.165,'draw':0.231,'away':0.604},
+  'st':{'h2h':'历史无重要交锋。新西兰R1 2-2平伊朗意外,埃及R1 1-1平比利时防守出色。',
+   'fh':'4-5-1(防守反击)','fa':'4-2-3-1(萨拉赫/马尔穆什)',
+   'xh':'新西兰以拼劲闻名,R1逼平伊朗展示顽强,但进攻端质量有限。',
+   'xa':'萨拉赫R1状态正常,马尔穆什速度+射门是补充火力。埃及防守纪律良好。',
+   'mu':['萨拉赫内切左脚 vs 新西兰右路:埃及最大杀手锏','马尔穆什速度反击 vs 新西兰防线:第二威胁','新西兰定位球 vs 埃及高中卫:客队唯一机会'],
+   'oh':17,'oa':60,'osrc':'去水位','otag':'埃及中热','val':'埃及胜 / 萨拉赫射手',
+   'note':'萨拉赫在这届世界杯已证明仍是顶级威胁。新西兰实力差距较大,推荐埃及胜。'}},
+ {'slug':'argentina_austria','home':'Argentina','away':'Austria','cn_h':'阿根廷','cn_a':'奥地利',
+  'ko':ko(2026,6,22,17),'tier':'②中热门 · 奥地利暗黑马','my':{'home':0.611,'draw':0.237,'away':0.152},
+  'st':{'h2h':'历史交锋不多,阿根廷略占优。两队R1均取胜:阿根廷3-0、奥地利3-1,状态都好。',
+   'fh':'4-3-3(梅西/劳塔罗/迪马利亚)','fa':'4-3-3(萨比策/莱默/格雷利奇)',
+   'xh':'梅西创造+劳塔罗终结,R1 3-0顺利。中场控球和节奏是核心。',
+   'xa':'奥地利R1 3-1胜约旦展示高效率(36.4%),莱默+萨比策高强度跑动是特色。',
+   'mu':['梅西传球创造 vs 奥地利中场覆盖:进攻端核心对决','劳塔罗 vs 奥地利中卫高空球:禁区内对决','奥地利高位逼抢 vs 阿根廷后卫出球:关键变数'],
+   'oh':61,'oa':24,'osrc':'去水位','otag':'阿根廷中热','val':'阿根廷胜 / 双方均入球',
+   'note':'奥地利实力被低估,R1展示高效进攻。阿根廷不会轻松赢,但整体质量更高。推荐阿根廷1-2球小胜,双方均入球。'}},
+ {'slug':'france_iraq','home':'France','away':'Iraq','cn_h':'法国','cn_a':'伊拉克',
+  'ko':ko(2026,6,22,21),'tier':'①悬殊 · 法国轰炸机开炮','my':{'home':0.877,'draw':0.086,'away':0.036},
+  'st':{'h2h':'无重要历史交锋。法国R1 3-1胜塞内加尔,姆巴佩状态出色。伊拉克R1 1-4大负挪威,防线崩盘。',
+   'fh':'4-3-3(姆巴佩/格列兹曼/科曼)','fa':'4-4-2(被动防守)',
+   'xh':'姆巴佩状态最佳,法国R1 4绝佳机会体现高质量进攻。格列兹曼跑位+科曼速度形成三叉戟。',
+   'xa':'伊拉克R1防线完全崩溃,中卫对抗速度型边锋极不适应。',
+   'mu':['姆巴佩直线冲刺 vs 伊拉克右路:速度摧毁','格列兹曼小区域技术 vs 伊拉克中场:创造混乱','伊拉克定位球 vs 法国空防:唯一机会点'],
+   'oh':88,'oa':9,'osrc':'去水位','otag':'法国超大热','val':'法国大球≥3 / 法国让球受',
+   'note':'伊拉克防线R1已暴露致命弱点,面对速度更快的法国进攻三叉戟将更难守。大球≥3价值突出。'}},
+ {'slug':'norway_senegal','home':'Norway','away':'Senegal','cn_h':'挪威','cn_a':'塞内加尔',
+  'ko':ko(2026,6,23,0),'tier':'③势均 · 哈兰德对决Jackson','my':{'home':0.432,'draw':0.271,'away':0.297},
+  'st':{'h2h':'近年无直接交锋。挪威R1 4-1大胜伊拉克(哈兰德梅开二度),塞内加尔R1 1-3负法国。',
+   'fh':'4-3-3(哈兰德/厄德高/萨尔洛特)','fa':'4-3-3(Jackson/盖伊/萨内)',
+   'xh':'哈兰德R1爆发,本届状态极佳。厄德高传球视野一流,挪威R1 5绝佳机会展示极高效率(41.7%)。',
+   'xa':'塞内加尔身体素质出色,Jackson+萨内速度反击。R1在法国面前失力,但防守结构尚可。',
+   'mu':['哈兰德禁区终结 vs 塞内加尔中卫:本场核心对决','厄德高直塞渗透 vs 塞内加尔防线:决定性传球','Jackson速度反击 vs 挪威高位防线:客队最大威胁'],
+   'oh':43,'oa':30,'osrc':'去水位','otag':'势均','val':'挪威胜 / 大球≥2',
+   'note':'挪威哈兰德状态最佳且技术面效率极高。塞内加尔有爆冷能力但质量差距存在。推荐挪威胜,大球概率高。'}},
+ {'slug':'jordan_algeria','home':'Jordan','away':'Algeria','cn_h':'约旦','cn_a':'阿尔及利亚',
+  'ko':ko(2026,6,23,3),'tier':'①临界② · 马赫雷斯最后机会','my':{'home':0.165,'draw':0.225,'away':0.61},
+  'st':{'h2h':'历史无重要交锋。约旦R1 1-3负奥地利,阿尔及利亚R1 0-3负阿根廷,两队均首轮落败。',
+   'fh':'4-4-2(Al-Naimat守中)','fa':'4-3-3(马赫雷斯/Amoura速度)',
+   'xh':'约旦R1表现中规中矩,但面对阿根廷级别进攻,缺乏质量差距。',
+   'xa':'马赫雷斯R1随队大败,仍是进攻核心。Amoura速度爆发型是补充,背水一战状态可能激发。',
+   'mu':['马赫雷斯技术过人 vs 约旦右路:最大威胁','Amoura速度冲击 vs 约旦防线:反击尖刀','约旦定位球 vs 阿尔及利亚空防:唯一机会'],
+   'oh':17,'oa':61,'osrc':'去水位','otag':'阿尔及利亚热门','val':'阿尔及利亚胜 / 马赫雷斯进球',
+   'note':'两队均一轮已负,背水一战。阿尔及利亚攻击线质量更高,马赫雷斯赛季状态稳定。推荐阿尔及利亚胜。'}},
+ {'slug':'portugal_uzbekistan','home':'Portugal','away':'Uzbekistan','cn_h':'葡萄牙','cn_a':'乌兹别克',
+  'ko':ko(2026,6,23,17),'tier':'①临界② · 葡萄牙必须复仇','my':{'home':0.791,'draw':0.136,'away':0.073},
+  'st':{'h2h':'首次世界杯交锋。葡萄牙R1意外1-1平刚果(金),乌兹别克R1 1-3负哥伦比亚。',
+   'fh':'4-3-3(B费/莱昂/C罗)','fa':'4-4-2(防守反击)',
+   'xh':'B费传球+莱昂速度是核心,葡萄牙R1表现大失所望。本场背水一战必须全力出击。',
+   'xa':'乌兹别克R1展示了一定防守组织,但进攻端质量与葡萄牙差距悬殊。',
+   'mu':['莱昂左路速度突破 vs 乌兹别克右路:最直接威胁','B费传球创造 vs 乌兹别克中场:组织核心','乌兹别克反击 vs 葡萄牙前压:客队唯一机会'],
+   'oh':79,'oa':14,'osrc':'去水位','otag':'葡萄牙热门','val':'葡萄牙大球≥3 / 葡萄牙让球受',
+   'note':'葡萄牙R1失误严重,本场必须大胜保证出线。对手实力差距大,预计发挥出真实水平,推荐大球且葡萄牙受让。'}},
+ {'slug':'england_ghana','home':'England','away':'Ghana','cn_h':'英格兰','cn_a':'加纳',
+  'ko':ko(2026,6,23,20),'tier':'①临界② · 英格兰全面碾压','my':{'home':0.791,'draw':0.136,'away':0.073},
+  'st':{'h2h':'两队同组交锋。英格兰R1 4-2大胜克罗地亚(22射门7绝佳机会),加纳R1 1-0小胜巴拿马。',
+   'fh':'4-3-3(贝林厄姆/凯恩/萨卡)','fa':'4-4-2(Kudus反击)',
+   'xh':'英格兰R1展示了本届最强进攻表现,贝林厄姆+凯恩+萨卡三叉戟效率极高(31.8%)。',
+   'xa':'加纳Kudus是高质量边锋,可能制造单个威胁。但整体深度和体系与英格兰差距明显。',
+   'mu':['凯恩禁区终结 vs 加纳中卫:最直接火力','萨卡右路内切 vs 加纳左路:最可能撕裂点','Kudus技术过人 vs 英格兰右路:加纳最大反击威胁'],
+   'oh':79,'oa':14,'osrc':'去水位','otag':'英格兰热门','val':'英格兰大球≥3 / 英格兰让球受',
+   'note':'英格兰R1展示了本届最高效进攻,7绝佳机会说明体系极成熟。加纳质量差距大,推荐大球和英格兰受让。'}},
+ {'slug':'panama_croatia','home':'Panama','away':'Croatia','cn_h':'巴拿马','cn_a':'克罗地亚',
+  'ko':ko(2026,6,23,23),'tier':'①临界② · 克罗地亚技术反弹','my':{'home':0.145,'draw':0.236,'away':0.618},
+  'st':{'h2h':'历史无重要交锋。巴拿马R1 0-1负加纳,克罗地亚R1 2-4负英格兰,两队均首轮败北。',
+   'fh':'4-5-1(低位防守)','fa':'4-3-3(莫德里奇/格瓦迪奥尔/科瓦契奇)',
+   'xh':'巴拿马防守纪律强,反击依赖单兵。R1进攻效率18.2%尚可,但面对克罗地亚质量差距大。',
+   'xa':'克罗地亚R1面对英格兰大败,但是硬仗。对阵弱队有望恢复技术统治。莫德里奇组织+格瓦迪奥尔防守。',
+   'mu':['莫德里奇传球节奏 vs 巴拿马中场:技术碾压','格瓦迪奥尔前插 vs 巴拿马右路:出人意料的攻击手','巴拿马定位球 vs 克罗地亚后排:唯一死球机会'],
+   'oh':15,'oa':62,'osrc':'去水位','otag':'克罗地亚热门','val':'克罗地亚胜 / 克罗地亚受让',
+   'note':'克罗地亚R1大败是实力强对手造成,本场对阵弱队有望正常发挥。莫德里奇末年仍在状态,推荐克罗地亚胜。'}},
+ {'slug':'colombia_congodr','home':'Colombia','away':'Congo DR','cn_h':'哥伦比亚','cn_a':'刚果(金)',
+  'ko':ko(2026,6,24,2),'tier':'②中热门 · 路易斯迪亚斯爆发','my':{'home':0.639,'draw':0.225,'away':0.135},
+  'st':{'h2h':'无历史交锋。哥伦比亚R1 3-1大胜乌兹别克(4绝佳机会效率高),刚果(金)R1 1-1逼平葡萄牙爆冷。',
+   'fh':'4-2-3-1(路易斯迪亚斯/科塔斯/詹姆斯)','fa':'4-4-2(西拉斯反击)',
+   'xh':'路易斯迪亚斯是本届最危险边锋之一,R1状态爆发。哥伦比亚整体进攻效率26.7%。',
+   'xa':'刚果(金)R1最大惊喜:1-1逼平葡萄牙,西拉斯+马苏阿库充满爆发力。',
+   'mu':['路易斯迪亚斯左路突破 vs 刚果(金)右路:本场最危险点','科塔斯中场穿插 vs 刚果(金)防线:组织核心','西拉斯速度反击 vs 哥伦比亚后卫线:客队最大威胁'],
+   'oh':64,'oa':23,'osrc':'去水位','otag':'哥伦比亚中热','val':'哥伦比亚胜 / 大球≥2',
+   'note':'哥伦比亚R1展示了高质量进攻体系,路易斯迪亚斯状态最佳。刚果(金)爆冷能力值得注意,但哥伦比亚实力更强。推荐哥伦比亚胜大球。'}},
 ]
 COL = {'home':'#CCFF00', 'draw':'#8e9379', 'away':'#FF0055'}  # 移盘曲线用色
 
@@ -276,14 +385,14 @@ TEAM_STATS = {
     '巴拿马':    {'shots':11,'shots_box': 6,'big':2,'eff':18.2,'atk':23.5,'def_exp':21.0,'poss':62,'vs':'加纳','round':'R1'},
     '乌兹别克':  {'shots': 8,'shots_box': 4,'big':1,'eff':12.5,'atk':15.0,'def_exp':39.5,'poss':39,'vs':'哥伦比亚','round':'R1'},
     '哥伦比亚':  {'shots':15,'shots_box':10,'big':4,'eff':26.7,'atk':39.5,'def_exp':15.0,'poss':61,'vs':'乌兹别克','round':'R1'},
-    '荷兰':      {'shots':10,'shots_box':10,'big':0,'eff': 0.0,'atk':25.0,'def_exp':17.0,'poss':60,'vs':'日本','round':'R1'},
+    '荷兰':      {'shots':10,'shots_box': 6,'big':0,'eff': 0.0,'atk':17.0,'def_exp':22.0,'poss':51,'vs':'瑞典','round':'R2'},
     '日本':      {'shots':10,'shots_box': 6,'big':0,'eff': 0.0,'atk':17.0,'def_exp':25.0,'poss':40,'vs':'荷兰','round':'R1'},
-    '瑞典':      {'shots':13,'shots_box': 9,'big':4,'eff':30.8,'atk':36.5,'def_exp': 7.0,'poss':49,'vs':'突尼斯','round':'R1'},
+    '瑞典':      {'shots':16,'shots_box': 7,'big':0,'eff': 0.0,'atk':22.0,'def_exp':17.0,'poss':49,'vs':'荷兰','round':'R2'},
     '突尼斯':    {'shots': 6,'shots_box': 2,'big':0,'eff': 0.0,'atk': 7.0,'def_exp':36.5,'poss':51,'vs':'瑞典','round':'R1'},
-    '德国':      {'shots':26,'shots_box':21,'big':6,'eff':23.1,'atk':73.0,'def_exp':12.0,'poss':65,'vs':'库拉索','round':'R1'},
-    '库拉索':    {'shots': 8,'shots_box': 4,'big':0,'eff': 0.0,'atk':12.0,'def_exp':73.0,'poss':35,'vs':'德国','round':'R1'},
-    '科特迪瓦':  {'shots':15,'shots_box': 8,'big':2,'eff':13.3,'atk':29.5,'def_exp':19.0,'poss':48,'vs':'厄瓜多尔','round':'R1'},
-    '厄瓜多尔':  {'shots':12,'shots_box': 5,'big':1,'eff': 8.3,'atk':19.0,'def_exp':29.5,'poss':52,'vs':'科特迪瓦','round':'R1'},
+    '德国':      {'shots':16,'shots_box': 9,'big':0,'eff': 0.0,'atk':26.0,'def_exp':16.5,'poss':59,'vs':'科特迪瓦','round':'R2'},
+    '库拉索':    {'shots':10,'shots_box': 4,'big':0,'eff': 0.0,'atk':13.0,'def_exp':58.0,'poss':25,'vs':'厄瓜多尔','round':'R2'},
+    '科特迪瓦':  {'shots': 9,'shots_box': 6,'big':0,'eff': 0.0,'atk':16.5,'def_exp':26.0,'poss':41,'vs':'德国','round':'R2'},
+    '厄瓜多尔':  {'shots':28,'shots_box':22,'big':0,'eff': 0.0,'atk':58.0,'def_exp':13.0,'poss':75,'vs':'库拉索','round':'R2'},
     # R2 数据（使用最新一场）
     '美国':      {'shots':10,'shots_box': 8,'big':2,'eff':20.0,'atk':27.0,'def_exp': 8.5,'poss':62,'vs':'澳大利亚','round':'R2'},
     '澳大利亚':  {'shots': 5,'shots_box': 3,'big':0,'eff': 0.0,'atk': 8.5,'def_exp':27.0,'poss':38,'vs':'美国','round':'R2'},
@@ -490,7 +599,11 @@ AFID = {'belgium_egypt':1489377, 'saudi_uruguay':1489379, 'france_senegal':14893
         'england_croatia':1489384, 'ghana_panama':1489385, 'uzbekistan_colombia':1489386,
         'usa_australia':1489391, 'scotland_morocco':1489390, 'brazil_haiti':1489389,
         'turkey_paraguay':1539006, 'netherlands_sweden':1539007, 'germany_ivorycoast':1489393,
-        'ecuador_curacao':1489392, 'tunisia_japan':1489394}
+        'ecuador_curacao':1489392, 'tunisia_japan':1489394,
+        'spain_saudi':1489397, 'belgium_iran':1489395, 'uruguay_capeverde':1489398,
+        'newzealand_egypt':1489396, 'argentina_austria':1489399, 'france_iraq':1539017,
+        'norway_senegal':1489401, 'jordan_algeria':1489400, 'portugal_uzbekistan':1489404,
+        'england_ghana':1489402, 'panama_croatia':1489403, 'colombia_congodr':1539008}
 # API-Football team id(供"最近5场"调用;FIFA排名/身价静态表已弃用,数据不准)
 TID = {'Belgium':1, 'Egypt':32, 'Saudi Arabia':23, 'Uruguay':7, 'France':2, 'Senegal':13,
        'Argentina':26, 'Algeria':1532, 'Spain':9, 'Cape Verde Islands':1533,
@@ -500,7 +613,8 @@ TID = {'Belgium':1, 'Egypt':32, 'Saudi Arabia':23, 'Uruguay':7, 'France':2, 'Sen
        'USA':2384, 'Australia':20, 'Scotland':1108, 'Morocco':31,
        'Brazil':6, 'Haiti':2386, 'Türkiye':777, 'Paraguay':2380,
        'Netherlands':1118, 'Sweden':5, 'Germany':25, 'Ivory Coast':1501,
-       'Ecuador':2382, 'Curaçao':5530, 'Tunisia':28, 'Japan':12}
+       'Ecuador':2382, 'Curaçao':5530, 'Tunisia':28, 'Japan':12,
+       'Iran':29, 'Cape Verde Islands':1533, 'New Zealand':1531}
 # 全量球队表(API 英文名 → 中文名, 国旗 emoji);供未来比赛与过去赛果对账共用
 TEAM = {
  'Belgium':('比利时','🇧🇪'), 'Egypt':('埃及','🇪🇬'), 'Saudi Arabia':('沙特','🇸🇦'), 'Uruguay':('乌拉圭','🇺🇾'),
@@ -929,7 +1043,8 @@ a.fxbig:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.34)}
 .fxbig-tm{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sec)}
 .fxbig-tm .material-symbols-outlined{font-size:14px;opacity:.7}
 .fxbig-tag{font-size:11px;font-weight:700;color:var(--lime);background:rgba(204,255,0,.1);border:1px solid rgba(204,255,0,.3);border-radius:5px;padding:2px 8px}
-.fxbig-vs{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:16px}
+.fxbig-vs{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:8px}
+.fxbig-prob{display:flex;justify-content:space-between;padding:0 4px 10px;font-size:12px;font-family:'JetBrains Mono',monospace}
 .fxbig-team{flex:1;font-size:18px;font-weight:700;color:var(--on);text-align:center;letter-spacing:-.01em}
 .fxbig-mid{flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--sec);opacity:.5}
 .fxbig-ph{display:flex;align-items:center;justify-content:center;gap:7px;height:40px;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.13);border-radius:8px;font-size:12px;color:var(--sec);opacity:.65}
@@ -2843,8 +2958,24 @@ def line_row(f, pmap, cur_fid, prob_map):
     when = f'{tm} 北京 · 进行中' if live else f'{tm} 北京 · 距开赛 {hrs:.0f}h'
     slug = FID2SLUG.get(int(fid))
     tag = ''
+    # 胜率条：去水位概率摘要
+    prob_bar = ''
+    dv = prob_map.get(int(fid)) if prob_map else None
+    if dv and slug and not live:
+        hp = round(dv.get('home', 0) * 100)
+        dp = round(dv.get('draw', 0) * 100)
+        ap = round(dv.get('away', 0) * 100)
+        hcol = 'var(--lime)' if hp >= ap else 'var(--sec)'
+        acol = 'var(--lime)' if ap > hp else 'var(--sec)'
+        cn_h_short = cn_of(h); cn_a_short = cn_of(a)
+        prob_bar = (f'<div class="fxbig-prob">'
+                    f'<span style="color:{hcol};font-weight:700">{cn_h_short} {hp}%</span>'
+                    f'<span style="color:var(--sec);opacity:.55">平 {dp}%</span>'
+                    f'<span style="color:{acol};font-weight:700">{cn_a_short} {ap}%</span>'
+                    f'</div>')
     inner = (f'<div class="fxbig-top"><span class="fxbig-tm"><span class="material-symbols-outlined">schedule</span>{when}</span>{tag}</div>'
-             f'<div class="fxbig-vs"><span class="fxbig-team">{th}</span><span class="fxbig-mid">VS</span><span class="fxbig-team">{ta}</span></div>')
+             f'<div class="fxbig-vs"><span class="fxbig-team">{th}</span><span class="fxbig-mid">VS</span><span class="fxbig-team">{ta}</span></div>'
+             + prob_bar)
     if slug: return f'<a class="fxbig star{cc}"{ida} href="{slug}.html">{inner}</a>'
     return f'<div class="fxbig{cc}"{ida}>{inner}</div>'
 
@@ -3106,6 +3237,13 @@ def build_index(items):
             _d = _cfg['ko'].astimezone(BJ).date()
             items_by_day[_d].append((_cfg, _rows, _rich))
 
+    # 构建 fid→devig 映射，供列表卡片显示胜率
+    pred_map = {}
+    for _cfg, _rows, _rich in items:
+        _fid = AFID.get(_cfg['slug'])
+        if _fid and _rows:
+            pred_map[_fid] = _rows[-1]['devig']
+
     tl = ''; cur_round = None; cur_day = None
     for f in fx:
         rd = f['league']['round']; rid, rname = RMAP.get(rd, ('rx', rd))
@@ -3121,7 +3259,7 @@ def build_index(items):
             tl += day_parlay
             tl += f'<div class="tl-day">{day}</div>'
             cur_day = day
-        tl += line_row(f, pmap, cur_fid, {})
+        tl += line_row(f, pmap, cur_fid, pred_map)
     filt = '<div class="filt"><a href="#r1">第 1 轮</a><a href="#r2">第 2 轮</a><a href="#r3">第 3 轮</a></div>'
     back_home = ('<a href="index.html" class="back">'
                  '<span class="material-symbols-outlined">arrow_back</span>首页</a>')
